@@ -1,0 +1,163 @@
+import Link from 'next/link'
+
+const services = [
+  { href: '/services/ceramic-coating', label: 'Ceramic Coating' },
+  { href: '/services/clay-bar-treatment', label: 'Clay Bar Treatment' },
+  { href: '/services/exterior-detailing', label: 'Exterior Detailing' },
+  { href: '/services/headlight-restoration', label: 'Headlight Restoration' },
+  { href: '/services/interior-detailing', label: 'Interior Detailing' },
+  { href: '/services/mobile-car-detailing', label: 'Mobile Car Detailing' },
+  { href: '/services/paint-correction', label: 'Paint Correction' },
+  { href: '/services/pet-hair-removal', label: 'Pet Hair Removal' },
+]
+
+const areas = [
+  { href: '/service-areas/miami-dade', label: 'Miami-Dade County' },
+  { href: '/service-areas/broward', label: 'Broward County' },
+  { href: '/service-areas/palm-beach', label: 'Palm Beach County' },
+]
+
+export default function Footer() {
+  const year = new Date().getFullYear()
+
+  return (
+    <footer className="bg-slate-900 text-slate-400">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          {/* Brand */}
+          <div className="lg:col-span-1">
+            <Link href="/" className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
+                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M5 3l14 0M5 3c-1.1 0-2 .9-2 2v3M5 3l0 5M19 3c1.1 0 2 .9 2 2v3M19 3l0 5M3 8h18M3 8c0 5.5 2.5 9.5 9 11.5M21 8c0 5.5-2.5 9.5-9 11.5" />
+                </svg>
+              </div>
+              <span className="text-lg font-bold text-white tracking-tight">
+                Teal<span className="text-teal-400">.</span>
+              </span>
+            </Link>
+            <p className="text-sm leading-relaxed text-slate-400 mb-5">
+              South Florida&apos;s premium mobile car detailing service. We come to your home or
+              office — no hassle, just results.
+            </p>
+            {/* Phone — prominent & clickable */}
+            <a
+              href="tel:+16452488292"
+              className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-teal-500/10 border border-teal-500/30 hover:bg-teal-500/20 transition-colors group"
+            >
+              <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+              </svg>
+              <div>
+                <p className="text-[10px] text-slate-500 leading-none mb-0.5">Call or text</p>
+                <p className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
+                  (645) 248-8292
+                </p>
+              </div>
+            </a>
+            <p className="text-sm mt-3">
+              <a href="mailto:hello@tealdetailing.com" className="hover:text-teal-400 transition-colors">
+                hello@tealdetailing.com
+              </a>
+            </p>
+          </div>
+
+          {/* Services */}
+          <div>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Services
+            </h4>
+            <ul className="space-y-2">
+              {services.map(({ href, label }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-sm hover:text-teal-400 transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Service Areas + Company */}
+          <div>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Service Areas
+            </h4>
+            <ul className="space-y-2">
+              {areas.map(({ href, label }) => (
+                <li key={label}>
+                  <Link
+                    href={href}
+                    className="text-sm hover:text-teal-400 transition-colors"
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mt-8 mb-4">
+              Company
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/about" className="text-sm hover:text-teal-400 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/gallery" className="text-sm hover:text-teal-400 transition-colors">
+                  Our Work
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-sm hover:text-teal-400 transition-colors">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact / Hours */}
+          <div>
+            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+              Hours
+            </h4>
+            <ul className="space-y-2 text-sm">
+              <li className="flex justify-between">
+                <span>Every Day</span>
+                <span className="text-white font-medium">8 AM – 10 PM</span>
+              </li>
+            </ul>
+            <Link
+              href="/contact"
+              className="mt-5 inline-flex items-center justify-center w-full py-2.5 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
+            >
+              Book Now
+            </Link>
+          </div>
+        </div>
+
+        <div className="mt-12 pt-6 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+          <p>© {year} Teal Detailing LLC. All rights reserved. South Florida, FL.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/about" className="hover:text-slate-300 transition-colors">
+              About
+            </Link>
+            <Link href="/gallery" className="hover:text-slate-300 transition-colors">
+              Our Work
+            </Link>
+            <Link href="/contact" className="hover:text-slate-300 transition-colors">
+              Contact
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
+}
