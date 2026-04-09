@@ -113,7 +113,7 @@ export default function MiamiDadeServicePage({ params }: { params: { service: st
               No hidden fees. Every package includes our satisfaction guarantee.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-end gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-start gap-6">
             {pricingPlans.map((plan) => (
               <div key={plan.name} className="flex-1">
                 <PricingCard {...plan} />

@@ -18,10 +18,7 @@ export default function PricingCard({
 
   if (tier === 'economy') {
     return (
-      <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0] w-[84%] mx-auto sm:w-full"
-        style={{ minHeight: 'clamp(300px, 30vw, 380px)' }}
-      >
+      <article className="flex flex-col rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0]">
         <div className="px-6 py-5 bg-[#d8d8d8]">
           <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">Economy</span>
           <div className="mt-2">
@@ -54,8 +51,8 @@ export default function PricingCard({
   if (tier === 'silver') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30 w-[92%] mx-auto sm:w-full"
-        style={{ minHeight: 'clamp(340px, 37vw, 460px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30"
+        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
       >
         <div className="h-1 w-full bg-gradient-to-r from-[#8d9caa] via-[#b0b8c1] to-[#8d9caa]" />
         <div className="px-6 py-5">
@@ -94,8 +91,8 @@ export default function PricingCard({
   if (tier === 'gold') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative w-full"
-        style={{ minHeight: 'clamp(380px, 44vw, 540px)', boxShadow: '0 8px 40px rgba(201,168,76,0.25)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative"
+        style={{ boxShadow: '0 8px 40px rgba(201,168,76,0.25)' }}
       >
         <div className="absolute top-4 right-4 z-10">
           <span
