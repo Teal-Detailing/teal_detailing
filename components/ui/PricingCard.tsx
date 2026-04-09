@@ -6,8 +6,6 @@ interface PricingCardProps {
   subtitle: string
   features: string[]
   tier?: 'economy' | 'silver' | 'gold'
-  isPopular?: boolean
-  accentColor?: 'teal' | 'slate'
 }
 
 export default function PricingCard({
@@ -20,7 +18,10 @@ export default function PricingCard({
 
   if (tier === 'economy') {
     return (
-      <article className="rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0]">
+      <article
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0] w-[84%] mx-auto sm:w-full"
+        style={{ minHeight: 'clamp(300px, 30vw, 380px)' }}
+      >
         <div className="px-6 py-5 bg-[#d8d8d8]">
           <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">Economy</span>
           <div className="mt-2">
@@ -28,8 +29,8 @@ export default function PricingCard({
           </div>
           <p className="text-xs mt-1 text-slate-500">{subtitle}</p>
         </div>
-        <div className="px-6 py-5">
-          <ul className="space-y-2">
+        <div className="px-6 py-5 flex flex-col flex-1">
+          <ul className="space-y-2 flex-1">
             {features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-xs text-slate-600">
                 <svg className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,10 +54,9 @@ export default function PricingCard({
   if (tier === 'silver') {
     return (
       <article
-        className="rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30"
-        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30 w-[92%] mx-auto sm:w-full"
+        style={{ minHeight: 'clamp(340px, 37vw, 460px)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
       >
-        {/* Silver accent bar */}
         <div className="h-1 w-full bg-gradient-to-r from-[#8d9caa] via-[#b0b8c1] to-[#8d9caa]" />
         <div className="px-6 py-5">
           <div className="flex items-center justify-between mb-2">
@@ -68,8 +68,8 @@ export default function PricingCard({
           </div>
           <p className="text-xs mt-1 text-slate-400">{subtitle}</p>
         </div>
-        <div className="px-6 pb-6">
-          <ul className="space-y-2">
+        <div className="px-6 pb-6 flex flex-col flex-1">
+          <ul className="space-y-2 flex-1">
             {features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-xs text-slate-300">
                 <svg className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#b0b8c1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,10 +94,9 @@ export default function PricingCard({
   if (tier === 'gold') {
     return (
       <article
-        className="rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative"
-        style={{ boxShadow: '0 8px 40px rgba(201,168,76,0.25)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative w-full"
+        style={{ minHeight: 'clamp(380px, 44vw, 540px)', boxShadow: '0 8px 40px rgba(201,168,76,0.25)' }}
       >
-        {/* Best Value ribbon */}
         <div className="absolute top-4 right-4 z-10">
           <span
             className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-[#0f1117]"
@@ -106,7 +105,6 @@ export default function PricingCard({
             ★ Best Value
           </span>
         </div>
-        {/* Gold accent bar */}
         <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)' }} />
         <div className="px-6 py-5">
           <span className="text-xs font-semibold uppercase tracking-widest text-[#f0d080]">Gold</span>
@@ -115,8 +113,8 @@ export default function PricingCard({
           </div>
           <p className="text-xs mt-1 text-slate-400">{subtitle}</p>
         </div>
-        <div className="px-6 pb-6">
-          <ul className="space-y-2">
+        <div className="px-6 pb-6 flex flex-col flex-1">
+          <ul className="space-y-2 flex-1">
             {features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-xs text-slate-300">
                 <svg className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[#f0d080]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,7 +136,6 @@ export default function PricingCard({
     )
   }
 
-  // Fallback (legacy support without tier prop)
   return (
     <article className="relative flex flex-col rounded-2xl overflow-hidden shadow-card bg-white ring-1 ring-slate-200">
       <div className="bg-slate-900 px-6 py-5">

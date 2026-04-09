@@ -1,78 +1,10 @@
 import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
-
-const plans = [
-  {
-    tier: 'economy' as const,
-    name: 'Economy',
-    price: '$109',
-    subtitle: 'Essential care for everyday drivers',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-    ],
-  },
-  {
-    tier: 'silver' as const,
-    name: 'Silver',
-    price: '$179',
-    subtitle: 'Full detail — inside and out',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-      'Full interior deep clean',
-      'Seat & carpet hot-water extraction',
-      'Door panels & headliner detail',
-      'Leather/vinyl conditioning',
-      'Trunk full detail',
-      'Tire dressing & shine',
-      'Exterior spray wax',
-    ],
-  },
-  {
-    tier: 'gold' as const,
-    name: 'Gold',
-    price: '$279',
-    subtitle: 'Premium transformation & protection',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-      'Full interior deep clean',
-      'Seat & carpet hot-water extraction',
-      'Door panels & headliner detail',
-      'Leather/vinyl conditioning',
-      'Trunk full detail',
-      'Tire dressing & shine',
-      'Exterior spray wax',
-      'Clay bar paint decontamination',
-      'Machine polish & swirl removal',
-      'Hand wax & paint sealant',
-      'Deep leather conditioning & protection',
-      'Headlight restoration',
-      'Exterior plastic trim restoration',
-      'Premium branded gift included',
-    ],
-  },
-]
+import { pricingPlans } from '@/lib/plans'
 
 export default function PricingOverview() {
   return (
-    <section id="pricing" className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
+    <section id="packages" className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">
@@ -87,9 +19,11 @@ export default function PricingOverview() {
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-6 items-end">
-          {plans.map((plan) => (
-            <PricingCard key={plan.name} {...plan} />
+        <div className="flex flex-col sm:flex-row sm:items-end gap-6">
+          {pricingPlans.map((plan) => (
+            <div key={plan.name} className="flex-1">
+              <PricingCard {...plan} />
+            </div>
           ))}
         </div>
 

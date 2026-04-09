@@ -13,12 +13,13 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tealdetailing.com'),
   title: {
     default: 'Teal Detailing — Premium Mobile Car Detailing in South Florida',
     template: '%s | Teal Detailing',
   },
   description:
-    'South Florida\'s premier mobile car detailing service. We come to you — Miami-Dade, Broward & Palm Beach. Hand-wash, interior deep clean, ceramic coating & more.',
+    "South Florida's premier mobile car detailing service. We come to you — Miami-Dade, Broward & Palm Beach. Hand-wash, interior deep clean, ceramic coating & more.",
   keywords: [
     'mobile car detailing',
     'South Florida car detailing',
@@ -31,10 +32,27 @@ export const metadata: Metadata = {
     'mobile detailing',
     'Teal Detailing',
   ],
+  icons: {
+    icon: [
+      { url: '/images/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/icons/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/icons/logo-192.webp', sizes: '192x192', type: 'image/webp' },
+      { url: '/images/icons/logo-512.webp', sizes: '512x512', type: 'image/webp' },
+    ],
+    apple: '/images/icons/apple-touch-icon.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
     siteName: 'Teal Detailing',
+    images: [
+      {
+        url: '/images/icons/logo-1024.webp',
+        width: 1024,
+        height: 1024,
+        alt: 'Teal Detailing',
+      },
+    ],
   },
 }
 

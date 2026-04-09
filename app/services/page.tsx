@@ -3,11 +3,19 @@ import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
 import Reviews from '@/components/sections/Reviews'
 import BookingForm from '@/components/ui/BookingForm'
+import { pricingPlans } from '@/lib/plans'
 
 export const metadata: Metadata = {
   title: 'Car Detailing Services & Pricing',
   description:
     'Browse all Teal Detailing services: Economy ($109), Silver ($179), Gold ($279), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
+  openGraph: {
+    title: 'Car Detailing Services & Pricing | Teal Detailing',
+    description:
+      'Browse all Teal Detailing services: Economy ($109), Silver ($179), Gold ($279), ceramic coating, clay bar, paint correction and more.',
+    url: 'https://tealdetailing.com/services',
+    images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
+  },
 }
 
 const serviceCards = [
@@ -27,7 +35,7 @@ const serviceCards = [
     slug: 'exterior-detailing',
     icon: 'M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z',
     title: 'Exterior Detailing',
-    desc: 'Hand wash, clay bar, polish, and wax to restore your car\'s finish and protect it from South Florida\'s elements.',
+    desc: "Hand wash, clay bar, polish, and wax to restore your car's finish and protect it from South Florida's elements.",
   },
   {
     slug: 'headlight-restoration',
@@ -61,79 +69,9 @@ const serviceCards = [
   },
 ]
 
-const pricingPlans = [
-  {
-    tier: 'economy' as const,
-    name: 'Economy',
-    price: '$109',
-    subtitle: 'Essential care for everyday drivers',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-    ],
-  },
-  {
-    tier: 'silver' as const,
-    name: 'Silver',
-    price: '$179',
-    subtitle: 'Full detail — inside and out',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-      'Full interior deep clean',
-      'Seat & carpet hot-water extraction',
-      'Door panels & headliner detail',
-      'Leather/vinyl conditioning',
-      'Trunk full detail',
-      'Tire dressing & shine',
-      'Exterior spray wax',
-    ],
-  },
-  {
-    tier: 'gold' as const,
-    name: 'Gold',
-    price: '$279',
-    subtitle: 'Premium transformation & protection',
-    features: [
-      'Exterior hand wash & rinse',
-      'Window cleaning (interior & exterior)',
-      'Tire & rim scrub',
-      'Interior vacuum (seats, carpets, trunk)',
-      'Dashboard & console wipe-down',
-      'Door jambs & sill cleaning',
-      'Air freshener',
-      'Full interior deep clean',
-      'Seat & carpet hot-water extraction',
-      'Door panels & headliner detail',
-      'Leather/vinyl conditioning',
-      'Trunk full detail',
-      'Tire dressing & shine',
-      'Exterior spray wax',
-      'Clay bar paint decontamination',
-      'Machine polish & swirl removal',
-      'Hand wax & paint sealant',
-      'Deep leather conditioning & protection',
-      'Headlight restoration',
-      'Exterior plastic trim restoration',
-      'Premium branded gift included',
-    ],
-  },
-]
-
 export default function ServicesPage() {
   return (
     <>
-      {/* Hero banner */}
       <section className="bg-hero-gradient pt-32 pb-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-4">
@@ -149,13 +87,12 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Service cards */}
       <section className="py-16 bg-slate-50" aria-labelledby="services-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 id="services-heading" className="text-2xl font-bold text-slate-900 mb-8 text-center">
             What We Do
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {serviceCards.map((s) => (
               <article key={s.slug} className="bg-white rounded-2xl p-5 shadow-card hover:shadow-card-hover transition-shadow border border-slate-100 flex flex-col gap-3">
                 <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center">
@@ -182,7 +119,6 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Pricing tiers */}
       <section className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -193,18 +129,18 @@ export default function ServicesPage() {
               No hidden fees. Every package includes our satisfaction guarantee.
             </p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-6 items-end">
+          <div className="flex flex-col sm:flex-row sm:items-end gap-6">
             {pricingPlans.map((plan) => (
-              <PricingCard key={plan.name} {...plan} />
+              <div key={plan.name} className="flex-1">
+                <PricingCard {...plan} />
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Reviews */}
       <Reviews />
 
-      {/* Booking form CTA */}
       <section className="py-20 bg-white" aria-labelledby="book-services-heading">
         <div className="max-w-lg mx-auto px-4 sm:px-6 lg:px-8">
           <h2 id="book-services-heading" className="text-2xl font-bold text-center text-slate-900 mb-8">
@@ -216,15 +152,14 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Area links */}
       <section className="py-12 bg-slate-900 text-center">
         <div className="max-w-3xl mx-auto px-4">
           <p className="text-slate-300 text-sm mb-4">We serve all of South Florida</p>
           <div className="flex flex-wrap justify-center gap-3">
             {[
-              { href: '/service-areas/miami-dade', label: 'Miami-Dade' },
-              { href: '/service-areas/broward', label: 'Broward' },
-              { href: '/service-areas/palm-beach', label: 'Palm Beach' },
+              { href: '/miami-dade', label: 'Miami-Dade' },
+              { href: '/broward', label: 'Broward' },
+              { href: '/palm-beach', label: 'Palm Beach' },
             ].map(({ href, label }) => (
               <Link
                 key={href}

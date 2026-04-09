@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const navLinks = [
@@ -13,9 +14,9 @@ const navLinks = [
 ]
 
 const serviceAreas = [
-  { href: '/service-areas/miami-dade', label: 'Miami-Dade' },
-  { href: '/service-areas/broward', label: 'Broward' },
-  { href: '/service-areas/palm-beach', label: 'Palm Beach' },
+  { href: '/miami-dade', label: 'Miami-Dade' },
+  { href: '/broward', label: 'Broward' },
+  { href: '/palm-beach', label: 'Palm Beach' },
 ]
 
 export default function Navbar() {
@@ -48,6 +49,8 @@ export default function Navbar() {
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
 
+  const isAreaActive = pathname.startsWith('/miami-dade') || pathname.startsWith('/broward') || pathname.startsWith('/palm-beach')
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -60,12 +63,14 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
-              <svg className="w-4.5 h-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                  d="M5 3l14 0M5 3c-1.1 0-2 .9-2 2v3M5 3l0 5M19 3c1.1 0 2 .9 2 2v3M19 3l0 5M3 8h18M3 8c0 5.5 2.5 9.5 9 11.5M21 8c0 5.5-2.5 9.5-9 11.5" />
-              </svg>
-            </div>
+            <Image
+              src="/images/icons/logo-256.webp"
+              alt="Teal Detailing"
+              width={40}
+              height={40}
+              className="rounded-lg"
+              priority
+            />
             <span className={`text-lg font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
               Teal<span className="text-teal-400">.</span>
             </span>
@@ -97,7 +102,7 @@ export default function Navbar() {
             >
               <button
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  pathname.startsWith('/service-areas')
+                  isAreaActive
                     ? 'text-teal-500 bg-teal-50'
                     : scrolled
                     ? 'text-slate-700 hover:text-teal-600 hover:bg-slate-50'
@@ -105,6 +110,7 @@ export default function Navbar() {
                 }`}
                 aria-expanded={areasOpen}
                 aria-haspopup="true"
+                aria-label="Service areas menu"
               >
                 Service Areas
                 <svg className={`w-3.5 h-3.5 transition-transform ${areasOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 const services = [
   { href: '/services/ceramic-coating', label: 'Ceramic Coating' },
@@ -12,9 +13,9 @@ const services = [
 ]
 
 const areas = [
-  { href: '/service-areas/miami-dade', label: 'Miami-Dade County' },
-  { href: '/service-areas/broward', label: 'Broward County' },
-  { href: '/service-areas/palm-beach', label: 'Palm Beach County' },
+  { href: '/miami-dade', label: 'Miami-Dade County' },
+  { href: '/broward', label: 'Broward County' },
+  { href: '/palm-beach', label: 'Palm Beach County' },
 ]
 
 export default function Footer() {
@@ -27,12 +28,13 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M5 3l14 0M5 3c-1.1 0-2 .9-2 2v3M5 3l0 5M19 3c1.1 0 2 .9 2 2v3M19 3l0 5M3 8h18M3 8c0 5.5 2.5 9.5 9 11.5M21 8c0 5.5-2.5 9.5-9 11.5" />
-                </svg>
-              </div>
+              <Image
+                src="/images/icons/logo-256.webp"
+                alt="Teal Detailing"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-lg font-bold text-white tracking-tight">
                 Teal<span className="text-teal-400">.</span>
               </span>
@@ -41,7 +43,6 @@ export default function Footer() {
               South Florida&apos;s premium mobile car detailing service. We come to your home or
               office — no hassle, just results.
             </p>
-            {/* Phone — prominent & clickable */}
             <a
               href="tel:+16452488292"
               className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-teal-500/10 border border-teal-500/30 hover:bg-teal-500/20 transition-colors group"
@@ -123,7 +124,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact / Hours */}
+          {/* Hours */}
           <div>
             <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Hours
