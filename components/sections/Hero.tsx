@@ -57,8 +57,8 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* Trust badges — 2-col grid */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Trust badges — desktop only (form replaces them on mobile) */}
+            <div className="hidden lg:grid grid-cols-2 gap-3">
               {trustBadges.map(({ icon, label }) => (
                 <div
                   key={label}
@@ -77,23 +77,7 @@ export default function Hero() {
               ))}
             </div>
 
-            {/* CTA buttons — visible on mobile, hidden on lg (form takes over) */}
-            <div className="flex flex-col sm:flex-row gap-3 lg:hidden">
-              <Link
-                href="/contact"
-                className="flex-1 text-center py-3.5 px-6 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-all hover:shadow-glow"
-              >
-                Book My Detail
-              </Link>
-              <a
-                href="#pricing"
-                className="flex-1 text-center py-3.5 px-6 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition-colors"
-              >
-                View Pricing
-              </a>
-            </div>
-
-            {/* Phone — shown on mobile below the buttons */}
+            {/* Phone — shown on mobile below the form */}
             <div className="flex items-center gap-3 lg:hidden">
               <a
                 href="tel:+16452488292"
@@ -148,8 +132,8 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* ── Right column — compact booking form (desktop only) ── */}
-          <div className="hidden lg:flex lg:justify-end">
+          {/* ── Right column — compact booking form (mobile + desktop) ── */}
+          <div className="lg:flex lg:justify-end">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-glow p-6">
               <BookingForm compact />
             </div>

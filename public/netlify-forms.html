@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+  <!--
+    Static form definitions for Netlify's build-time form detection.
+    These mirror the forms rendered by BookingForm.tsx (a client component
+    that Netlify's crawler cannot see). Netlify discovers forms here and
+    routes POSTed submissions to the Netlify Forms dashboard.
+
+    To receive submissions at info@tealdetailing.com, configure an email
+    notification in the Netlify dashboard under:
+    Site → Forms → quote-compact / quote-full → Notifications.
+  -->
+
+  <!-- Compact quote form (hero section + service/area pages) -->
+  <form name="quote-compact" netlify hidden>
+    <input name="name" />
+    <input name="phone" />
+    <textarea name="message"></textarea>
+  </form>
+
+  <!-- Full quote form (contact page) -->
+  <form name="quote-full" netlify hidden>
+    <input name="name" />
+    <input name="phone" />
+    <input name="email" />
+    <select name="vehicleType"></select>
+    <select name="service"></select>
+    <textarea name="message"></textarea>
+  </form>
+</body>
+</html>

@@ -59,8 +59,8 @@ export default function Footer() {
               </div>
             </a>
             <p className="text-sm mt-3">
-              <a href="mailto:hello@tealdetailing.com" className="hover:text-teal-400 transition-colors">
-                hello@tealdetailing.com
+              <a href="mailto:info@tealdetailing.com" className="hover:text-teal-400 transition-colors">
+                info@tealdetailing.com
               </a>
             </p>
           </div>

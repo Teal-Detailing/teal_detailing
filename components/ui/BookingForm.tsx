@@ -57,8 +57,48 @@ export default function BookingForm({ location, defaultService, compact = false 
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setForm((prev) => ({ ...prev, name: e.target.value.replace(/[0-9]/g, '') }))
+  }
+
+  function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 10)
+    let formatted = ''
+    if (digits.length === 0) {
+      formatted = ''
+    } else if (digits.length <= 3) {
+      formatted = `(${digits}`
+    } else if (digits.length <= 6) {
+      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    } else {
+      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+    }
+    setForm((prev) => ({ ...prev, phone: formatted }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    const formName = compact ? 'quote-compact' : 'quote-full'
+    const params: Record<string, string> = {
+      'form-name': formName,
+      name: form.name,
+      phone: form.phone,
+      message: form.message,
+    }
+    if (!compact) {
+      params.email = form.email
+      params.vehicleType = form.vehicleType
+      params.service = form.service
+    }
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(params).toString(),
+      })
+    } catch (_) {
+      // proceed to success state regardless
+    }
     setSubmitted(true)
   }
 
@@ -97,7 +137,13 @@ export default function BookingForm({ location, defaultService, compact = false 
   const selectedPackage = serviceOptions.slice(0, 3).includes(form.service) ? form.service : null
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      name={compact ? 'quote-compact' : 'quote-full'}
+      data-netlify="true"
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+    >
+      <input type="hidden" name="form-name" value={compact ? 'quote-compact' : 'quote-full'} />
       {/* Header */}
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">
@@ -145,7 +191,7 @@ export default function BookingForm({ location, defaultService, compact = false 
             type="text"
             required
             value={form.name}
-            onChange={handleChange}
+            onChange={handleNameChange}
             placeholder="John Smith"
             className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
           />
@@ -160,7 +206,7 @@ export default function BookingForm({ location, defaultService, compact = false 
             type="tel"
             required
             value={form.phone}
-            onChange={handleChange}
+            onChange={handlePhoneChange}
             placeholder="(305) 555-0100"
             className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
           />
