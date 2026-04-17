@@ -13,14 +13,16 @@
   -->
 
   <!-- Compact quote form (hero section + service/area pages) -->
-  <form name="quote-compact" netlify hidden>
+  <form name="quote-compact" netlify netlify-honeypot="bot-field" data-netlify-recaptcha="true" hidden>
+    <input name="bot-field" />
     <input name="name" />
     <input name="phone" />
     <textarea name="message"></textarea>
   </form>
 
   <!-- Full quote form (contact page) -->
-  <form name="quote-full" netlify hidden>
+  <form name="quote-full" netlify netlify-honeypot="bot-field" data-netlify-recaptcha="true" hidden>
+    <input name="bot-field" />
     <input name="name" />
     <input name="phone" />
     <input name="email" />

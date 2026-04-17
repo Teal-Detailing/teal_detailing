@@ -33,15 +33,31 @@ const serviceOptions = [
   'Other / Custom Quote',
 ]
 
-// Colour accent per package
 const packageAccent: Record<string, string> = {
   'Economy Detail ($109)': 'bg-slate-100 text-slate-700 border-slate-300',
   'Silver Detail ($179)': 'bg-blue-50 text-blue-700 border-blue-200',
   'Gold Detail ($279)': 'bg-amber-50 text-amber-700 border-amber-300',
 }
 
+async function getRecaptchaToken(action: string): Promise<string> {
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+  if (!siteKey || typeof window === 'undefined' || !window.grecaptcha?.enterprise) return ''
+  return new Promise((resolve) => {
+    window.grecaptcha.enterprise.ready(async () => {
+      try {
+        const token = await window.grecaptcha.enterprise.execute(siteKey, { action })
+        resolve(token)
+      } catch {
+        resolve('')
+      }
+    })
+  })
+}
+
 export default function BookingForm({ location, defaultService, compact = false }: BookingFormProps) {
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -78,28 +94,39 @@ export default function BookingForm({ location, defaultService, compact = false 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const formName = compact ? 'quote-compact' : 'quote-full'
-    const params: Record<string, string> = {
-      'form-name': formName,
-      name: form.name,
-      phone: form.phone,
-      message: form.message,
-    }
-    if (!compact) {
-      params.email = form.email
-      params.vehicleType = form.vehicleType
-      params.service = form.service
-    }
+    setSubmitting(true)
+    setError('')
+
     try {
-      await fetch('/', {
+      const token = await getRecaptchaToken('booking_submit')
+      const formName = compact ? 'quote-compact' : 'quote-full'
+      const params: Record<string, string> = {
+        'form-name': formName,
+        'bot-field': '',
+        name: form.name,
+        phone: form.phone,
+        message: form.message,
+        ...(token ? { 'g-recaptcha-response': token } : {}),
+      }
+      if (!compact) {
+        params.email = form.email
+        params.vehicleType = form.vehicleType
+        params.service = form.service
+      }
+
+      const res = await fetch('/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(params).toString(),
       })
-    } catch (_) {
-      // proceed to success state regardless
+
+      if (!res.ok) throw new Error('Submission failed')
+      setSubmitted(true)
+    } catch {
+      setError('Something went wrong. Please call us at (645) 248-8292 or try again.')
+    } finally {
+      setSubmitting(false)
     }
-    setSubmitted(true)
   }
 
   function clearService() {
@@ -139,11 +166,17 @@ export default function BookingForm({ location, defaultService, compact = false 
   return (
     <form
       name={compact ? 'quote-compact' : 'quote-full'}
+      method="POST"
       data-netlify="true"
+      data-netlify-honeypot="bot-field"
+      data-netlify-recaptcha="true"
       onSubmit={handleSubmit}
       className="flex flex-col gap-4"
     >
       <input type="hidden" name="form-name" value={compact ? 'quote-compact' : 'quote-full'} />
+      <div hidden aria-hidden="true">
+        <input name="bot-field" tabIndex={-1} autoComplete="off" />
+      </div>
       {/* Header */}
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">
@@ -297,11 +330,16 @@ export default function BookingForm({ location, defaultService, compact = false 
         />
       </div>
 
+      {error && (
+        <p className="text-xs text-red-600 text-center">{error}</p>
+      )}
+
       <button
         type="submit"
-        className="w-full py-3 px-6 rounded-xl bg-teal-500 hover:bg-teal-600 text-white font-semibold text-sm transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
+        disabled={submitting}
+        className="w-full py-3 px-6 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
       >
-        Get My Free Quote
+        {submitting ? 'Sending…' : 'Get My Free Quote'}
       </button>
       <p className="text-center text-xs text-slate-400">
         No commitment · We respond in 15 minutes

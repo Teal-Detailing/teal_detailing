@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import Script from 'next/script'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import StickyBottomCTA from '@/components/ui/StickyBottomCTA'
+import BottomBar from '@/components/ui/BottomBar'
 import FloatingPhone from '@/components/ui/FloatingPhone'
 
 const inter = Inter({
@@ -61,14 +62,49 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
   return (
     <html lang="en" className={inter.variable}>
+      {/*
+        GA Consent Mode v2 — must fire before the GA script loads.
+        Defaults analytics to 'denied' until user accepts via the cookie banner.
+      */}
+      <Script id="ga-consent-defaults" strategy="beforeInteractive">{`
+        window.dataLayer=window.dataLayer||[];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('consent','default',{
+          analytics_storage:'denied',
+          ad_storage:'denied',
+          wait_for_update:500
+        });
+      `}</Script>
+
       <body className="font-sans antialiased bg-white text-slate-900 pb-14">
         <Navbar />
         <main>{children}</main>
         <Footer />
-        <StickyBottomCTA />
+        <BottomBar />
         <FloatingPhone />
+
+        {/* Google Analytics 4 */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-7Y6KV48PV9"
+          strategy="afterInteractive"
+        />
+        <Script id="ga-init" strategy="afterInteractive">{`
+          window.dataLayer=window.dataLayer||[];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js',new Date());
+          gtag('config','G-7Y6KV48PV9');
+        `}</Script>
+
+        {recaptchaSiteKey && (
+          <Script
+            src={`https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`}
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   )
