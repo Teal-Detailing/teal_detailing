@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { send as emailjsSend } from '@emailjs/browser'
+import DatePicker, { formatDisplayDate } from './DatePicker'
 
 interface BookingFormProps {
   location?: string
@@ -39,15 +41,33 @@ const packageAccent: Record<string, string> = {
   'Gold Detail ($279)': 'bg-amber-50 text-amber-700 border-amber-300',
 }
 
+const timeSlots = [
+  { value: 'morning',   label: 'Morning',   hours: '8am – 12pm' },
+  { value: 'afternoon', label: 'Afternoon', hours: '12pm – 4pm' },
+  { value: 'evening',   label: 'Evening',   hours: '4pm – 8pm'  },
+]
+
 export default function BookingForm({ location, defaultService, compact = false }: BookingFormProps) {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [recaptchaToken, setRecaptchaToken] = useState('')
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const recaptchaRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<number | null>(null)
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    email: '',
+    vehicleType: '',
+    service: defaultService ?? '',
+    timeSlot: '',
+    message: '',
+  })
+
+  // Mount reCAPTCHA widget
   useEffect(() => {
     if (!siteKey || !recaptchaRef.current) return
 
@@ -64,52 +84,50 @@ export default function BookingForm({ location, defaultService, compact = false 
       render()
     } else {
       const timer = setInterval(() => {
-        if (window.grecaptcha?.render) {
-          clearInterval(timer)
-          render()
-        }
+        if (window.grecaptcha?.render) { clearInterval(timer); render() }
       }, 150)
       return () => clearInterval(timer)
     }
   }, [siteKey])
 
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    vehicleType: '',
-    service: defaultService ?? '',
-    message: '',
-  })
-
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm((prev) => ({ ...prev, name: e.target.value.replace(/[0-9]/g, '') }))
+    setForm(prev => ({ ...prev, name: e.target.value.replace(/[0-9]/g, '') }))
   }
 
   function handlePhoneChange(e: React.ChangeEvent<HTMLInputElement>) {
     const digits = e.target.value.replace(/\D/g, '').slice(0, 10)
     let formatted = ''
-    if (digits.length === 0) {
-      formatted = ''
-    } else if (digits.length <= 3) {
-      formatted = `(${digits}`
-    } else if (digits.length <= 6) {
-      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`
-    } else {
-      formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+    if (digits.length === 0) formatted = ''
+    else if (digits.length <= 3) formatted = `(${digits}`
+    else if (digits.length <= 6) formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`
+    else formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`
+    setForm(prev => ({ ...prev, phone: formatted }))
+  }
+
+  function resetRecaptcha() {
+    if (widgetIdRef.current !== null) {
+      window.grecaptcha?.reset(widgetIdRef.current)
+      setRecaptchaToken('')
     }
-    setForm((prev) => ({ ...prev, phone: formatted }))
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
+    if (!selectedDate) {
+      setError('Please select a preferred date.')
+      return
+    }
+    if (!form.timeSlot) {
+      setError('Please select a preferred time of day.')
+      return
+    }
     if (siteKey && !recaptchaToken) {
       setError('Please complete the reCAPTCHA challenge.')
       return
@@ -119,49 +137,50 @@ export default function BookingForm({ location, defaultService, compact = false 
     setError('')
 
     try {
-      const formName = compact ? 'quote-compact' : 'quote-full'
-      const params: Record<string, string> = {
-        'form-name': formName,
-        'bot-field': '',
-        name: form.name,
-        phone: form.phone,
-        message: form.message,
-      }
-      if (!compact) {
-        params.email = form.email
-        params.vehicleType = form.vehicleType
-        params.service = form.service
-      }
-      if (recaptchaToken) {
-        params['g-recaptcha-response'] = recaptchaToken
+      const serviceId  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
+      const publicKey  = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+
+      if (!serviceId || !templateId || !publicKey) {
+        throw new Error('Email service not configured — contact us at (645) 248-8292.')
       }
 
-      const res = await fetch('/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams(params).toString(),
-      })
+      const slot = timeSlots.find(t => t.value === form.timeSlot)
+      await emailjsSend(
+        serviceId,
+        templateId,
+        {
+          from_name:      form.name,
+          phone:          form.phone,
+          email:          form.email || 'Not provided',
+          vehicle_type:   form.vehicleType || 'Not specified',
+          service:        form.service || 'Not specified',
+          preferred_date: formatDisplayDate(selectedDate),
+          preferred_time: slot ? `${slot.label} (${slot.hours})` : form.timeSlot,
+          message:        form.message || 'None',
+          form_source:    compact ? 'Quick Quote' : 'Full Booking Form',
+          location:       location || 'General',
+        },
+        publicKey
+      )
 
-      if (!res.ok) throw new Error('Submission failed')
       setSubmitted(true)
-      // Reset reCAPTCHA for next submission
-      if (widgetIdRef.current !== null) {
-        window.grecaptcha?.reset(widgetIdRef.current)
-        setRecaptchaToken('')
-      }
-    } catch {
-      setError('Something went wrong. Please call us at (645) 248-8292 or try again.')
-      if (widgetIdRef.current !== null) {
-        window.grecaptcha?.reset(widgetIdRef.current)
-        setRecaptchaToken('')
-      }
+      resetRecaptcha()
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : ''
+      setError(
+        msg.includes('Email service')
+          ? msg
+          : 'Something went wrong. Please call us at (645) 248-8292 or try again.'
+      )
+      resetRecaptcha()
     } finally {
       setSubmitting(false)
     }
   }
 
   function clearService() {
-    setForm((prev) => ({ ...prev, service: '' }))
+    setForm(prev => ({ ...prev, service: '' }))
   }
 
   if (submitted) {
@@ -174,16 +193,23 @@ export default function BookingForm({ location, defaultService, compact = false 
         </div>
         <h3 className="text-xl font-semibold text-slate-900">Request Received!</h3>
         <p className="text-slate-600 text-sm leading-relaxed max-w-xs">
-          Thanks, {form.name.split(' ')[0]}! We&apos;ll respond within 15 minutes to confirm
-          your appointment.
+          Thanks, {form.name.split(' ')[0]}! We&apos;ll confirm your appointment within 15 minutes.
         </p>
+        {selectedDate && form.timeSlot && (
+          <div className="flex flex-col items-center gap-1 text-xs text-slate-500">
+            <span className="font-medium text-slate-700">{formatDisplayDate(selectedDate)}</span>
+            <span>{timeSlots.find(t => t.value === form.timeSlot)?.label}</span>
+          </div>
+        )}
         {form.service && (
-          <p className="text-xs text-teal-600 font-medium">
-            Package: {form.service}
-          </p>
+          <p className="text-xs text-teal-600 font-medium">Package: {form.service}</p>
         )}
         <button
-          onClick={() => setSubmitted(false)}
+          onClick={() => {
+            setSubmitted(false)
+            setSelectedDate(undefined)
+            setForm({ name:'', phone:'', email:'', vehicleType:'', service:'', timeSlot:'', message:'' })
+          }}
           className="text-teal-600 text-sm font-medium underline underline-offset-2"
         >
           Submit another request
@@ -195,23 +221,10 @@ export default function BookingForm({ location, defaultService, compact = false 
   const selectedPackage = serviceOptions.slice(0, 3).includes(form.service) ? form.service : null
 
   return (
-    <form
-      name={compact ? 'quote-compact' : 'quote-full'}
-      method="POST"
-      data-netlify="true"
-      data-netlify-honeypot="bot-field"
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4"
-    >
-      <input type="hidden" name="form-name" value={compact ? 'quote-compact' : 'quote-full'} />
-      <div hidden aria-hidden="true">
-        <input name="bot-field" tabIndex={-1} autoComplete="off" />
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* Header */}
       <div className="text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">
-          Free Quote
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Free Quote</p>
         <h3 className="text-lg font-bold text-slate-900 mt-0.5">
           {location ? `Book in ${location}` : 'Book Your Detail'}
         </h3>
@@ -242,7 +255,7 @@ export default function BookingForm({ location, defaultService, compact = false 
         </div>
       )}
 
-      {/* Name + Phone (always shown) */}
+      {/* Name + Phone */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
           <label htmlFor="name" className="block text-xs font-medium text-slate-700 mb-1">
@@ -276,10 +289,9 @@ export default function BookingForm({ location, defaultService, compact = false 
         </div>
       </div>
 
-      {/* Full form fields — hidden in compact mode */}
+      {/* Full form fields */}
       {!compact && (
         <>
-          {/* Email */}
           <div>
             <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1">
               Email *
@@ -296,7 +308,6 @@ export default function BookingForm({ location, defaultService, compact = false 
             />
           </div>
 
-          {/* Vehicle + Service */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label htmlFor="vehicleType" className="block text-xs font-medium text-slate-700 mb-1">
@@ -311,11 +322,7 @@ export default function BookingForm({ location, defaultService, compact = false 
                 className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
               >
                 <option value="">Select…</option>
-                {vehicleTypes.map((v) => (
-                  <option key={v} value={v}>
-                    {v}
-                  </option>
-                ))}
+                {vehicleTypes.map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
             <div>
@@ -333,18 +340,50 @@ export default function BookingForm({ location, defaultService, compact = false 
                 }`}
               >
                 <option value="">Select…</option>
-                {serviceOptions.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
+                {serviceOptions.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
         </>
       )}
 
-      {/* Notes (always shown) */}
+      {/* Preferred Date */}
+      <div>
+        <label className="block text-xs font-medium text-slate-700 mb-1">
+          Preferred Date *
+        </label>
+        <DatePicker
+          value={selectedDate}
+          onChange={setSelectedDate}
+          placeholder="Select a date…"
+        />
+      </div>
+
+      {/* Preferred Time */}
+      <div>
+        <label className="block text-xs font-medium text-slate-700 mb-1.5">
+          Preferred Time *
+        </label>
+        <div className="grid grid-cols-3 gap-2">
+          {timeSlots.map(slot => (
+            <button
+              key={slot.value}
+              type="button"
+              onClick={() => setForm(prev => ({ ...prev, timeSlot: slot.value }))}
+              className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all duration-150 ${
+                form.timeSlot === slot.value
+                  ? 'border-teal-400 bg-teal-50 text-teal-700 ring-1 ring-teal-300'
+                  : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
+              }`}
+            >
+              <span className="text-xs font-semibold leading-tight">{slot.label}</span>
+              <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes */}
       <div>
         <label htmlFor="message" className="block text-xs font-medium text-slate-700 mb-1">
           {compact ? 'Notes' : 'Additional Notes'}
@@ -352,15 +391,24 @@ export default function BookingForm({ location, defaultService, compact = false 
         <textarea
           id="message"
           name="message"
-          rows={compact ? 2 : 2}
+          rows={2}
           value={form.message}
           onChange={handleChange}
-          placeholder={compact ? 'Preferred date, service needed, any details…' : 'Preferred date/time, location, any special requests…'}
+          placeholder={
+            compact
+              ? 'Any details about your vehicle or service needs…'
+              : 'Location, special requests, or anything else we should know…'
+          }
           className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
         />
       </div>
 
-      {siteKey && <div ref={recaptchaRef} className="flex justify-center" />}
+      {/* reCAPTCHA */}
+      {siteKey && (
+        <div className="flex justify-center">
+          <div ref={recaptchaRef} />
+        </div>
+      )}
 
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>
