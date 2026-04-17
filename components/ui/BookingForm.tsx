@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface BookingFormProps {
   location?: string
@@ -43,6 +43,36 @@ export default function BookingForm({ location, defaultService, compact = false 
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [recaptchaToken, setRecaptchaToken] = useState('')
+  const recaptchaRef = useRef<HTMLDivElement>(null)
+  const widgetIdRef = useRef<number | null>(null)
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+
+  useEffect(() => {
+    if (!siteKey || !recaptchaRef.current) return
+
+    const render = () => {
+      if (!recaptchaRef.current || widgetIdRef.current !== null || !window.grecaptcha) return
+      widgetIdRef.current = window.grecaptcha.render(recaptchaRef.current, {
+        sitekey: siteKey,
+        callback: (token: string) => setRecaptchaToken(token),
+        'expired-callback': () => setRecaptchaToken(''),
+      })
+    }
+
+    if (window.grecaptcha?.render) {
+      render()
+    } else {
+      const timer = setInterval(() => {
+        if (window.grecaptcha?.render) {
+          clearInterval(timer)
+          render()
+        }
+      }, 150)
+      return () => clearInterval(timer)
+    }
+  }, [siteKey])
+
   const [form, setForm] = useState({
     name: '',
     phone: '',
@@ -79,6 +109,12 @@ export default function BookingForm({ location, defaultService, compact = false 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    if (siteKey && !recaptchaToken) {
+      setError('Please complete the reCAPTCHA challenge.')
+      return
+    }
+
     setSubmitting(true)
     setError('')
 
@@ -96,6 +132,9 @@ export default function BookingForm({ location, defaultService, compact = false 
         params.vehicleType = form.vehicleType
         params.service = form.service
       }
+      if (recaptchaToken) {
+        params['g-recaptcha-response'] = recaptchaToken
+      }
 
       const res = await fetch('/', {
         method: 'POST',
@@ -105,8 +144,17 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       if (!res.ok) throw new Error('Submission failed')
       setSubmitted(true)
+      // Reset reCAPTCHA for next submission
+      if (widgetIdRef.current !== null) {
+        window.grecaptcha?.reset(widgetIdRef.current)
+        setRecaptchaToken('')
+      }
     } catch {
       setError('Something went wrong. Please call us at (645) 248-8292 or try again.')
+      if (widgetIdRef.current !== null) {
+        window.grecaptcha?.reset(widgetIdRef.current)
+        setRecaptchaToken('')
+      }
     } finally {
       setSubmitting(false)
     }
@@ -152,7 +200,6 @@ export default function BookingForm({ location, defaultService, compact = false 
       method="POST"
       data-netlify="true"
       data-netlify-honeypot="bot-field"
-      data-netlify-recaptcha="true"
       onSubmit={handleSubmit}
       className="flex flex-col gap-4"
     >
@@ -313,7 +360,7 @@ export default function BookingForm({ location, defaultService, compact = false 
         />
       </div>
 
-      <div data-netlify-recaptcha="true" />
+      {siteKey && <div ref={recaptchaRef} className="flex justify-center" />}
 
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>

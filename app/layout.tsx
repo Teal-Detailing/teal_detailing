@@ -85,6 +85,12 @@ export default function RootLayout({
         <BottomBar />
         <FloatingPhone />
 
+        {/* reCAPTCHA v2 — explicit render mode so BookingForm controls the widget */}
+        <Script
+          src="https://www.google.com/recaptcha/api.js?render=explicit"
+          strategy="afterInteractive"
+        />
+
         {/* Google Analytics 4 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-7Y6KV48PV9"
