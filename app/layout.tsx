@@ -62,8 +62,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-
   return (
     <html lang="en" className={inter.variable}>
       {/*
@@ -99,12 +97,6 @@ export default function RootLayout({
           gtag('config','G-7Y6KV48PV9');
         `}</Script>
 
-        {recaptchaSiteKey && (
-          <Script
-            src={`https://www.google.com/recaptcha/enterprise.js?render=${recaptchaSiteKey}`}
-            strategy="afterInteractive"
-          />
-        )}
       </body>
     </html>
   )

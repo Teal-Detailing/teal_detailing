@@ -39,21 +39,6 @@ const packageAccent: Record<string, string> = {
   'Gold Detail ($279)': 'bg-amber-50 text-amber-700 border-amber-300',
 }
 
-async function getRecaptchaToken(action: string): Promise<string> {
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
-  if (!siteKey || typeof window === 'undefined' || !window.grecaptcha?.enterprise) return ''
-  return new Promise((resolve) => {
-    window.grecaptcha.enterprise.ready(async () => {
-      try {
-        const token = await window.grecaptcha.enterprise.execute(siteKey, { action })
-        resolve(token)
-      } catch {
-        resolve('')
-      }
-    })
-  })
-}
-
 export default function BookingForm({ location, defaultService, compact = false }: BookingFormProps) {
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -98,7 +83,6 @@ export default function BookingForm({ location, defaultService, compact = false 
     setError('')
 
     try {
-      const token = await getRecaptchaToken('booking_submit')
       const formName = compact ? 'quote-compact' : 'quote-full'
       const params: Record<string, string> = {
         'form-name': formName,
@@ -106,7 +90,6 @@ export default function BookingForm({ location, defaultService, compact = false 
         name: form.name,
         phone: form.phone,
         message: form.message,
-        ...(token ? { 'g-recaptcha-response': token } : {}),
       }
       if (!compact) {
         params.email = form.email
@@ -329,6 +312,8 @@ export default function BookingForm({ location, defaultService, compact = false 
           className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
         />
       </div>
+
+      <div data-netlify-recaptcha="true" />
 
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>
