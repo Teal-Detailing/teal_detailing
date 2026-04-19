@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: 'Car Detailing Services & Pricing',
   description:
     'Browse all Teal Detailing services: Economy ($109), Silver ($179), Gold ($279), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
+  alternates: { canonical: 'https://tealdetailing.com/services' },
   openGraph: {
     title: 'Car Detailing Services & Pricing | Teal Detailing',
     description:

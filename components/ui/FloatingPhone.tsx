@@ -1,12 +1,13 @@
 'use client'
 
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
+
 export default function FloatingPhone() {
   return (
     <a
-      href="tel:+16452488292"
-      aria-label="Call Teal Detailing at (645) 248-8292"
-      className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-400 transition-colors flex items-center justify-center"
-      style={{ boxShadow: '0 4px 24px rgba(20,184,166,0.5)' }}
+      href={PHONE_HREF}
+      aria-label={`Call Teal Detailing at ${PHONE_DISPLAY}`}
+      className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-400 transition-colors flex items-center justify-center shadow-phone-glow"
     >
       {/* pulse ring */}
       <span className="absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-60 animate-ping" />

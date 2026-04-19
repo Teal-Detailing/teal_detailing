@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'Auto Detailing in Miami-Dade County',
   description:
     'Teal Detailing provides premium mobile car detailing throughout Miami-Dade County. Coral Gables, Brickell, Doral, Kendall, and more. Book same-week service online.',
+  alternates: { canonical: 'https://tealdetailing.com/miami-dade' },
   openGraph: {
     title: 'Auto Detailing in Miami-Dade County | Teal Detailing',
     description:

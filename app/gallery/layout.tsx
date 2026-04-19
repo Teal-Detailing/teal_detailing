@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: 'Our Work — Gallery',
   description:
     "See real results from Teal Detailing's work across South Florida. Ceramic coatings, paint corrections, interior details, foam treatments, and more.",
+  alternates: { canonical: 'https://tealdetailing.com/gallery' },
   openGraph: {
     title: 'Our Work — Gallery | Teal Detailing',
     description:

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import BookingForm from '@/components/ui/BookingForm'
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 const trustBadges = [
   {
@@ -80,7 +81,7 @@ export default function Hero() {
             {/* Phone — shown on mobile below the form */}
             <div className="flex items-center gap-3 lg:hidden">
               <a
-                href="tel:+16452488292"
+                href={PHONE_HREF}
                 className="flex items-center gap-2.5 text-white font-medium hover:text-teal-300 transition-colors"
               >
                 <div className="w-9 h-9 rounded-full bg-teal-500/20 border border-teal-500/30 flex items-center justify-center flex-shrink-0">
@@ -95,7 +96,7 @@ export default function Hero() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 leading-none mb-0.5">Call us direct</p>
-                  <p className="text-sm font-semibold">(645) 248-8292</p>
+                  <p className="text-sm font-semibold">{PHONE_DISPLAY}</p>
                 </div>
               </a>
               <div className="h-6 w-px bg-white/10" />
@@ -107,7 +108,7 @@ export default function Hero() {
             {/* Desktop-only phone row */}
             <div className="hidden lg:flex items-center gap-4">
               <a
-                href="tel:+16452488292"
+                href={PHONE_HREF}
                 className="flex items-center gap-2 text-white font-semibold hover:text-teal-300 transition-colors"
               >
                 <div className="w-9 h-9 rounded-full bg-teal-500/20 border border-teal-500/30 flex items-center justify-center">
@@ -122,7 +123,7 @@ export default function Hero() {
                 </div>
                 <div>
                   <p className="text-xs text-slate-400 leading-none mb-0.5">Call us direct</p>
-                  <p className="text-base">(645) 248-8292</p>
+                  <p className="text-base">{PHONE_DISPLAY}</p>
                 </div>
               </a>
               <div className="h-8 w-px bg-white/10" />

@@ -4,7 +4,15 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'About Teal Detailing',
   description:
-    'Learn about Teal Detailing — South Florida\'s premium mobile car detailing company. Our story, values, and commitment to excellence across Miami-Dade, Broward, and Palm Beach.',
+    "Learn about Teal Detailing — South Florida's premium mobile car detailing company. Our story, values, and commitment to excellence across Miami-Dade, Broward, and Palm Beach.",
+  alternates: { canonical: 'https://tealdetailing.com/about' },
+  openGraph: {
+    title: 'About Teal Detailing | Teal Detailing',
+    description:
+      "Learn about Teal Detailing — South Florida's premium mobile car detailing company. Our story, values, and commitment to excellence.",
+    url: 'https://tealdetailing.com/about',
+    images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
+  },
 }
 
 const values = [

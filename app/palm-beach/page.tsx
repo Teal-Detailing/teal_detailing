@@ -13,6 +13,7 @@ export const metadata: Metadata = {
     url: 'https://tealdetailing.com/palm-beach',
     images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
   },
+  alternates: { canonical: 'https://tealdetailing.com/palm-beach' },
 }
 
 const neighborhoods = [

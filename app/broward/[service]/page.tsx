@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { servicesData, serviceSlugs } from '@/lib/services'
 import { pricingPlans } from '@/lib/plans'
 import PricingCard from '@/components/ui/PricingCard'
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 const COUNTY = 'Broward County'
 const COUNTY_SLUG = 'broward'
@@ -20,6 +21,7 @@ export function generateMetadata({ params }: { params: { service: string } }): M
   return {
     title,
     description,
+    alternates: { canonical: `https://tealdetailing.com/${COUNTY_SLUG}/${params.service}` },
     openGraph: {
       title: `${title} | Teal Detailing`,
       description,
@@ -33,8 +35,24 @@ export default function BrowardServicePage({ params }: { params: { service: stri
   const service = servicesData[params.service as keyof typeof servicesData]
   if (!service) notFound()
 
+  const pageUrl = `https://tealdetailing.com/${COUNTY_SLUG}/${params.service}`
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tealdetailing.com' },
+              { '@type': 'ListItem', position: 2, name: COUNTY, item: `https://tealdetailing.com/${COUNTY_SLUG}` },
+              { '@type': 'ListItem', position: 3, name: service.name, item: pageUrl },
+            ],
+          }),
+        }}
+      />
       <section className="bg-hero-gradient pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8" aria-label="Breadcrumb">
@@ -135,8 +153,8 @@ export default function BrowardServicePage({ params }: { params: { service: stri
             <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
-            <a href="tel:+16452488292" className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
-              Call (645) 248-8292
+            <a href={PHONE_HREF} className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
+              Call {PHONE_DISPLAY}
             </a>
           </div>
         </div>

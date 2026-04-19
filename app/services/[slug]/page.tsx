@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { servicesData, serviceSlugs } from '@/lib/services'
 import { pricingPlans } from '@/lib/plans'
 import PricingCard from '@/components/ui/PricingCard'
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 export function generateStaticParams() {
   return serviceSlugs.map((slug) => ({ slug }))
@@ -17,6 +18,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   return {
     title,
     description,
+    alternates: { canonical: `https://tealdetailing.com/services/${params.slug}` },
     openGraph: {
       title: `${title} | Teal Detailing`,
       description,
@@ -30,8 +32,43 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
   const service = servicesData[params.slug as keyof typeof servicesData]
   if (!service) notFound()
 
+  const pageUrl = `https://tealdetailing.com/services/${params.slug}`
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            {
+              '@context': 'https://schema.org',
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tealdetailing.com' },
+                { '@type': 'ListItem', position: 2, name: 'Services', item: 'https://tealdetailing.com/services' },
+                { '@type': 'ListItem', position: 3, name: service.name, item: pageUrl },
+              ],
+            },
+            {
+              '@context': 'https://schema.org',
+              '@type': 'Service',
+              name: service.name,
+              description: service.heroSub,
+              url: pageUrl,
+              provider: {
+                '@type': 'LocalBusiness',
+                '@id': 'https://tealdetailing.com/#business',
+                name: 'Teal Detailing',
+              },
+              areaServed: [
+                { '@type': 'County', name: 'Miami-Dade County' },
+                { '@type': 'County', name: 'Broward County' },
+                { '@type': 'County', name: 'Palm Beach County' },
+              ],
+            },
+          ]),
+        }}
+      />
       <section className="bg-hero-gradient pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-4">
@@ -160,8 +197,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
-            <a href="tel:+16452488292" className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
-              Call (645) 248-8292
+            <a href={PHONE_HREF} className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
+              Call {PHONE_DISPLAY}
             </a>
           </div>
         </div>

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: 'Auto Detailing in Broward County',
   description:
     'Teal Detailing provides premium mobile car detailing across Broward County. Fort Lauderdale, Hollywood, Pembroke Pines, Weston, and more. Same-week appointments available.',
+  alternates: { canonical: 'https://tealdetailing.com/broward' },
   openGraph: {
     title: 'Auto Detailing in Broward County | Teal Detailing',
     description:

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -145,7 +146,7 @@ export default function Navbar() {
           {/* Phone + CTA */}
           <div className="hidden md:flex items-center gap-3">
             <a
-              href="tel:+16452488292"
+              href={PHONE_HREF}
               className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
                 scrolled ? 'text-slate-700 hover:text-teal-600' : 'text-white/90 hover:text-white'
               }`}
@@ -154,7 +155,7 @@ export default function Navbar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              (645) 248-8292
+              {PHONE_DISPLAY}
             </a>
             <Link
               href="/contact"

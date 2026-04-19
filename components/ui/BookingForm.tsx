@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { send as emailjsSend } from '@emailjs/browser'
 import DatePicker, { formatDisplayDate } from './DatePicker'
+import { PHONE_DISPLAY } from '@/lib/constants'
 
 interface BookingFormProps {
   location?: string
@@ -136,43 +136,37 @@ export default function BookingForm({ location, defaultService, compact = false 
     setSubmitting(true)
     setError('')
 
+    const formName = compact ? 'quote-compact' : 'quote-full'
+    const slot = timeSlots.find(t => t.value === form.timeSlot)
+    const timeLabel = slot ? `${slot.label} (${slot.hours})` : form.timeSlot
+
     try {
-      const serviceId  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID
-      const publicKey  = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY
+      const response = await fetch('/__forms.html', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          'form-name': formName,
+          'bot-field': '',
+          name: form.name,
+          phone: form.phone,
+          email: form.email || '',
+          vehicleType: form.vehicleType || '',
+          service: form.service || '',
+          date: formatDisplayDate(selectedDate),
+          timeSlot: timeLabel,
+          location: location || '',
+          message: form.message || '',
+        }).toString(),
+      })
 
-      if (!serviceId || !templateId || !publicKey) {
-        throw new Error('Email service not configured — contact us at (645) 248-8292.')
+      if (!response.ok) {
+        throw new Error('Submission failed')
       }
-
-      const slot = timeSlots.find(t => t.value === form.timeSlot)
-      await emailjsSend(
-        serviceId,
-        templateId,
-        {
-          from_name:      form.name,
-          phone:          form.phone,
-          email:          form.email || 'Not provided',
-          vehicle_type:   form.vehicleType || 'Not specified',
-          service:        form.service || 'Not specified',
-          preferred_date: formatDisplayDate(selectedDate),
-          preferred_time: slot ? `${slot.label} (${slot.hours})` : form.timeSlot,
-          message:        form.message || 'None',
-          form_source:    compact ? 'Quick Quote' : 'Full Booking Form',
-          location:       location || 'General',
-        },
-        publicKey
-      )
 
       setSubmitted(true)
       resetRecaptcha()
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : ''
-      setError(
-        msg.includes('Email service')
-          ? msg
-          : 'Something went wrong. Please call us at (645) 248-8292 or try again.'
-      )
+    } catch {
+      setError(`Something went wrong. Please call us at ${PHONE_DISPLAY} or try again.`)
       resetRecaptcha()
     } finally {
       setSubmitting(false)
@@ -219,9 +213,19 @@ export default function BookingForm({ location, defaultService, compact = false 
   }
 
   const selectedPackage = serviceOptions.slice(0, 3).includes(form.service) ? form.service : null
+  const formName = compact ? 'quote-compact' : 'quote-full'
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-4"
+      name={formName}
+    >
+      <input type="hidden" name="form-name" value={formName} />
+      <p style={{ display: 'none' }}>
+        <label>Don&apos;t fill this out: <input name="bot-field" /></label>
+      </p>
+
       {/* Header */}
       <div className="text-center">
         <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Free Quote</p>

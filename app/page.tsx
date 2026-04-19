@@ -5,11 +5,13 @@ import PricingOverview from '@/components/sections/PricingOverview'
 import WhyChooseUs from '@/components/sections/WhyChooseUs'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import Reviews from '@/components/sections/Reviews'
+import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Premium Mobile Car Detailing in South Florida',
   description:
     'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $109.',
+  alternates: { canonical: 'https://tealdetailing.com' },
   openGraph: {
     title: 'Teal Detailing — Premium Mobile Car Detailing in South Florida',
     description:
@@ -78,10 +80,10 @@ export default function HomePage() {
               Book Your Detail
             </Link>
             <a
-              href="tel:+16452488292"
+              href={PHONE_HREF}
               className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl border border-white/20 text-white font-semibold hover:bg-white/10 transition-colors"
             >
-              Call (645) 248-8292
+              Call {PHONE_DISPLAY}
             </a>
           </div>
         </div>

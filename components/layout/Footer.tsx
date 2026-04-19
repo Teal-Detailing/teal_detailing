@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
+import { PHONE_DISPLAY, PHONE_HREF, EMAIL_DISPLAY, EMAIL_HREF } from '@/lib/constants'
 
 const services = [
   { href: '/services/ceramic-coating', label: 'Ceramic Coating' },
@@ -44,7 +45,7 @@ export default function Footer() {
               office — no hassle, just results.
             </p>
             <a
-              href="tel:+16452488292"
+              href={PHONE_HREF}
               className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-teal-500/10 border border-teal-500/30 hover:bg-teal-500/20 transition-colors group"
             >
               <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,13 +55,13 @@ export default function Footer() {
               <div>
                 <p className="text-[10px] text-slate-500 leading-none mb-0.5">Call or text</p>
                 <p className="text-sm font-bold text-white group-hover:text-teal-300 transition-colors">
-                  (645) 248-8292
+                  {PHONE_DISPLAY}
                 </p>
               </div>
             </a>
             <p className="text-sm mt-3">
-              <a href="mailto:info@tealdetailing.com" className="hover:text-teal-400 transition-colors">
-                info@tealdetailing.com
+              <a href={EMAIL_HREF} className="hover:text-teal-400 transition-colors">
+                {EMAIL_DISPLAY}
               </a>
             </p>
           </div>

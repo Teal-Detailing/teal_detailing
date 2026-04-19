@@ -55,6 +55,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: 'summary',
+    title: 'Teal Detailing — Premium Mobile Car Detailing in South Florida',
+    description:
+      "South Florida's premier mobile car detailing service. We come to you — Miami-Dade, Broward & Palm Beach.",
+    images: ['/images/icons/logo-1024.webp'],
+  },
 }
 
 export default function RootLayout({
@@ -64,10 +71,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      {/*
-        GA Consent Mode v2 — must fire before the GA script loads.
-        Defaults analytics to 'denied' until user accepts via the cookie banner.
-      */}
       <Script id="ga-consent-defaults" strategy="beforeInteractive">{`
         window.dataLayer=window.dataLayer||[];
         function gtag(){dataLayer.push(arguments);}
@@ -79,19 +82,69 @@ export default function RootLayout({
       `}</Script>
 
       <body className="font-sans antialiased bg-white text-slate-900 pb-14">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'LocalBusiness',
+              '@id': 'https://tealdetailing.com/#business',
+              name: 'Teal Detailing',
+              description:
+                "South Florida's premier mobile car detailing service covering Miami-Dade, Broward, and Palm Beach counties.",
+              url: 'https://tealdetailing.com',
+              telephone: '+16452488292',
+              email: 'info@tealdetailing.com',
+              priceRange: '$109–$279',
+              image: 'https://tealdetailing.com/images/icons/logo-1024.webp',
+              logo: 'https://tealdetailing.com/images/icons/logo-256.webp',
+              address: {
+                '@type': 'PostalAddress',
+                addressRegion: 'FL',
+                addressCountry: 'US',
+              },
+              areaServed: [
+                { '@type': 'County', name: 'Miami-Dade County', containedInPlace: { '@type': 'State', name: 'Florida' } },
+                { '@type': 'County', name: 'Broward County', containedInPlace: { '@type': 'State', name: 'Florida' } },
+                { '@type': 'County', name: 'Palm Beach County', containedInPlace: { '@type': 'State', name: 'Florida' } },
+              ],
+              openingHoursSpecification: [{
+                '@type': 'OpeningHoursSpecification',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                opens: '08:00',
+                closes: '22:00',
+              }],
+              aggregateRating: {
+                '@type': 'AggregateRating',
+                ratingValue: '5.0',
+                reviewCount: '200',
+                bestRating: '5',
+                worstRating: '1',
+              },
+              hasOfferCatalog: {
+                '@type': 'OfferCatalog',
+                name: 'Mobile Car Detailing Services',
+                itemListElement: [
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Economy Detail' }, price: '109', priceCurrency: 'USD' },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Silver Detail' }, price: '179', priceCurrency: 'USD' },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Gold Detail' }, price: '279', priceCurrency: 'USD' },
+                ],
+              },
+            }),
+          }}
+        />
+
         <Navbar />
         <main>{children}</main>
         <Footer />
         <BottomBar />
         <FloatingPhone />
 
-        {/* reCAPTCHA v2 — explicit render mode so BookingForm controls the widget */}
         <Script
           src="https://www.google.com/recaptcha/api.js?render=explicit"
           strategy="afterInteractive"
         />
 
-        {/* Google Analytics 4 */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-7Y6KV48PV9"
           strategy="afterInteractive"
@@ -102,7 +155,6 @@ export default function RootLayout({
           gtag('js',new Date());
           gtag('config','G-7Y6KV48PV9');
         `}</Script>
-
       </body>
     </html>
   )

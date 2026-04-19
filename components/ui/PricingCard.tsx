@@ -51,8 +51,7 @@ export default function PricingCard({
   if (tier === 'silver') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30"
-        style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/30 shadow-dark-card"
       >
         <div className="h-1 w-full bg-gradient-to-r from-[#8d9caa] via-[#b0b8c1] to-[#8d9caa]" />
         <div className="px-6 py-5">
@@ -78,8 +77,7 @@ export default function PricingCard({
           </ul>
           <Link
             href="/contact?plan=Silver"
-            className="mt-6 block w-full text-center py-2.5 rounded-xl font-semibold text-sm text-[#0f1117] transition-all"
-            style={{ background: 'linear-gradient(135deg, #8d9caa, #b0b8c1, #8d9caa)' }}
+            className="mt-6 block w-full text-center py-2.5 rounded-xl font-semibold text-sm text-[#0f1117] transition-all bg-silver-gradient"
           >
             Book Silver
           </Link>
@@ -91,18 +89,16 @@ export default function PricingCard({
   if (tier === 'gold') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative"
-        style={{ boxShadow: '0 8px 40px rgba(201,168,76,0.25)' }}
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative shadow-gold-glow"
       >
         <div className="absolute top-4 right-4 z-10">
           <span
-            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-[#0f1117]"
-            style={{ background: 'linear-gradient(135deg, #c9a84c, #f0d080)' }}
+            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold text-[#0f1117] bg-gold-gradient"
           >
             ★ Best Value
           </span>
         </div>
-        <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)' }} />
+        <div className="h-1 w-full bg-gold-bar-gradient" />
         <div className="px-6 py-5">
           <span className="text-xs font-semibold uppercase tracking-widest text-[#f0d080]">Gold</span>
           <div className="mt-2">
@@ -123,8 +119,7 @@ export default function PricingCard({
           </ul>
           <Link
             href="/contact?plan=Gold"
-            className="mt-6 block w-full text-center py-2.5 rounded-xl font-bold text-sm text-[#0f1117] transition-all"
-            style={{ background: 'linear-gradient(135deg, #c9a84c, #f0d080, #c9a84c)' }}
+            className="mt-6 block w-full text-center py-2.5 rounded-xl font-bold text-sm text-[#0f1117] transition-all bg-gold-gradient"
           >
             Book Gold
           </Link>
