@@ -228,11 +228,13 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       {/* Header */}
       <div className="text-center">
-        <p className="text-xs font-semibold uppercase tracking-widest text-teal-500">Free Quote</p>
-        <h3 className="text-lg font-bold text-slate-900 mt-0.5">
-          {location ? `Book in ${location}` : 'Book Your Detail'}
+        <p className="text-sm font-bold uppercase tracking-widest text-teal-500">Free Quote</p>
+        <h3 className="text-xl font-extrabold text-slate-900 mt-0.5">
+          {location ? `Book in ${location}` : (
+            <>Book Your Detailing Today — <span className="text-teal-600 whitespace-nowrap">Get Up To 30% OFF!</span></>
+          )}
         </h3>
-        <p className="text-xs text-slate-500 mt-0.5">We come to you — same-week availability</p>
+        <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
       </div>
 
       {/* Pre-selected package banner */}
@@ -262,7 +264,7 @@ export default function BookingForm({ location, defaultService, compact = false 
       {/* Name + Phone */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label htmlFor="name" className="block text-xs font-medium text-slate-700 mb-1">
+          <label htmlFor="name" className="block text-sm font-semibold text-slate-700 mb-1">
             Full Name *
           </label>
           <input
@@ -273,11 +275,11 @@ export default function BookingForm({ location, defaultService, compact = false 
             value={form.name}
             onChange={handleNameChange}
             placeholder="John Smith"
-            className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+            className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
           />
         </div>
         <div>
-          <label htmlFor="phone" className="block text-xs font-medium text-slate-700 mb-1">
+          <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1">
             Phone *
           </label>
           <input
@@ -288,7 +290,7 @@ export default function BookingForm({ location, defaultService, compact = false 
             value={form.phone}
             onChange={handlePhoneChange}
             placeholder="(305) 555-0100"
-            className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+            className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
           />
         </div>
       </div>
@@ -297,7 +299,7 @@ export default function BookingForm({ location, defaultService, compact = false 
       {!compact && (
         <>
           <div>
-            <label htmlFor="email" className="block text-xs font-medium text-slate-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-semibold text-slate-700 mb-1">
               Email *
             </label>
             <input
@@ -308,13 +310,13 @@ export default function BookingForm({ location, defaultService, compact = false 
               value={form.email}
               onChange={handleChange}
               placeholder="john@example.com"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+              className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="vehicleType" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="vehicleType" className="block text-sm font-semibold text-slate-700 mb-1">
                 Vehicle Type *
               </label>
               <select
@@ -323,14 +325,14 @@ export default function BookingForm({ location, defaultService, compact = false 
                 required
                 value={form.vehicleType}
                 onChange={handleChange}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+                className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
               >
                 <option value="">Select…</option>
                 {vehicleTypes.map(v => <option key={v} value={v}>{v}</option>)}
               </select>
             </div>
             <div>
-              <label htmlFor="service" className="block text-xs font-medium text-slate-700 mb-1">
+              <label htmlFor="service" className="block text-sm font-semibold text-slate-700 mb-1">
                 Service Needed *
               </label>
               <select
@@ -339,7 +341,7 @@ export default function BookingForm({ location, defaultService, compact = false 
                 required
                 value={form.service}
                 onChange={handleChange}
-                className={`w-full px-3 py-2.5 text-sm rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition ${
+                className={`w-full px-3 py-3 text-base font-medium rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition ${
                   selectedPackage ? 'border-teal-400 ring-1 ring-teal-300' : 'border-slate-200'
                 }`}
               >
@@ -353,7 +355,7 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       {/* Preferred Date */}
       <div>
-        <label className="block text-xs font-medium text-slate-700 mb-1">
+        <label className="block text-sm font-semibold text-slate-700 mb-1">
           Preferred Date *
         </label>
         <DatePicker
@@ -380,8 +382,8 @@ export default function BookingForm({ location, defaultService, compact = false 
                   : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
               }`}
             >
-              <span className="text-xs font-semibold leading-tight">{slot.label}</span>
-              <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
+              <span className="text-sm font-bold leading-tight">{slot.label}</span>
+              <span className="text-xs text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
             </button>
           ))}
         </div>
@@ -389,7 +391,7 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       {/* Notes */}
       <div>
-        <label htmlFor="message" className="block text-xs font-medium text-slate-700 mb-1">
+        <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-1">
           {compact ? 'Notes' : 'Additional Notes'}
         </label>
         <textarea
@@ -403,7 +405,7 @@ export default function BookingForm({ location, defaultService, compact = false 
               ? 'Any details about your vehicle or service needs…'
               : 'Location, special requests, or anything else we should know…'
           }
-          className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
+          className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
         />
       </div>
 
@@ -421,11 +423,11 @@ export default function BookingForm({ location, defaultService, compact = false 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3 px-6 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
+        className="w-full py-3.5 px-6 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
       >
         {submitting ? 'Sending…' : 'Get My Free Quote'}
       </button>
-      <p className="text-center text-xs text-slate-400">
+      <p className="text-center text-sm text-slate-400">
         No commitment · We respond in 15 minutes
       </p>
     </form>

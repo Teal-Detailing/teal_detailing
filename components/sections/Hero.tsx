@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import BookingForm from '@/components/ui/BookingForm'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
@@ -17,21 +18,25 @@ const trustBadges = [
   },
   {
     icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
-    label: 'Same-Week Appts',
+    label: 'Same Day Appointment',
   },
 ]
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center bg-hero-gradient overflow-hidden">
-      {/* Decorative blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-teal-500/5 blur-3xl" />
-        <div className="absolute top-1/2 -left-40 w-80 h-80 rounded-full bg-teal-400/5 blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-64 h-64 rounded-full bg-teal-600/8 blur-3xl" />
-      </div>
+    <section className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Background photo */}
+      <Image
+        src="/hero-bg.png"
+        alt="Hero background"
+        fill
+        className="object-cover object-center"
+        priority
+      />
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-black/60" />
 
-      <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 w-full">
+      <div className="relative w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 lg:max-w-[90rem] overflow-x-hidden">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
 
           {/* ── Left / mobile-only column ── */}
@@ -48,14 +53,27 @@ export default function Hero() {
             {/* Headline */}
             <div className="space-y-3">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
-                Premium Detail.{' '}
-                <span className="text-gradient-teal">Your Driveway.</span>
+                <span className="lg:whitespace-nowrap">Premium Mobile Car Detailing</span> <span className="text-gradient-teal"><span className="lg:whitespace-nowrap">in Miami, Broward,</span> Palm Beach</span>
               </h1>
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-lg">
-                South Florida&apos;s most trusted mobile detailing service. We bring
-                professional-grade equipment to your home or office — Miami-Dade, Broward
-                &amp; Palm Beach.
+              <p className="text-slate-300 leading-relaxed max-w-2xl text-[1rem] lg:text-[1.5rem] font-bold">
+                Teal Detailing brings professional mobile car detailing directly to your location across South Florida. Specializing in:
               </p>
+              <div className="flex flex-wrap gap-x-2 gap-y-1 text-slate-300 font-sans text-[0.85rem] lg:text-[1.25rem] font-bold">
+                {[
+                  { label: 'Full Detail', href: '/services/mobile-car-detailing' },
+                  { label: 'Interior Deep Clean', href: '/services/interior-detailing' },
+                  { label: 'Ceramic Coating', href: '/services/ceramic-coating' },
+                  { label: 'Paint Correction', href: '/services/paint-correction' },
+                  { label: 'Headlight Restoration', href: '/services/headlight-restoration' },
+                ].map(({ label, href }) => (
+                  <span key={label} className="flex items-center gap-2">
+                    <span className="text-teal-400">·</span>
+                    <Link href={href} className="hover:text-teal-300 transition-colors underline underline-offset-2">
+                      {label}
+                    </Link>
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Trust badges — desktop only (form replaces them on mobile) */}
@@ -73,7 +91,7 @@ export default function Hero() {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
                   </svg>
-                  <span className="text-sm font-medium text-white/80">{label}</span>
+                  <span className="text-[1rem] font-semibold text-white/80">{label}</span>
                 </div>
               ))}
             </div>
@@ -100,8 +118,8 @@ export default function Hero() {
                 </div>
               </a>
               <div className="h-6 w-px bg-white/10" />
-              <p className="text-sm text-slate-400">
-                <span className="text-white font-semibold">200+</span> happy customers
+              <p className="text-slate-400" style={{ fontSize: '1rem' }}>
+                <span className="text-white font-semibold">700+</span> happy customers
               </p>
             </div>
 
@@ -127,16 +145,18 @@ export default function Hero() {
                 </div>
               </a>
               <div className="h-8 w-px bg-white/10" />
-              <p className="text-sm text-slate-400">
-                <span className="text-white font-semibold">200+</span> happy customers
+              <p className="text-slate-400" style={{ fontSize: '1rem' }}>
+                <span className="text-white font-semibold">700+</span> happy customers
               </p>
             </div>
           </div>
 
           {/* ── Right column — compact booking form (mobile + desktop) ── */}
-          <div className="lg:flex lg:justify-end">
-            <div className="w-full max-w-md bg-white rounded-2xl shadow-glow p-6">
-              <BookingForm compact />
+          <div className="lg:flex lg:flex-col lg:items-end gap-3">
+            <div className="w-full max-w-md">
+              <div className="bg-white rounded-2xl shadow-glow p-6">
+                <BookingForm compact />
+              </div>
             </div>
           </div>
         </div>

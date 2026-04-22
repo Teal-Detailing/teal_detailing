@@ -72,9 +72,6 @@ export default function Navbar() {
               className="rounded-lg"
               priority
             />
-            <span className={`text-lg font-bold tracking-tight transition-colors ${scrolled ? 'text-slate-900' : 'text-white'}`}>
-              Teal<span className="text-teal-400">.</span>
-            </span>
           </Link>
 
           {/* Desktop Nav */}
