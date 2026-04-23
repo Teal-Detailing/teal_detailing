@@ -13,8 +13,8 @@ export default function ServiceFeature({ iconPath, title, description }: Service
         </svg>
       </div>
       <div>
-        <h3 className="font-semibold text-slate-900 text-base">{title}</h3>
-        <p className="text-slate-600 text-sm mt-1 leading-relaxed">{description}</p>
+        <h3 className="font-semibold text-slate-900 text-[1.2rem]">{title}</h3>
+        <p className="text-slate-600 text-[1.05rem] mt-1 leading-relaxed">{description}</p>
       </div>
     </div>
   )

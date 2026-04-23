@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const planMap: Record<string, string> = {
   Economy: 'Economy Detail ($109)',
   Silver: 'Silver Detail ($179)',
-  Gold: 'Gold Detail ($279)',
+  Gold: 'Gold Detail ($249)',
 }
 
 const infoCards = [

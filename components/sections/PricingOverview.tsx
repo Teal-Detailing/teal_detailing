@@ -7,15 +7,14 @@ export default function PricingOverview() {
     <section id="packages" className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">
+          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-400 mb-3">
             Transparent Pricing
           </p>
-          <h2 id="pricing-heading" className="text-3xl sm:text-4xl font-extrabold text-white">
+          <h2 id="pricing-heading" className="text-[2.16rem] sm:text-[2.88rem] font-extrabold text-white">
             Choose Your Package
           </h2>
-          <p className="mt-3 text-slate-400 max-w-xl mx-auto text-base leading-relaxed">
-            No hidden fees. No surprises. Every package includes our satisfaction guarantee —
-            if it&apos;s not right, we&apos;ll come back and make it right.
+          <p className="mt-3 text-slate-400 max-w-xl mx-auto text-[1.2rem] leading-relaxed">
+            No hidden fees. No surprises. Every package includes our satisfaction guarantee.
           </p>
         </div>
 

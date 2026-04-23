@@ -25,20 +25,10 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <section className="py-4 bg-[#0a0a0f]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-1">
-            Choose Your Detail Package
-          </h2>
-          <p className="text-slate-400 text-sm">
-            Starting at $109 — we come to you, fully equipped.
-          </p>
-        </div>
-      </section>
       <PricingOverview />
+      <Reviews />
       <WhyChooseUs />
       <ServicesGrid />
-      <Reviews />
 
       {/* Gallery Teaser */}
       <section className="py-14 bg-white border-b border-slate-100">

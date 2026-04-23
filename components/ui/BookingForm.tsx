@@ -21,9 +21,9 @@ const vehicleTypes = [
 ]
 
 const serviceOptions = [
-  'Economy Detail ($109)',
+  'Economy Detail ($99)',
   'Silver Detail ($179)',
-  'Gold Detail ($279)',
+  'Gold Detail ($249)',
   'Ceramic Coating',
   'Clay Bar Treatment',
   'Exterior Detailing',
@@ -36,9 +36,9 @@ const serviceOptions = [
 ]
 
 const packageAccent: Record<string, string> = {
-  'Economy Detail ($109)': 'bg-slate-100 text-slate-700 border-slate-300',
+  'Economy Detail ($99)': 'bg-slate-100 text-slate-700 border-slate-300',
   'Silver Detail ($179)': 'bg-blue-50 text-blue-700 border-blue-200',
-  'Gold Detail ($279)': 'bg-amber-50 text-amber-700 border-amber-300',
+  'Gold Detail ($249)': 'bg-amber-50 text-amber-700 border-amber-300',
 }
 
 const timeSlots = [
