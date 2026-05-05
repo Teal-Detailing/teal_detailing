@@ -179,7 +179,7 @@ export default function BookingForm({ location, defaultService, compact = false 
           email: form.email || '',
           vehicleType: form.vehicleType || '',
           service: form.service || '',
-          date: formatDisplayDate(selectedDate as Date),
+          date: selectedDate ? formatDisplayDate(selectedDate) : '',
           timeSlot: timeLabel,
           location: location || '',
           message: form.message || '',
