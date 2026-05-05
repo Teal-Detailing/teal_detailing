@@ -173,6 +173,7 @@ export default function BookingForm({ location, defaultService, compact = false 
         body: new URLSearchParams({
           'form-name': formName,
           'bot-field': '',
+          'g-recaptcha-response': recaptchaToken || '',
           name: form.name,
           phone: form.phone,
           email: form.email || '',
