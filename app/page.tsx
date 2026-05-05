@@ -26,9 +26,9 @@ export default function HomePage() {
     <>
       <Hero />
       <PricingOverview />
+      <ServicesGrid />
       <Reviews />
       <WhyChooseUs />
-      <ServicesGrid />
 
       {/* Gallery Teaser */}
       <section className="py-14 bg-white border-b border-slate-100">

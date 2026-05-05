@@ -33,6 +33,14 @@ export default function BottomBar() {
 
   const hideCTA = pathname === '/contact'
 
+  function handleViewPricing() {
+    if (pathname === '/') {
+      document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' })
+    } else {
+      window.location.href = '/#packages'
+    }
+  }
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col">
       {/* CTA Bar */}
@@ -43,12 +51,12 @@ export default function BottomBar() {
               Mobile detailing · Miami-Dade · Broward · Palm Beach
             </p>
             <div className="flex items-center gap-2 w-full sm:w-auto">
-              <Link
-                href="/services"
+              <button
+                onClick={handleViewPricing}
                 className="flex-1 sm:flex-none text-center px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-medium transition-colors"
               >
                 View Pricing
-              </Link>
+              </button>
               <Link
                 href="/contact"
                 className="flex-1 sm:flex-none text-center px-5 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-semibold transition-colors"

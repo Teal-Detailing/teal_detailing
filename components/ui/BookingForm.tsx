@@ -20,10 +20,17 @@ const vehicleTypes = [
   'Luxury / Exotic',
 ]
 
-const serviceOptions = [
-  'Economy Detail ($99)',
-  'Silver Detail ($179)',
-  'Gold Detail ($249)',
+const vehicleSurcharges: Record<string, number> = {
+  'Sedan': 0,
+  'Coupe': 0,
+  'Sports Car': 0,
+  'SUV / Crossover': 10,
+  'Truck': 10,
+  'Van / Minivan': 20,
+  'Luxury / Exotic': 20,
+}
+
+const extraServices = [
   'Ceramic Coating',
   'Clay Bar Treatment',
   'Exterior Detailing',
@@ -35,10 +42,19 @@ const serviceOptions = [
   'Other / Custom Quote',
 ]
 
-const packageAccent: Record<string, string> = {
-  'Economy Detail ($99)': 'bg-slate-100 text-slate-700 border-slate-300',
-  'Silver Detail ($179)': 'bg-blue-50 text-blue-700 border-blue-200',
-  'Gold Detail ($249)': 'bg-amber-50 text-amber-700 border-amber-300',
+function getPackageOptions(surcharge: number) {
+  return [
+    `Economy Detail ($${99 + surcharge})`,
+    `Silver Detail ($${179 + surcharge})`,
+    `Gold Detail ($${249 + surcharge})`,
+  ]
+}
+
+function getPackageAccent(service: string): string {
+  if (service.startsWith('Economy')) return 'bg-slate-100 text-slate-700 border-slate-300'
+  if (service.startsWith('Silver')) return 'bg-blue-50 text-blue-700 border-blue-200'
+  if (service.startsWith('Gold')) return 'bg-amber-50 text-amber-700 border-amber-300'
+  return 'bg-teal-50 text-teal-700 border-teal-200'
 }
 
 const timeSlots = [
@@ -96,6 +112,16 @@ export default function BookingForm({ location, defaultService, compact = false 
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  function handleVehicleTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const newType = e.target.value
+    const newSurcharge = vehicleSurcharges[newType] ?? 0
+    const newPackages = getPackageOptions(newSurcharge)
+    const oldPackages = getPackageOptions(vehicleSurcharges[form.vehicleType] ?? 0)
+    const pkgIndex = oldPackages.indexOf(form.service)
+    const newService = pkgIndex !== -1 ? newPackages[pkgIndex] : form.service
+    setForm(prev => ({ ...prev, vehicleType: newType, service: newService }))
+  }
+
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm(prev => ({ ...prev, name: e.target.value.replace(/[0-9]/g, '') }))
   }
@@ -120,11 +146,11 @@ export default function BookingForm({ location, defaultService, compact = false 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    if (!selectedDate) {
+    if (!compact && !selectedDate) {
       setError('Please select a preferred date.')
       return
     }
-    if (!form.timeSlot) {
+    if (!compact && !form.timeSlot) {
       setError('Please select a preferred time of day.')
       return
     }
@@ -212,7 +238,10 @@ export default function BookingForm({ location, defaultService, compact = false 
     )
   }
 
-  const selectedPackage = serviceOptions.slice(0, 3).includes(form.service) ? form.service : null
+  const currentSurcharge = vehicleSurcharges[form.vehicleType] ?? 0
+  const currentPackageOptions = getPackageOptions(currentSurcharge)
+  const allServiceOptions = [...currentPackageOptions, ...extraServices]
+  const selectedPackage = currentPackageOptions.includes(form.service) ? form.service : null
   const formName = compact ? 'quote-compact' : 'quote-full'
 
   return (
@@ -241,7 +270,7 @@ export default function BookingForm({ location, defaultService, compact = false 
       {selectedPackage && (
         <div
           className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium ${
-            packageAccent[selectedPackage] ?? 'bg-teal-50 text-teal-700 border-teal-200'
+            getPackageAccent(selectedPackage)
           }`}
         >
           <div className="flex items-center gap-2">
@@ -324,7 +353,7 @@ export default function BookingForm({ location, defaultService, compact = false 
                 name="vehicleType"
                 required
                 value={form.vehicleType}
-                onChange={handleChange}
+                onChange={handleVehicleTypeChange}
                 className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
               >
                 <option value="">Select…</option>
@@ -346,7 +375,7 @@ export default function BookingForm({ location, defaultService, compact = false 
                 }`}
               >
                 <option value="">Select…</option>
-                {serviceOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                {allServiceOptions.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
           </div>
@@ -354,40 +383,44 @@ export default function BookingForm({ location, defaultService, compact = false 
       )}
 
       {/* Preferred Date */}
-      <div>
-        <label className="block text-sm font-semibold text-slate-700 mb-1">
-          Preferred Date *
-        </label>
-        <DatePicker
-          value={selectedDate}
-          onChange={setSelectedDate}
-          placeholder="Select a date…"
-        />
-      </div>
+      {!compact && (
+        <div>
+          <label className="block text-sm font-semibold text-slate-700 mb-1">
+            Preferred Date *
+          </label>
+          <DatePicker
+            value={selectedDate}
+            onChange={setSelectedDate}
+            placeholder="Select a date…"
+          />
+        </div>
+      )}
 
       {/* Preferred Time */}
-      <div>
-        <label className="block text-xs font-medium text-slate-700 mb-1.5">
-          Preferred Time *
-        </label>
-        <div className="grid grid-cols-3 gap-2">
-          {timeSlots.map(slot => (
-            <button
-              key={slot.value}
-              type="button"
-              onClick={() => setForm(prev => ({ ...prev, timeSlot: slot.value }))}
-              className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all duration-150 ${
-                form.timeSlot === slot.value
-                  ? 'border-teal-400 bg-teal-50 text-teal-700 ring-1 ring-teal-300'
-                  : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
-              }`}
-            >
-              <span className="text-sm font-bold leading-tight">{slot.label}</span>
-              <span className="text-xs text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
-            </button>
-          ))}
+      {!compact && (
+        <div>
+          <label className="block text-xs font-medium text-slate-700 mb-1.5">
+            Preferred Time *
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {timeSlots.map(slot => (
+              <button
+                key={slot.value}
+                type="button"
+                onClick={() => setForm(prev => ({ ...prev, timeSlot: slot.value }))}
+                className={`flex flex-col items-center justify-center py-2.5 px-2 rounded-xl border text-center transition-all duration-150 ${
+                  form.timeSlot === slot.value
+                    ? 'border-teal-400 bg-teal-50 text-teal-700 ring-1 ring-teal-300'
+                    : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
+                }`}
+              >
+                <span className="text-sm font-bold leading-tight">{slot.label}</span>
+                <span className="text-xs text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Notes */}
       <div>

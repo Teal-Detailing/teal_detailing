@@ -24,6 +24,8 @@ const config: Config = {
         glow: '0 0 24px rgba(45,212,191,0.35)',
         'dark-card': '0 8px 32px rgba(0,0,0,0.4)',
         'gold-glow': '0 8px 40px rgba(201,168,76,0.25)',
+        'gold-glow-hover': '0 0 40px rgba(201,168,76,0.5), 0 8px 40px rgba(201,168,76,0.3)',
+        'silver-glow-hover': '0 0 40px rgba(176,184,193,0.4), 0 8px 40px rgba(176,184,193,0.25)',
         'phone-glow': '0 4px 24px rgba(20,184,166,0.5)',
       },
       backgroundImage: {

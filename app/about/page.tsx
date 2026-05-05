@@ -39,7 +39,7 @@ const values = [
 ]
 
 const stats = [
-  { value: '200+', label: 'Happy Customers' },
+  { value: '700+', label: 'Happy Customers' },
   { value: '5★', label: 'Average Rating' },
   { value: '3', label: 'Counties Served' },
   { value: '100%', label: 'Satisfaction Rate' },
@@ -159,7 +159,7 @@ export default function AboutPage() {
             Experience the Teal Difference
           </h2>
           <p className="text-slate-300 mb-8">
-            Join 200+ South Florida customers who trust us with their vehicles.
+            Join 700+ South Florida customers who trust us with their vehicles.
           </p>
           <Link
             href="/contact"

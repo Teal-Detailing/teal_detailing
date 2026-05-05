@@ -1,12 +1,60 @@
+'use client'
+
+import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
 import { pricingPlans } from '@/lib/plans'
 
+const basePrices = [99, 179, 249]
+const baseOldPrices = [129, 229, 329]
+
+const carTypes = [
+  {
+    id: 'sedan',
+    label: 'Sedan & Coupe',
+    surcharge: 0,
+    icon: (selected: boolean) => <Image src="/icons/sedan.png" alt="Sedan & Coupe" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+  },
+  {
+    id: 'suv',
+    label: 'Small SUV & Truck',
+    surcharge: 10,
+    icon: (selected: boolean) => <Image src="/icons/suv.png" alt="Small SUV & Truck" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+  },
+  {
+    id: 'large',
+    label: 'Large SUV, Truck & Van',
+    surcharge: 20,
+    icon: (selected: boolean) => <Image src="/icons/large.png" alt="Large SUV, Truck & Van" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+  },
+]
+
 export default function PricingOverview() {
+  const [selectedCar, setSelectedCar] = useState(0)
+  const [animating, setAnimating] = useState(false)
+
+  function handleCarChange(index: number) {
+    if (index === selectedCar) return
+    setAnimating(true)
+    setTimeout(() => {
+      setSelectedCar(index)
+      setAnimating(false)
+    }, 200)
+  }
+
+  const surcharge = carTypes[selectedCar].surcharge
+
+  const adjustedPlans = pricingPlans.map((plan, i) => ({
+    ...plan,
+    price: `$${basePrices[i] + surcharge}`,
+    oldPrice: `$${baseOldPrices[i] + surcharge}`,
+  }))
+
   return (
     <section id="packages" className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-400 mb-3">
             Transparent Pricing
           </p>
@@ -18,8 +66,31 @@ export default function PricingOverview() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-          {pricingPlans.map((plan) => (
+        {/* Car type toggle */}
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex flex-col sm:flex-row gap-2 bg-white/5 border border-white/10 rounded-2xl p-2 w-full sm:w-auto">
+            {carTypes.map((car, i) => (
+              <button
+                key={car.id}
+                onClick={() => handleCarChange(i)}
+                className={`flex flex-row sm:flex-col items-center gap-3 sm:gap-1.5 px-4 py-3 rounded-xl transition-all duration-200 text-left sm:text-center ${
+                  selectedCar === i
+                    ? 'bg-teal-500 text-white shadow-glow'
+                    : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <div className="flex-shrink-0">{car.icon(selectedCar === i)}</div>
+                <span className="text-xs font-semibold">{car.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Pricing cards */}
+        <div
+          className={`flex flex-col sm:flex-row sm:items-start gap-6 transition-opacity duration-200 ${animating ? 'opacity-0' : 'opacity-100'}`}
+        >
+          {adjustedPlans.map((plan) => (
             <div key={plan.name} className="flex-1">
               <PricingCard {...plan} />
             </div>

@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 
 // Maps URL ?plan= query value to the full service option label
 const planMap: Record<string, string> = {
-  Economy: 'Economy Detail ($109)',
+  Economy: 'Economy Detail ($99)',
   Silver: 'Silver Detail ($179)',
   Gold: 'Gold Detail ($249)',
 }
@@ -79,7 +79,7 @@ export default function ContactPage({
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-start">
             {/* Info */}
-            <div>
+            <div className="order-last lg:order-first">
               <h2 id="contact-heading" className="text-2xl font-bold text-slate-900 mb-6">
                 Contact Information
               </h2>
@@ -124,7 +124,7 @@ export default function ContactPage({
             </div>
 
             {/* Form */}
-            <div>
+            <div className="order-first lg:order-last">
               <h2 className="text-2xl font-bold text-slate-900 mb-6">Request a Quote</h2>
               <div className="bg-white rounded-2xl shadow-card-hover border border-slate-100 p-6">
                 <BookingForm defaultService={defaultService} />

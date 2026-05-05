@@ -3,6 +3,7 @@ import Link from 'next/link'
 interface PricingCardProps {
   name: string
   price: string
+  oldPrice?: string
   subtitle: string
   features: string[]
   highlightedFeatures?: string[]
@@ -12,6 +13,7 @@ interface PricingCardProps {
 export default function PricingCard({
   name,
   price,
+  oldPrice,
   subtitle,
   features,
   highlightedFeatures = [],
@@ -25,7 +27,7 @@ export default function PricingCard({
           <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-slate-500">Economy</span>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-extrabold text-slate-700">{price}</span>
-            <span className="text-[1.05rem] text-slate-600 line-through">$129</span>
+            {oldPrice && <span className="text-[1.05rem] text-slate-600 line-through">{oldPrice}</span>}
             <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-50 text-teal-700 text-[0.9rem] font-semibold">15% off</span>
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-500">{subtitle}</p>
@@ -55,7 +57,7 @@ export default function PricingCard({
   if (tier === 'silver') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/60 shadow-dark-card relative ring-1 ring-[#b0b8c1]/40"
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/60 shadow-dark-card relative ring-1 ring-[#b0b8c1]/40 transition-shadow duration-300 hover:shadow-silver-glow-hover"
       >
         <div className="absolute top-4 right-4 z-10">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.9rem] font-bold text-[#0f1117] bg-gradient-to-r from-[#8d9caa] via-[#b0b8c1] to-[#8d9caa]">
@@ -70,7 +72,7 @@ export default function PricingCard({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
-            <span className="text-[1.05rem] text-slate-400 line-through">$229</span>
+            {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}
             <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">22% off</span>
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-400">{subtitle}</p>
@@ -93,7 +95,7 @@ export default function PricingCard({
             href="/contact?plan=Silver"
             className="mt-6 block w-full text-center py-2.5 rounded-xl font-semibold text-[1.05rem] text-[#0f1117] transition-all bg-silver-gradient"
           >
-            Book Silver
+            Book Most Popular One
           </Link>
         </div>
       </article>
@@ -103,7 +105,7 @@ export default function PricingCard({
   if (tier === 'gold') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative shadow-gold-glow"
+        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative shadow-gold-glow transition-shadow duration-300 hover:shadow-gold-glow-hover"
       >
         <div className="absolute top-4 right-4 z-10">
           <span
@@ -117,13 +119,13 @@ export default function PricingCard({
           <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-[#f0d080]">Gold</span>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
-            <span className="text-[1.05rem] text-slate-400 line-through">$329</span>
+            {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}
             <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">25% off</span>
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-400">{subtitle}</p>
         </div>
         <div className="px-6 pt-5 pb-6 flex flex-col flex-1">
-          <ul className="space-y-2 flex-1">
+          <ul className="space-y-[0.6rem] flex-1">
             {features.map((feature) => {
               const isHighlighted = highlightedFeatures.includes(feature)
               return (

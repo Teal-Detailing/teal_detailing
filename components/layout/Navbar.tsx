@@ -80,7 +80,7 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`px-3 py-2 rounded-lg text-[1.05rem] font-semibold transition-colors ${
                   isActive(href)
                     ? 'text-teal-500 bg-teal-50'
                     : scrolled
@@ -99,7 +99,7 @@ export default function Navbar() {
               onMouseLeave={scheduleClose}
             >
               <button
-                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                className={`flex items-center gap-1 px-3 py-2 rounded-lg text-[1.05rem] font-semibold transition-colors ${
                   isAreaActive
                     ? 'text-teal-500 bg-teal-50'
                     : scrolled
