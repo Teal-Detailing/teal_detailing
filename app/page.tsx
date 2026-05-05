@@ -24,6 +24,32 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      {/* Hidden forms for Netlify form detection */}
+      <form name="quote-compact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+        <input type="text" name="bot-field" />
+        <input type="text" name="name" />
+        <input type="tel" name="phone" />
+        <input type="email" name="email" />
+        <input type="text" name="vehicleType" />
+        <input type="text" name="service" />
+        <input type="text" name="date" />
+        <input type="text" name="timeSlot" />
+        <input type="text" name="location" />
+        <textarea name="message"></textarea>
+      </form>
+      <form name="quote-full" data-netlify="true" netlify-honeypot="bot-field" hidden>
+        <input type="text" name="bot-field" />
+        <input type="text" name="name" />
+        <input type="tel" name="phone" />
+        <input type="email" name="email" />
+        <input type="text" name="vehicleType" />
+        <input type="text" name="service" />
+        <input type="text" name="date" />
+        <input type="text" name="timeSlot" />
+        <input type="text" name="location" />
+        <textarea name="message"></textarea>
+      </form>
+
       <Hero />
       <PricingOverview />
       <ServicesGrid />
