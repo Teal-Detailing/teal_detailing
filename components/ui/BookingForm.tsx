@@ -167,26 +167,28 @@ export default function BookingForm({ location, defaultService, compact = false 
     const timeLabel = slot ? `${slot.label} (${slot.hours})` : form.timeSlot
 
     try {
-      const response = await fetch('/__forms.html', {
+      const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          'form-name': formName,
-          'bot-field': '',
-          'g-recaptcha-response': recaptchaToken || '',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: 'dfe29cf1-1805-4522-b998-a41c2c100e2f',
+          subject: `New Booking Request — ${form.service || 'General Inquiry'}`,
+          from_name: 'Teal Detailing Website',
           name: form.name,
           phone: form.phone,
-          email: form.email || '',
-          vehicleType: form.vehicleType || '',
-          service: form.service || '',
-          date: selectedDate ? formatDisplayDate(selectedDate) : '',
-          timeSlot: timeLabel,
-          location: location || '',
+          email: form.email || 'not provided',
+          vehicle_type: form.vehicleType || 'not provided',
+          service: form.service || 'not provided',
+          date: selectedDate ? formatDisplayDate(selectedDate) : 'not provided',
+          time_slot: timeLabel || 'not provided',
+          location: location || 'not provided',
           message: form.message || '',
-        }).toString(),
+          form_type: formName,
+        }),
       })
 
-      if (!response.ok) {
+      const data = await response.json()
+      if (!data.success) {
         throw new Error('Submission failed')
       }
 
