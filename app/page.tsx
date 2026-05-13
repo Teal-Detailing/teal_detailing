@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Hero from '@/components/sections/Hero'
 import PricingOverview from '@/components/sections/PricingOverview'
+import ServiceAreas from '@/components/sections/ServiceAreas'
 import WhyChooseUs from '@/components/sections/WhyChooseUs'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import Reviews from '@/components/sections/Reviews'
@@ -24,34 +25,9 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      {/* Hidden forms for Netlify form detection */}
-      <form name="quote-compact" data-netlify="true" netlify-honeypot="bot-field" hidden>
-        <input type="text" name="bot-field" />
-        <input type="text" name="name" />
-        <input type="tel" name="phone" />
-        <input type="email" name="email" />
-        <input type="text" name="vehicleType" />
-        <input type="text" name="service" />
-        <input type="text" name="date" />
-        <input type="text" name="timeSlot" />
-        <input type="text" name="location" />
-        <textarea name="message"></textarea>
-      </form>
-      <form name="quote-full" data-netlify="true" netlify-honeypot="bot-field" hidden>
-        <input type="text" name="bot-field" />
-        <input type="text" name="name" />
-        <input type="tel" name="phone" />
-        <input type="email" name="email" />
-        <input type="text" name="vehicleType" />
-        <input type="text" name="service" />
-        <input type="text" name="date" />
-        <input type="text" name="timeSlot" />
-        <input type="text" name="location" />
-        <textarea name="message"></textarea>
-      </form>
-
       <Hero />
       <PricingOverview />
+      <ServiceAreas />
       <ServicesGrid />
       <Reviews />
       <WhyChooseUs />

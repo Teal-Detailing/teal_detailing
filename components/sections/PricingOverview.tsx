@@ -6,6 +6,14 @@ import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
 import { pricingPlans } from '@/lib/plans'
 
+function StarOutline() {
+  return (
+    <svg className="w-10 h-10 drop-shadow-[0_0_6px_rgba(45,212,191,0.6)]" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" strokeWidth="1.5" strokeLinejoin="round">
+      <path d="M12 2l2.939 6.326L22 9.274l-5 4.861 1.18 6.865L12 17.77l-6.18 3.23L7 14.135 2 9.274l7.061-.948L12 2z" />
+    </svg>
+  )
+}
+
 const basePrices = [99, 179, 249]
 const baseOldPrices = [129, 229, 329]
 
@@ -95,6 +103,35 @@ export default function PricingOverview() {
               <PricingCard {...plan} />
             </div>
           ))}
+        </div>
+
+        {/* Add-on banner */}
+        <div className="mt-6 rounded-2xl border-2 border-teal-500 overflow-hidden flex flex-col sm:flex-row items-stretch">
+          <div className="flex flex-col items-center justify-center px-6 py-4 gap-0.5">
+            <div className="flex gap-0.5">
+              <StarOutline />
+            </div>
+            <div className="flex gap-0.5">
+              <StarOutline /><StarOutline />
+            </div>
+            <div className="flex gap-0.5">
+              <StarOutline />
+            </div>
+          </div>
+          <div className="flex-1 px-6 py-5 flex flex-col justify-center gap-2">
+            <p className="text-[1.2rem] font-extrabold text-teal-400 uppercase tracking-wide">Add-On Available:</p>
+            <p className="text-slate-300 text-[1rem] leading-relaxed max-w-md">
+              For tough stains, spills and spot treatment, ask us about our additional stain removal service.
+            </p>
+          </div>
+          <div className="relative w-full sm:w-56 h-40 sm:h-auto flex-shrink-0">
+            <Image
+              src="/services/stain-removal.webp"
+              alt="Stain removal service"
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
 
         <div className="mt-10 text-center">

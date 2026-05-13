@@ -251,12 +251,7 @@ export default function BookingForm({ location, defaultService, compact = false 
     <form
       onSubmit={handleSubmit}
       className="flex flex-col gap-4"
-      name={formName}
     >
-      <input type="hidden" name="form-name" value={formName} />
-      <p style={{ display: 'none' }}>
-        <label>Don&apos;t fill this out: <input name="bot-field" /></label>
-      </p>
 
       {/* Header */}
       <div className="text-center">
