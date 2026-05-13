@@ -189,7 +189,7 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       const data = await response.json()
       if (!data.success) {
-        throw new Error('Submission failed')
+        throw new Error(data.message || 'Submission failed')
       }
 
       setSubmitted(true)
