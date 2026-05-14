@@ -137,9 +137,10 @@ export default function BookingForm({ location, defaultService, compact = false 
           access_key: 'dfe29cf1-1805-4522-b998-a41c2c100e2f',
           subject: `New Booking Request — ${form.service || 'General Inquiry'}`,
           from_name: 'Teal Detailing Website',
+          botcheck: false,
           name: form.name,
           phone: form.phone,
-          email: form.email || 'not provided',
+          email: form.email || 'info@tealdetailing.com',
           vehicle_type: form.vehicleType || 'not provided',
           service: form.service || 'not provided',
           date: selectedDate ? formatDisplayDate(selectedDate) : 'not provided',
@@ -156,9 +157,8 @@ export default function BookingForm({ location, defaultService, compact = false 
       }
 
       setSubmitted(true)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Unknown error'
-      setError(`Error: ${msg}`)
+    } catch {
+      setError(`Something went wrong. Please call us at ${PHONE_DISPLAY} or try again.`)
     } finally {
       setSubmitting(false)
     }
