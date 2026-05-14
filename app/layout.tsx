@@ -141,11 +141,6 @@ export default function RootLayout({
         <FloatingPhone />
 
         <Script
-          src="https://www.google.com/recaptcha/api.js?render=explicit"
-          strategy="afterInteractive"
-        />
-
-        <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-7Y6KV48PV9"
           strategy="afterInteractive"
         />

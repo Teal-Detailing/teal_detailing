@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import DatePicker, { formatDisplayDate } from './DatePicker'
 import { PHONE_DISPLAY } from '@/lib/constants'
 
@@ -67,11 +67,7 @@ export default function BookingForm({ location, defaultService, compact = false 
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [recaptchaToken, setRecaptchaToken] = useState('')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
-  const recaptchaRef = useRef<HTMLDivElement>(null)
-  const widgetIdRef = useRef<number | null>(null)
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
   const [form, setForm] = useState({
     name: '',
@@ -83,28 +79,6 @@ export default function BookingForm({ location, defaultService, compact = false 
     message: '',
   })
 
-  // Mount reCAPTCHA widget
-  useEffect(() => {
-    if (!siteKey || !recaptchaRef.current) return
-
-    const render = () => {
-      if (!recaptchaRef.current || widgetIdRef.current !== null || !window.grecaptcha) return
-      widgetIdRef.current = window.grecaptcha.render(recaptchaRef.current, {
-        sitekey: siteKey,
-        callback: (token: string) => setRecaptchaToken(token),
-        'expired-callback': () => setRecaptchaToken(''),
-      })
-    }
-
-    if (window.grecaptcha?.render) {
-      render()
-    } else {
-      const timer = setInterval(() => {
-        if (window.grecaptcha?.render) { clearInterval(timer); render() }
-      }, 150)
-      return () => clearInterval(timer)
-    }
-  }, [siteKey])
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -136,12 +110,6 @@ export default function BookingForm({ location, defaultService, compact = false 
     setForm(prev => ({ ...prev, phone: formatted }))
   }
 
-  function resetRecaptcha() {
-    if (widgetIdRef.current !== null) {
-      window.grecaptcha?.reset(widgetIdRef.current)
-      setRecaptchaToken('')
-    }
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -154,11 +122,6 @@ export default function BookingForm({ location, defaultService, compact = false 
       setError('Please select a preferred time of day.')
       return
     }
-    if (siteKey && !recaptchaToken) {
-      setError('Please complete the reCAPTCHA challenge.')
-      return
-    }
-
     setSubmitting(true)
     setError('')
 
@@ -193,10 +156,8 @@ export default function BookingForm({ location, defaultService, compact = false 
       }
 
       setSubmitted(true)
-      resetRecaptcha()
     } catch {
       setError(`Something went wrong. Please call us at ${PHONE_DISPLAY} or try again.`)
-      resetRecaptcha()
     } finally {
       setSubmitting(false)
     }
@@ -439,13 +400,6 @@ export default function BookingForm({ location, defaultService, compact = false 
           className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
         />
       </div>
-
-      {/* reCAPTCHA */}
-      {siteKey && (
-        <div className="flex justify-center">
-          <div ref={recaptchaRef} />
-        </div>
-      )}
 
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>
