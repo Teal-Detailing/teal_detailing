@@ -156,8 +156,9 @@ export default function BookingForm({ location, defaultService, compact = false 
       }
 
       setSubmitted(true)
-    } catch {
-      setError(`Something went wrong. Please call us at ${PHONE_DISPLAY} or try again.`)
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error'
+      setError(`Error: ${msg}`)
     } finally {
       setSubmitting(false)
     }
