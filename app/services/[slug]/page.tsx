@@ -85,7 +85,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold text-base transition-all hover:shadow-glow"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-base transition-all hover:shadow-glow"
           >
             Get a Free Quote
           </Link>
@@ -194,7 +194,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
             Same-week availability · No travel fees · 5-star service guaranteed
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm transition-all hover:shadow-glow">
+            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
             <a href={PHONE_HREF} className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">

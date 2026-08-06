@@ -59,7 +59,7 @@ export default function BottomBar() {
               </button>
               <Link
                 href="/contact"
-                className="flex-1 sm:flex-none text-center px-5 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-sm font-semibold transition-colors"
+                className="flex-1 sm:flex-none text-center px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
               >
                 Book Now
               </Link>
@@ -97,7 +97,7 @@ export default function BottomBar() {
                 </button>
                 <button
                   onClick={() => handleConsent(true)}
-                  className="px-4 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-white text-xs font-semibold transition-colors"
+                  className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold transition-colors"
                 >
                   Accept
                 </button>

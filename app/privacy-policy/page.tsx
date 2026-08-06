@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
             Legal
           </p>
           <h1 className="text-4xl sm:text-5xl font-extrabold text-white mb-4">Privacy Policy</h1>
-          <p className="text-slate-400 text-sm">Last updated: April 9, 2026</p>
+          <p className="text-slate-400 text-sm">Last updated: August 6, 2026</p>
         </div>
       </section>
 
@@ -57,12 +57,12 @@ export default function PrivacyPolicyPage() {
             <p className="text-slate-600 leading-relaxed mb-6">
               Form submissions are processed by{' '}
               <a
-                href="https://www.netlify.com"
+                href="https://web3forms.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-teal-600 hover:text-teal-500"
               >
-                Netlify
+                Web3Forms
               </a>{' '}
               and forwarded to{' '}
               <a href="mailto:info@tealdetailing.com" className="text-teal-600 hover:text-teal-500">
@@ -81,29 +81,11 @@ export default function PrivacyPolicyPage() {
               consent via our cookie banner.
             </p>
 
-            <h3 className="text-lg font-semibold text-slate-800 mb-2">2c. reCAPTCHA</h3>
+            <h3 className="text-lg font-semibold text-slate-800 mb-2">2c. Spam Prevention</h3>
             <p className="text-slate-600 leading-relaxed mb-6">
-              Our forms are protected by Google reCAPTCHA v3, which helps prevent spam and abuse.
-              reCAPTCHA collects hardware and software information and sends it to Google for
-              analysis. Use of reCAPTCHA is subject to Google&apos;s{' '}
-              <a
-                href="https://policies.google.com/privacy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-teal-600 hover:text-teal-500"
-              >
-                Privacy Policy
-              </a>{' '}
-              and{' '}
-              <a
-                href="https://policies.google.com/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-teal-600 hover:text-teal-500"
-              >
-                Terms of Service
-              </a>
-              .
+              Our forms use a hidden honeypot field to help filter out automated spam submissions.
+              This check runs entirely within our form provider (Web3Forms) and does not collect
+              any additional information about you.
             </p>
 
             <h2 className="text-2xl font-bold text-slate-900 mb-4">3. Cookies</h2>
@@ -125,15 +107,10 @@ export default function PrivacyPolicyPage() {
                     <td className="py-2 pr-4">Stores your cookie preference (accepted / declined)</td>
                     <td className="py-2">localStorage (persistent)</td>
                   </tr>
-                  <tr className="border-b border-slate-100">
+                  <tr>
                     <td className="py-2 pr-4 font-mono text-xs">_ga, _ga_*</td>
                     <td className="py-2 pr-4">Google Analytics — distinguishes unique visitors</td>
                     <td className="py-2">2 years (if accepted)</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 pr-4 font-mono text-xs">_grecaptcha</td>
-                    <td className="py-2 pr-4">Google reCAPTCHA — spam prevention</td>
-                    <td className="py-2">Session</td>
                   </tr>
                 </tbody>
               </table>
@@ -157,7 +134,7 @@ export default function PrivacyPolicyPage() {
 
             <h2 className="text-2xl font-bold text-slate-900 mb-4">5. Data Retention</h2>
             <p className="text-slate-600 leading-relaxed mb-6">
-              Form submission data is retained in our email inbox and Netlify dashboard for as
+              Form submission data is retained in our email inbox and Web3Forms dashboard for as
               long as necessary to fulfill your service request. If you would like your data
               removed, contact us at{' '}
               <a href="mailto:info@tealdetailing.com" className="text-teal-600 hover:text-teal-500">
@@ -180,7 +157,18 @@ export default function PrivacyPolicyPage() {
                 >
                   Netlify
                 </a>{' '}
-                — website hosting and form submissions
+                — website hosting
+              </li>
+              <li>
+                <a
+                  href="https://web3forms.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-teal-600 hover:text-teal-500"
+                >
+                  Web3Forms
+                </a>{' '}
+                — form submission processing
               </li>
               <li>
                 <a
@@ -192,17 +180,6 @@ export default function PrivacyPolicyPage() {
                   Google Analytics
                 </a>{' '}
                 — anonymous site analytics (consent-gated)
-              </li>
-              <li>
-                <a
-                  href="https://policies.google.com/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-teal-600 hover:text-teal-500"
-                >
-                  Google reCAPTCHA
-                </a>{' '}
-                — spam prevention on forms
               </li>
             </ul>
 

@@ -23,10 +23,8 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
-  const tomorrow = new Date(today)
-  tomorrow.setDate(today.getDate() + 1)
 
-  const initial = value ?? tomorrow
+  const initial = value ?? today
   const [viewYear, setViewYear] = useState(initial.getFullYear())
   const [viewMonth, setViewMonth] = useState(initial.getMonth())
 
@@ -124,7 +122,7 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
             {cells.map((day, i) => {
               if (!day) return <div key={`pad-${i}`} />
 
-              const isPast = day < tomorrow
+              const isPast = day < today
               const isSelected = value ? day.toDateString() === value.toDateString() : false
               const isToday = day.toDateString() === today.toDateString()
 
@@ -137,7 +135,7 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
                   className={[
                     'h-8 w-full rounded-full text-xs flex items-center justify-center transition-colors',
                     isSelected
-                      ? 'bg-teal-500 text-white font-semibold'
+                      ? 'bg-teal-600 text-white font-semibold'
                       : isToday
                       ? 'text-teal-600 font-semibold hover:bg-teal-50'
                       : isPast

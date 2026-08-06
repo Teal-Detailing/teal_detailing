@@ -101,7 +101,7 @@ export default function MiamiDadePage() {
               Services Available in Miami-Dade
             </h2>
             <p className="text-slate-500 mt-2 text-sm">
-              All 8 services available county-wide — we come to you
+              All 10 services available county-wide — we come to you
             </p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -155,7 +155,7 @@ export default function MiamiDadePage() {
             Same-week availability · No travel fees · 5-star service guaranteed
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold text-sm transition-all hover:shadow-glow">
+            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
             <a href="tel:+16452488292" className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">

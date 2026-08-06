@@ -45,7 +45,7 @@ export default function HomePage() {
             </div>
             <Link
               href="/gallery"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-all hover:shadow-glow"
+              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
             >
               Browse the Gallery
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +69,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-all hover:shadow-glow"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
             >
               Book Your Detail
             </Link>

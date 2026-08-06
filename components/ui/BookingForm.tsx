@@ -39,6 +39,8 @@ const extraServices = [
   'Mobile Car Detailing',
   'Paint Correction',
   'Pet Hair Removal',
+  'Stain Removal',
+  'Engine Bay Cleaning',
   'Other / Custom Quote',
 ]
 
@@ -218,11 +220,11 @@ export default function BookingForm({ location, defaultService, compact = false 
       {/* Header */}
       <div className="text-center">
         <p className="text-sm font-bold uppercase tracking-widest text-teal-500">Free Quote</p>
-        <h3 className="text-xl font-extrabold text-slate-900 mt-0.5">
+        <p className="text-xl font-extrabold text-slate-900 mt-0.5">
           {location ? `Book in ${location}` : (
             <>Book Your Detailing Today — <span className="text-teal-600 whitespace-nowrap">Get Up To 30% OFF!</span></>
           )}
-        </h3>
+        </p>
         <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
       </div>
 
@@ -409,7 +411,7 @@ export default function BookingForm({ location, defaultService, compact = false 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3.5 px-6 rounded-xl bg-teal-500 hover:bg-teal-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
+        className="w-full py-3.5 px-6 rounded-xl bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
       >
         {submitting ? 'Sending…' : 'Get My Free Quote'}
       </button>

@@ -181,7 +181,7 @@ export default function GalleryClient() {
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                     img.label === 'Before'
                       ? 'bg-slate-700/90 text-slate-200'
-                      : 'bg-teal-500/90 text-white'
+                      : 'bg-teal-600/90 text-white'
                   }`}>
                     {img.label}
                   </span>
@@ -273,7 +273,7 @@ export default function GalleryClient() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white font-semibold transition-all hover:shadow-glow"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
             >
               Get a Free Quote
             </Link>

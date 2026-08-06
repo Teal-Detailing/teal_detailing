@@ -70,9 +70,9 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Services
-            </h4>
+            </h3>
             <ul className="space-y-2">
               {services.map(({ href, label }) => (
                 <li key={label}>
@@ -89,9 +89,9 @@ export default function Footer() {
 
           {/* Service Areas + Company */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Service Areas
-            </h4>
+            </h3>
             <ul className="space-y-2">
               {areas.map(({ href, label }) => (
                 <li key={label}>
@@ -105,9 +105,9 @@ export default function Footer() {
               ))}
             </ul>
 
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mt-8 mb-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mt-8 mb-4">
               Company
-            </h4>
+            </h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/about" className="text-sm hover:text-teal-400 transition-colors">
@@ -129,9 +129,9 @@ export default function Footer() {
 
           {/* Hours */}
           <div>
-            <h4 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
               Hours
-            </h4>
+            </h3>
             <ul className="space-y-2 text-sm">
               <li className="flex justify-between">
                 <span>Every Day</span>
@@ -140,7 +140,7 @@ export default function Footer() {
             </ul>
             <Link
               href="/contact"
-              className="mt-5 inline-flex items-center justify-center w-full py-2.5 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
+              className="mt-5 inline-flex items-center justify-center w-full py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold transition-colors"
             >
               Book Now
             </Link>

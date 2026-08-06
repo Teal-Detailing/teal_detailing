@@ -7,7 +7,7 @@ export default function FloatingPhone() {
     <a
       href={PHONE_HREF}
       aria-label={`Call Teal Detailing at ${PHONE_DISPLAY}`}
-      className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-teal-500 hover:bg-teal-400 transition-colors flex items-center justify-center shadow-phone-glow"
+      className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-teal-600 hover:bg-teal-500 transition-colors flex items-center justify-center shadow-phone-glow"
     >
       {/* pulse ring */}
       <span className="absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-60 animate-ping" />
