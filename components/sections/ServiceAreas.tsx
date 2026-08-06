@@ -57,10 +57,10 @@ export default function ServiceAreas() {
           {/* Right — van photo */}
           <div className="relative w-full h-72 lg:h-96 rounded-2xl overflow-hidden border border-white/10">
             <Image
-              src="/images/van.png"
-              alt="Teal Detailing service van"
+              src="/images/gallery/showcase/showcase-3.jpg.jpg"
+              alt="Teal Detailing servicing a client's vehicle on-site in South Florida"
               fill
-              className="object-cover"
+              className="object-cover object-[center_35%]"
             />
           </div>
 
