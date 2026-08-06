@@ -80,10 +80,12 @@ export default function Reviews() {
                 </svg>
                 <div className="text-4xl font-serif text-teal-100 leading-none select-none">&ldquo;</div>
               </div>
-              <p className="text-slate-700 text-[1.3rem] leading-relaxed -mt-3 whitespace-pre-line">
-                {r.text}
-              </p>
-              <div className="mt-auto pt-4 border-t border-slate-100 flex items-center justify-between">
+              <div className="flex-1 flex items-center -mt-3">
+                <p className="text-slate-700 text-[1.3rem] leading-relaxed whitespace-pre-line">
+                  {r.text}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-teal-500 flex items-center justify-center">
                     {r.avatar ? (
