@@ -45,7 +45,7 @@ export default function BottomBar() {
     <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col">
       {/* CTA Bar */}
       {!hideCTA && (
-        <div className="bg-slate-950/95 backdrop-blur-md border-t border-slate-800">
+        <div className="bg-ink/95 backdrop-blur-md border-t border-slate-800">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
             <p className="hidden sm:block text-xs text-slate-500 flex-1 leading-tight">
               Mobile detailing · Miami-Dade · Broward · Palm Beach
@@ -77,7 +77,7 @@ export default function BottomBar() {
             transition: 'max-height 0.36s cubic-bezier(0.4, 0, 0.2, 1)',
           }}
         >
-          <div className="bg-slate-900 border-t border-slate-800 px-4 py-3">
+          <div className="bg-ink border-t border-slate-800 px-4 py-3">
             <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <p className="text-xs text-slate-400 flex-1 leading-relaxed">
                 We use cookies and Google Analytics to understand how visitors use our site.{' '}

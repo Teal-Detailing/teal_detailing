@@ -20,7 +20,7 @@ html {
   }
 
   .bg-hero-gradient {
-    background: linear-gradient(135deg, #0f172a 0%, #0f172a 60%, #042f2e 100%);
+    background: linear-gradient(135deg, #0a0a0f 0%, #0a0a0f 55%, #063b38 100%);
   }
 
   .animate-shimmer {

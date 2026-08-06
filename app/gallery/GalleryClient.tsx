@@ -117,7 +117,7 @@ export default function GalleryClient() {
       </nav>
 
       {/* Section 1 — Showcase */}
-      <section id="showcase" className="py-20 bg-slate-950" aria-labelledby="showcase-heading">
+      <section id="showcase" className="py-20 bg-ink" aria-labelledby="showcase-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Results</p>
@@ -153,7 +153,7 @@ export default function GalleryClient() {
       </section>
 
       {/* Section 2 — Interior Before & After */}
-      <section id="interior" className="py-20 bg-[#0a0a0f]" aria-labelledby="interior-heading">
+      <section id="interior" className="py-20 bg-ink" aria-labelledby="interior-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Before & After</p>
@@ -193,7 +193,7 @@ export default function GalleryClient() {
       </section>
 
       {/* Section 3 — Foam Treatment */}
-      <section id="foam" className="py-20 bg-slate-950" aria-labelledby="foam-heading">
+      <section id="foam" className="py-20 bg-ink" aria-labelledby="foam-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Process</p>

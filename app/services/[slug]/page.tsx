@@ -135,7 +135,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      <section className="py-20 bg-[#0a0a0f]" aria-labelledby="service-pricing-heading">
+      <section className="py-20 bg-ink" aria-labelledby="service-pricing-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">

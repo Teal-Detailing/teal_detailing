@@ -60,7 +60,7 @@ export default function PricingOverview() {
   }))
 
   return (
-    <section id="packages" className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
+    <section id="packages" className="py-20 bg-ink" aria-labelledby="pricing-heading">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-400 mb-3">

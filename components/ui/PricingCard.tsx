@@ -57,7 +57,7 @@ export default function PricingCard({
   if (tier === 'silver') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#b0b8c1]/60 shadow-dark-card relative ring-1 ring-[#b0b8c1]/40 transition-shadow duration-300 hover:shadow-silver-glow-hover"
+        className="flex flex-col rounded-2xl overflow-hidden bg-ink border border-[#b0b8c1]/60 shadow-dark-card relative ring-1 ring-[#b0b8c1]/40 transition-shadow duration-300 hover:shadow-silver-glow-hover"
       >
         <div className="absolute top-4 right-4 z-10">
           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.9rem] font-bold text-[#0f1117] bg-gradient-to-r from-[#8d9caa] via-[#b0b8c1] to-[#8d9caa]">
@@ -105,7 +105,7 @@ export default function PricingCard({
   if (tier === 'gold') {
     return (
       <article
-        className="flex flex-col rounded-2xl overflow-hidden bg-[#0f1117] border border-[#c9a84c]/30 relative shadow-gold-glow transition-shadow duration-300 hover:shadow-gold-glow-hover"
+        className="flex flex-col rounded-2xl overflow-hidden bg-ink border border-[#c9a84c]/30 relative shadow-gold-glow transition-shadow duration-300 hover:shadow-gold-glow-hover"
       >
         <div className="absolute top-4 right-4 z-10">
           <span
@@ -151,7 +151,7 @@ export default function PricingCard({
 
   return (
     <article className="relative flex flex-col rounded-2xl overflow-hidden shadow-card bg-white ring-1 ring-slate-200">
-      <div className="bg-slate-900 px-6 py-5">
+      <div className="bg-ink px-6 py-5">
         <h3 className="text-lg font-bold text-white">{name}</h3>
         <div className="flex items-baseline gap-1 mt-2">
           <span className="text-[2.25rem] font-extrabold text-white">{price}</span>
@@ -173,7 +173,7 @@ export default function PricingCard({
       <div className="px-6 pb-6">
         <Link
           href={`/contact?plan=${encodeURIComponent(name)}`}
-          className="block w-full text-center py-3 rounded-xl font-semibold text-[1.05rem] bg-slate-900 hover:bg-slate-700 text-white transition-all"
+          className="block w-full text-center py-3 rounded-xl font-semibold text-[1.05rem] bg-ink hover:bg-slate-800 text-white transition-all"
         >
           Book This Package
         </Link>

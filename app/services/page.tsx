@@ -132,7 +132,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-[#0a0a0f]" aria-labelledby="pricing-heading">
+      <section className="py-20 bg-ink" aria-labelledby="pricing-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 id="pricing-heading" className="text-3xl font-extrabold text-white mb-3">
@@ -165,7 +165,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-slate-900 text-center">
+      <section className="py-12 bg-ink text-center">
         <div className="max-w-3xl mx-auto px-4">
           <p className="text-slate-300 text-sm mb-4">We serve all of South Florida</p>
           <div className="flex flex-wrap justify-center gap-3">

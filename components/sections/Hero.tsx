@@ -37,7 +37,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/60" />
 
       <div className="relative w-full max-w-full mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 lg:max-w-[90rem] overflow-x-hidden">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="grid lg:grid-cols-[1.15fr_1fr] gap-12 lg:gap-10 xl:gap-16 items-center">
 
           {/* ── Left / mobile-only column ── */}
           <div className="flex flex-col gap-8">
@@ -52,8 +52,9 @@ export default function Hero() {
 
             {/* Headline */}
             <div className="space-y-3">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
-                <span className="lg:whitespace-nowrap">Premium Mobile Car Detailing</span> <span className="text-gradient-teal lg:whitespace-nowrap">in Miami, Broward, Palm Beach</span>
+              <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.1] text-white">
+                Premium Mobile Car Detailing{' '}
+                <span className="text-gradient-teal">in Miami, Broward, Palm&nbsp;Beach</span>
               </h1>
               <p className="text-slate-300 leading-relaxed max-w-2xl text-[1rem] lg:text-[1.5rem] font-bold">
                 Teal Detailing brings professional mobile car detailing directly to your location across South Florida. Specializing in:

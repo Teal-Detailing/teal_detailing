@@ -17,6 +17,10 @@ const config: Config = {
           500: '#14B8A6',
           600: '#0D9488',
         },
+        ink: {
+          DEFAULT: '#0a0a0f',
+          light: '#12121a',
+        },
       },
       boxShadow: {
         card: '0 1px 3px 0 rgba(0,0,0,0.08), 0 4px 16px -2px rgba(0,0,0,0.06)',
@@ -29,7 +33,7 @@ const config: Config = {
         'phone-glow': '0 4px 24px rgba(20,184,166,0.5)',
       },
       backgroundImage: {
-        'hero-gradient': 'linear-gradient(135deg, #0f172a 0%, #0f172a 60%, #042f2e 100%)',
+        'hero-gradient': 'linear-gradient(135deg, #0a0a0f 0%, #0a0a0f 55%, #063b38 100%)',
         'silver-gradient': 'linear-gradient(135deg, #8d9caa, #b0b8c1, #8d9caa)',
         'gold-gradient': 'linear-gradient(135deg, #c9a84c, #f0d080)',
         'gold-bar-gradient': 'linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)',
