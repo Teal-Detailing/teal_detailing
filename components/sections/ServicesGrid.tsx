@@ -75,7 +75,7 @@ export default function ServicesGrid() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-12">
-          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-500 mb-3">
+          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-700 mb-3">
             Services
           </p>
           <h2 id="services-grid-heading" className="text-[2.16rem] sm:text-[2.88rem] font-extrabold text-slate-900">
@@ -105,15 +105,15 @@ export default function ServicesGrid() {
               <div className="flex-1">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <h3 className="font-semibold text-slate-900 text-[1.05rem]">{name}</h3>
-                  <span className="text-[0.9rem] font-bold text-teal-600 whitespace-nowrap">{price}</span>
+                  <span className="text-[0.9rem] font-bold text-teal-700 whitespace-nowrap">{price}</span>
                 </div>
                 <p className="text-[0.9rem] text-slate-500 leading-relaxed">{desc}</p>
               </div>
               <Link
                 href={`/services/${slug}`}
-                className="text-[0.9rem] font-semibold text-teal-600 hover:text-teal-500 transition-colors inline-flex items-center gap-1 mt-auto"
+                className="text-[0.9rem] font-semibold text-teal-700 hover:text-teal-600 transition-colors inline-flex items-center gap-1 mt-auto"
               >
-                Learn More
+                Learn More<span className="sr-only"> about {name}</span>
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                 </svg>

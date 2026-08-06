@@ -24,13 +24,13 @@ export default function PricingCard({
     return (
       <article className="flex flex-col rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0]">
         <div className="px-6 py-5 bg-[#d8d8d8]">
-          <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-slate-500">Economy</span>
+          <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-slate-600">Economy</span>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-extrabold text-slate-700">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-600 line-through">{oldPrice}</span>}
             <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-50 text-teal-700 text-[0.9rem] font-semibold">15% off</span>
           </div>
-          <p className="text-[1rem] font-semibold mt-1 text-slate-500">{subtitle}</p>
+          <p className="text-[1rem] font-semibold mt-1 text-slate-600">{subtitle}</p>
         </div>
         <div className="px-6 py-5 flex flex-col flex-1">
           <ul className="space-y-2 flex-1">

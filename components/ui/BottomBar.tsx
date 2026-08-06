@@ -47,7 +47,7 @@ export default function BottomBar() {
       {!hideCTA && (
         <div className="bg-ink/95 backdrop-blur-md border-t border-slate-800">
           <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-            <p className="hidden sm:block text-xs text-slate-500 flex-1 leading-tight">
+            <p className="hidden sm:block text-xs text-slate-400 flex-1 leading-tight">
               Mobile detailing · Miami-Dade · Broward · Palm Beach
             </p>
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -59,7 +59,7 @@ export default function BottomBar() {
               </button>
               <Link
                 href="/contact"
-                className="flex-1 sm:flex-none text-center px-5 py-2 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-sm font-semibold transition-colors"
+                className="flex-1 sm:flex-none text-center px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
               >
                 Book Now
               </Link>
@@ -97,7 +97,7 @@ export default function BottomBar() {
                 </button>
                 <button
                   onClick={() => handleConsent(true)}
-                  className="px-4 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-semibold transition-colors"
+                  className="px-4 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold transition-colors"
                 >
                   Accept
                 </button>

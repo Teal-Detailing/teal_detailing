@@ -95,7 +95,7 @@ export default function ContactPage({
                       </svg>
                     </div>
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-0.5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-0.5">
                         {label}
                       </p>
                       {href ? (

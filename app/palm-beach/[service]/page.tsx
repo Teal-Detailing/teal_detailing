@@ -55,7 +55,7 @@ export default function PalmBeachServicePage({ params }: { params: { service: st
       />
       <section className="bg-hero-gradient pt-32 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-2 text-sm text-slate-400 mb-8" aria-label="Breadcrumb">
+          <nav className="flex items-center gap-2 text-sm text-slate-500 mb-8" aria-label="Breadcrumb">
             <Link href="/" className="hover:text-teal-400 transition-colors">Home</Link>
             <span>/</span>
             <Link href={`/${COUNTY_SLUG}`} className="hover:text-teal-400 transition-colors">{COUNTY}</Link>
@@ -74,7 +74,7 @@ export default function PalmBeachServicePage({ params }: { params: { service: st
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-base transition-all hover:shadow-glow"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-base transition-all hover:shadow-glow"
             >
               Get a Free Quote
             </Link>
@@ -150,7 +150,7 @@ export default function PalmBeachServicePage({ params }: { params: { service: st
             Same-week availability · No travel fees · 5-star service guaranteed
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all hover:shadow-glow">
+            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
             <a href={PHONE_HREF} className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">

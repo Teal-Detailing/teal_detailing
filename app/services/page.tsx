@@ -117,9 +117,9 @@ export default function ServicesPage() {
                   </div>
                   <Link
                     href={`/services/${s.slug}`}
-                    className="text-xs font-semibold text-teal-600 hover:text-teal-500 inline-flex items-center gap-1 mt-auto"
+                    className="text-xs font-semibold text-teal-700 hover:text-teal-600 inline-flex items-center gap-1 mt-auto"
                   >
-                    Learn More
+                    Learn More<span className="sr-only"> about {s.title}</span>
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                     </svg>

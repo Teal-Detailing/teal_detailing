@@ -71,6 +71,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
+      </head>
       <body className="font-sans antialiased bg-white text-slate-900 pb-14">
         <Script id="ga-consent-defaults" strategy="beforeInteractive">{`
           window.dataLayer=window.dataLayer||[];

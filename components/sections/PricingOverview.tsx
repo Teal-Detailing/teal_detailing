@@ -83,7 +83,7 @@ export default function PricingOverview() {
                 onClick={() => handleCarChange(i)}
                 className={`flex flex-row sm:flex-col items-center gap-3 sm:gap-1.5 px-4 py-3 rounded-xl transition-all duration-200 text-left sm:text-center ${
                   selectedCar === i
-                    ? 'bg-teal-600 text-white shadow-glow'
+                    ? 'bg-teal-700 text-white shadow-glow'
                     : 'text-white hover:bg-white/10'
                 }`}
               >

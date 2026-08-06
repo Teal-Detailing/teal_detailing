@@ -65,7 +65,7 @@ export default function AboutPage() {
       </section>
 
       {/* Stats */}
-      <section className="bg-teal-500 py-10">
+      <section className="bg-teal-700 py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {stats.map(({ value, label }) => (
@@ -163,7 +163,7 @@ export default function AboutPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
+            className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition-all hover:shadow-glow"
           >
             Book Your First Detail
           </Link>

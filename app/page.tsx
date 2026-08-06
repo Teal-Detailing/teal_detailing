@@ -39,13 +39,13 @@ export default function HomePage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-teal-500 mb-1.5">Our Work</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-700 mb-1.5">Our Work</p>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">See Real Results</h2>
               <p className="text-slate-500 mt-2 max-w-md">Real transformations from across South Florida — browse our photo gallery.</p>
             </div>
             <Link
               href="/gallery"
-              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
+              className="flex-shrink-0 inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition-all hover:shadow-glow"
             >
               Browse the Gallery
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +69,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold transition-all hover:shadow-glow"
+              className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition-all hover:shadow-glow"
             >
               Book Your Detail
             </Link>

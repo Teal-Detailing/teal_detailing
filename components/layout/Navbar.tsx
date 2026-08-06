@@ -82,7 +82,7 @@ export default function Navbar() {
                 href={href}
                 className={`px-3 py-2 rounded-lg text-[1.05rem] font-semibold transition-colors ${
                   isActive(href)
-                    ? 'text-teal-600 bg-teal-50'
+                    ? 'text-teal-700 bg-teal-50'
                     : scrolled
                     ? 'text-slate-700 hover:text-teal-600 hover:bg-slate-50'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -101,7 +101,7 @@ export default function Navbar() {
               <button
                 className={`flex items-center gap-1 px-3 py-2 rounded-lg text-[1.05rem] font-semibold transition-colors ${
                   isAreaActive
-                    ? 'text-teal-600 bg-teal-50'
+                    ? 'text-teal-700 bg-teal-50'
                     : scrolled
                     ? 'text-slate-700 hover:text-teal-600 hover:bg-slate-50'
                     : 'text-white/90 hover:text-white hover:bg-white/10'
@@ -128,7 +128,7 @@ export default function Navbar() {
                       href={href}
                       className={`flex items-center px-4 py-2.5 text-sm transition-colors ${
                         isActive(href)
-                          ? 'bg-teal-50 text-teal-600 font-medium'
+                          ? 'bg-teal-50 text-teal-700 font-medium'
                           : 'text-slate-700 hover:bg-slate-50 hover:text-teal-600'
                       }`}
                     >
@@ -156,7 +156,7 @@ export default function Navbar() {
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center px-4 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold transition-all duration-200 hover:shadow-glow"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold transition-all duration-200 hover:shadow-glow"
             >
               Get a Quote
             </Link>
@@ -191,14 +191,14 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 className={`flex items-center px-4 py-2.5 text-sm font-medium rounded-lg mx-2 transition-colors ${
-                  isActive(href) ? 'bg-teal-50 text-teal-600' : 'text-slate-700 hover:bg-slate-50'
+                  isActive(href) ? 'bg-teal-50 text-teal-700' : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 {label}
               </Link>
             ))}
             <div className="px-4 pt-1 pb-1">
-              <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 px-0 mb-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 px-0 mb-1">
                 Service Areas
               </p>
             </div>
@@ -207,7 +207,7 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 className={`flex items-center px-6 py-2 text-sm font-medium rounded-lg mx-2 transition-colors ${
-                  isActive(href) ? 'bg-teal-50 text-teal-600' : 'text-slate-600 hover:bg-slate-50'
+                  isActive(href) ? 'bg-teal-50 text-teal-700' : 'text-slate-600 hover:bg-slate-50'
                 }`}
               >
                 {label}
@@ -216,7 +216,7 @@ export default function Navbar() {
             <div className="px-4 pt-2">
               <Link
                 href="/contact"
-                className="flex items-center justify-center py-2.5 px-4 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold transition-colors"
+                className="flex items-center justify-center py-2.5 px-4 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold transition-colors"
               >
                 Get a Quote
               </Link>

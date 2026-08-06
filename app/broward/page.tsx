@@ -114,7 +114,7 @@ export default function BrowardPage() {
                 <span className="text-sm font-semibold text-slate-800 group-hover:text-teal-700 transition-colors">
                   {name}
                 </span>
-                <span className="text-xs text-teal-500 font-medium">Learn More →</span>
+                <span className="text-xs text-teal-700 font-medium">Learn More →</span>
               </Link>
             ))}
           </div>
@@ -155,7 +155,7 @@ export default function BrowardPage() {
             Same-week availability · No travel fees · 5-star service guaranteed
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-semibold text-sm transition-all hover:shadow-glow">
+            <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm transition-all hover:shadow-glow">
               Book Online
             </Link>
             <a href="tel:+16452488292" className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">

@@ -70,7 +70,7 @@ export default function FAQ() {
       />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-500 mb-3">
+          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-700 mb-3">
             FAQ
           </p>
           <h2 id="faq-heading" className="text-[2.16rem] sm:text-[2.88rem] font-extrabold text-slate-900">

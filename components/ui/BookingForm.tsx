@@ -189,7 +189,7 @@ export default function BookingForm({ location, defaultService, compact = false 
           </div>
         )}
         {form.service && (
-          <p className="text-xs text-teal-600 font-medium">Package: {form.service}</p>
+          <p className="text-xs text-teal-700 font-medium">Package: {form.service}</p>
         )}
         <button
           onClick={() => {
@@ -197,7 +197,7 @@ export default function BookingForm({ location, defaultService, compact = false 
             setSelectedDate(undefined)
             setForm({ name:'', phone:'', email:'', vehicleType:'', service:'', timeSlot:'', message:'' })
           }}
-          className="text-teal-600 text-sm font-medium underline underline-offset-2"
+          className="text-teal-700 text-sm font-medium underline underline-offset-2"
         >
           Submit another request
         </button>
@@ -219,10 +219,10 @@ export default function BookingForm({ location, defaultService, compact = false 
 
       {/* Header */}
       <div className="text-center">
-        <p className="text-sm font-bold uppercase tracking-widest text-teal-500">Free Quote</p>
+        <p className="text-sm font-bold uppercase tracking-widest text-teal-700">Free Quote</p>
         <p className="text-xl font-extrabold text-slate-900 mt-0.5">
           {location ? `Book in ${location}` : (
-            <>Book Your Detailing Today — <span className="text-teal-600 whitespace-nowrap">Get Up To 30% OFF!</span></>
+            <>Book Your Detailing Today — <span className="text-teal-700 whitespace-nowrap">Get Up To 30% OFF!</span></>
           )}
         </p>
         <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
@@ -377,7 +377,7 @@ export default function BookingForm({ location, defaultService, compact = false 
                 }`}
               >
                 <span className="text-sm font-bold leading-tight">{slot.label}</span>
-                <span className="text-xs text-slate-400 mt-0.5 leading-tight">{slot.hours}</span>
+                <span className="text-xs text-slate-500 mt-0.5 leading-tight">{slot.hours}</span>
               </button>
             ))}
           </div>
@@ -411,11 +411,11 @@ export default function BookingForm({ location, defaultService, compact = false 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full py-3.5 px-6 rounded-xl bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
+        className="w-full py-3.5 px-6 rounded-xl bg-teal-700 hover:bg-teal-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
       >
         {submitting ? 'Sending…' : 'Get My Free Quote'}
       </button>
-      <p className="text-center text-sm text-slate-400">
+      <p className="text-center text-sm text-slate-500">
         No commitment · We respond in 15 minutes
       </p>
     </form>

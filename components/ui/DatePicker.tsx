@@ -76,7 +76,7 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
         <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
         </svg>
-        <span className={value ? 'text-slate-900' : 'text-slate-400'}>
+        <span className={value ? 'text-slate-900' : 'text-slate-500'}>
           {value ? formatDisplayDate(value) : placeholder}
         </span>
       </button>
@@ -111,7 +111,7 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
           {/* Weekday headers */}
           <div className="grid grid-cols-7 mb-1">
             {WEEKDAYS.map(d => (
-              <div key={d} className="text-center text-[11px] font-medium text-slate-400 py-1">
+              <div key={d} className="text-center text-[11px] font-medium text-slate-500 py-1">
                 {d}
               </div>
             ))}
@@ -135,9 +135,9 @@ export default function DatePicker({ value, onChange, placeholder = 'Select a da
                   className={[
                     'h-8 w-full rounded-full text-xs flex items-center justify-center transition-colors',
                     isSelected
-                      ? 'bg-teal-600 text-white font-semibold'
+                      ? 'bg-teal-700 text-white font-semibold'
                       : isToday
-                      ? 'text-teal-600 font-semibold hover:bg-teal-50'
+                      ? 'text-teal-700 font-semibold hover:bg-teal-50'
                       : isPast
                       ? 'text-slate-300 cursor-not-allowed'
                       : 'text-slate-700 hover:bg-teal-50 hover:text-teal-700 cursor-pointer',

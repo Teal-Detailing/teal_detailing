@@ -52,7 +52,7 @@ export default function Reviews() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading */}
         <div className="text-center mb-12">
-          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-500 mb-3">
+          <p className="text-[0.9rem] font-semibold uppercase tracking-widest text-teal-700 mb-3">
             Client Reviews
           </p>
           <h2 id="reviews-heading" className="text-[2.16rem] sm:text-[2.88rem] font-extrabold text-slate-900">
@@ -94,7 +94,7 @@ export default function Reviews() {
                   </div>
                   <div>
                     <p className="text-[1.2rem] font-semibold text-slate-900">{r.name}</p>
-                    <p className="text-[1.05rem] text-slate-400">{r.location}</p>
+                    <p className="text-[1.05rem] text-slate-500">{r.location}</p>
                   </div>
                 </div>
                 <StarRating count={r.stars} />
@@ -117,7 +117,7 @@ export default function Reviews() {
             </svg>
             <div>
               <p className="text-[1.05rem] font-bold text-slate-900 group-hover:text-teal-600 transition-colors">See All Our Reviews</p>
-              <p className="text-[0.9rem] text-slate-400 mt-1">Read more on Google →</p>
+              <p className="text-[0.9rem] text-slate-500 mt-1">Read more on Google →</p>
             </div>
           </a>
         </div>
