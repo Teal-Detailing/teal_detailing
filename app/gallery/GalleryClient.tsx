@@ -19,6 +19,46 @@ const showcaseImages = [
     src: '/images/gallery/showcase/showcase-3.jpg.jpg',
     alt: 'SUV exterior detail complete — clean paint with wax sealant by Teal Detailing South Florida',
   },
+  {
+    src: '/images/gallery/showcase2/lambo-urus-after.jpg',
+    alt: 'Purple Lamborghini Urus after full exterior detail — deep gloss finish by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/showcase2/amg-sl-after.jpg',
+    alt: 'Black Mercedes-AMG SL after exterior detail — mirror-like paint finish by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/showcase2/porsche-356-front.jpg',
+    alt: 'Classic green Porsche 356 after full detail and paint correction by Teal Detailing',
+  },
+]
+
+const wheelImages = [
+  {
+    src: '/images/gallery/showcase2/urus-wheel-detail.jpg',
+    alt: 'Lamborghini Urus wheel and brake caliper after deep rim cleaning by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/showcase2/amg-wheel-detail.jpg',
+    alt: 'Mercedes-AMG wheel with yellow brake calipers after detailed rim cleaning by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/showcase2/porsche-wheel-detail.jpg',
+    alt: 'Classic Porsche 356 chrome wheel polished to a mirror shine by Teal Detailing',
+  },
+]
+
+const exteriorBeforeAfter = [
+  {
+    src: '/images/gallery/exterior-ba/silverado-before.jpg',
+    alt: 'Chevrolet Silverado ZR2 before exterior detail — dust and road grime on the paint',
+    label: 'Before',
+  },
+  {
+    src: '/images/gallery/exterior-ba/silverado-after.jpg',
+    alt: 'Chevrolet Silverado ZR2 after exterior detail — clean, glossy paint by Teal Detailing',
+    label: 'After',
+  },
 ]
 
 const interiorImages = [
@@ -44,6 +84,21 @@ const interiorImages = [
   },
 ]
 
+const interiorHighlights = [
+  {
+    src: '/images/gallery/interiors2/bmw-x7-interior.jpg',
+    alt: 'BMW X7 tan leather interior after full detail, with protective steering wheel wrap and floor mat by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/interiors2/nissan-interior.jpg',
+    alt: 'Nissan Sentra interior after detail, with complimentary gift bag and protective coverings by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/interiors2/porsche-356-interior.jpg',
+    alt: 'Classic Porsche 356 tan leather interior detailed to showroom condition by Teal Detailing',
+  },
+]
+
 const foamImages = [
   {
     src: '/images/gallery/foam/foam-1.jpg.jpg',
@@ -60,6 +115,10 @@ const foamImages = [
   {
     src: '/images/gallery/foam/foam-4.jpg.jpg',
     alt: 'Foam treatment close-up on car panel — professional pre-soak for safe washing by Teal Detailing',
+  },
+  {
+    src: '/images/gallery/foam2/amg-foam.jpg',
+    alt: 'Mercedes-AMG fully covered in foam pre-wash under South Florida trees — Teal Detailing process',
   },
 ]
 
@@ -101,6 +160,8 @@ export default function GalleryClient() {
           <div className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-hide">
             {[
               { href: '#showcase', label: 'Showcase' },
+              { href: '#exterior-ba', label: 'Exterior Before & After' },
+              { href: '#wheels', label: 'Wheel Detail' },
               { href: '#interior', label: 'Interior Detailing' },
               { href: '#foam', label: 'Foam Treatment' },
             ].map(({ href, label }) => (
@@ -152,6 +213,77 @@ export default function GalleryClient() {
         </div>
       </section>
 
+      {/* Section 1b — Exterior Before & After */}
+      <section id="exterior-ba" className="py-20 bg-ink border-t border-white/5" aria-labelledby="exterior-ba-heading">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Before & After</p>
+            <h2 id="exterior-ba-heading" className="text-3xl font-extrabold text-white">Exterior Transformations</h2>
+            <p className="text-slate-400 mt-2 text-sm">Real results from a full exterior detail — no filters, no staging</p>
+          </div>
+          <div role="img" aria-label="Exterior detailing before and after gallery" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {exteriorBeforeAfter.map((img) => (
+              <button
+                key={img.src}
+                onClick={() => openLightbox(img)}
+                className="relative aspect-[4/3] rounded-2xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                aria-label={`View full size: ${img.alt}`}
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                <div className="absolute top-3 left-3">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                    img.label === 'Before'
+                      ? 'bg-slate-700/90 text-slate-200'
+                      : 'bg-teal-700/90 text-white'
+                  }`}>
+                    {img.label}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 1c — Wheel Detail */}
+      <section id="wheels" className="py-20 bg-ink border-t border-white/5" aria-labelledby="wheels-heading">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Detail Work</p>
+            <h2 id="wheels-heading" className="text-3xl font-extrabold text-white">Wheel & Rim Detail</h2>
+            <p className="text-slate-400 mt-2 text-sm">Every package includes deep rim cleaning — here&apos;s what that looks like up close</p>
+          </div>
+          <div role="img" aria-label="Wheel and rim detail gallery" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {wheelImages.map((img) => (
+              <button
+                key={img.src}
+                onClick={() => openLightbox(img)}
+                className="relative aspect-[4/3] rounded-2xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                aria-label={`View full size: ${img.alt}`}
+              >
+                <Image
+                  src={img.src}
+                  alt={img.alt}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Section 2 — Interior Before & After */}
       <section id="interior" className="py-20 bg-ink" aria-labelledby="interior-heading">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,6 +320,31 @@ export default function GalleryClient() {
                 </div>
               </button>
             ))}
+          </div>
+
+          {/* More interior highlights */}
+          <div className="mt-12">
+            <h3 className="text-lg font-semibold text-white mb-4">More Interior Results</h3>
+            <div role="img" aria-label="Additional interior detailing highlights" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {interiorHighlights.map((img) => (
+                <button
+                  key={img.src}
+                  onClick={() => openLightbox(img)}
+                  className="relative aspect-[4/3] rounded-2xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                  aria-label={`View full size: ${img.alt}`}
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </section>
