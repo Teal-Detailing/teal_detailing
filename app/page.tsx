@@ -6,6 +6,7 @@ import ServiceAreas from '@/components/sections/ServiceAreas'
 import WhyChooseUs from '@/components/sections/WhyChooseUs'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import Reviews from '@/components/sections/Reviews'
+import FAQ from '@/components/sections/FAQ'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function HomePage() {
       <ServicesGrid />
       <Reviews />
       <WhyChooseUs />
+      <FAQ />
 
       {/* Gallery Teaser */}
       <section className="py-14 bg-white border-b border-slate-100">
