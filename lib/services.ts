@@ -223,6 +223,62 @@ export const servicesData = {
       },
     ],
   },
+  'stain-removal': {
+    name: 'Stain Removal',
+    tagline: 'Tough stains, gone for good.',
+    heroSub:
+      'Targeted treatment to lift stubborn stains from seats, carpets, and upholstery — restoring a fresh, spotless interior without damaging your fabric.',
+    what: [
+      'Spills, food stains, dirt, and mystery marks work their way deep into seat fabric and carpet fibers, where a quick wipe-down or standard vacuum can\'t reach. Left untreated, these stains set in permanently and can leave lingering odors behind.',
+      'Our stain removal process starts by identifying the stain type and selecting the right pH-balanced treatment — avoiding harsh chemicals that can discolor or weaken fabric. We use hot-water extraction and targeted agitation to break down the stain and lift it out of the fibers, not just push it around.',
+      "Whether it's a single spot or widespread staining across your seats and carpets, Teal's technicians treat each case individually for the best possible result, leaving your interior looking and smelling like new.",
+    ],
+    why: [
+      {
+        icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+        title: 'Targeted Treatment',
+        desc: 'We match the treatment to the stain type instead of using a one-size-fits-all approach.',
+      },
+      {
+        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+        title: 'Fabric-Safe Process',
+        desc: 'pH-balanced treatments and hot-water extraction lift stains without discoloring or weakening fibers.',
+      },
+      {
+        icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
+        title: 'Mobile Service',
+        desc: 'We treat stains at your home or office — no need to leave your vehicle at a shop.',
+      },
+    ],
+  },
+  'engine-bay-cleaning': {
+    name: 'Engine Bay Cleaning',
+    tagline: 'A cleaner engine bay, easier to inspect and maintain.',
+    heroSub:
+      'Professional degreasing and detailing of your engine bay — removes built-up grime, improves under-hood appearance, and helps you spot leaks early.',
+    what: [
+      "Your engine bay collects road grime, oil residue, and dust that build up over time, making it harder to spot leaks, worn hoses, or other issues during routine checks. A dirty engine bay can also mask the source of a problem when something does go wrong.",
+      "Our engine bay cleaning service uses safe, water-controlled degreasing methods designed specifically for engine compartments — all sensitive electrical components and connections are carefully covered and protected before any product is applied.",
+      "The result is a clean, presentable engine bay that's easier to inspect, easier to maintain, and looks the part whether you're popping the hood for a buyer, a mechanic, or just your own peace of mind.",
+    ],
+    why: [
+      {
+        icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+        title: 'Safe, Controlled Process',
+        desc: 'Electrical components and connections are protected before any water or degreaser is applied.',
+      },
+      {
+        icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
+        title: 'Trained Technicians',
+        desc: "Our team knows what's safe to clean and what needs to be avoided under the hood.",
+      },
+      {
+        icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
+        title: 'Mobile Service',
+        desc: 'We clean your engine bay at your home or office — no need to leave your vehicle at a shop.',
+      },
+    ],
+  },
 } as const
 
 export type ServiceSlug = keyof typeof servicesData

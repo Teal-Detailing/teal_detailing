@@ -97,6 +97,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://tealdetailing.com/services/stain-removal</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/services/engine-bay-cleaning</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://tealdetailing.com/miami-dade/ceramic-coating</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -141,6 +153,18 @@
   <url>
     <loc>https://tealdetailing.com/miami-dade/pet-hair-removal</loc>
     <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/miami-dade/stain-removal</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/miami-dade/engine-bay-cleaning</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -193,6 +217,18 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://tealdetailing.com/broward/stain-removal</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/broward/engine-bay-cleaning</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://tealdetailing.com/palm-beach/ceramic-coating</loc>
     <lastmod>2026-04-19</lastmod>
     <changefreq>monthly</changefreq>
@@ -237,6 +273,18 @@
   <url>
     <loc>https://tealdetailing.com/palm-beach/pet-hair-removal</loc>
     <lastmod>2026-04-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/palm-beach/stain-removal</loc>
+    <lastmod>2026-08-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://tealdetailing.com/palm-beach/engine-bay-cleaning</loc>
+    <lastmod>2026-08-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

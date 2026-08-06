@@ -11,12 +11,12 @@ import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 export const metadata: Metadata = {
   title: 'Premium Mobile Car Detailing in South Florida',
   description:
-    'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $109.',
+    'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $99.',
   alternates: { canonical: 'https://tealdetailing.com' },
   openGraph: {
     title: 'Teal Detailing — Premium Mobile Car Detailing in South Florida',
     description:
-      'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $109.',
+      'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $99.',
     url: 'https://tealdetailing.com',
     images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
   },

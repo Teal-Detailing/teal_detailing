@@ -8,12 +8,12 @@ import { pricingPlans } from '@/lib/plans'
 export const metadata: Metadata = {
   title: 'Car Detailing Services & Pricing',
   description:
-    'Browse all Teal Detailing services: Economy ($109), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
+    'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
   alternates: { canonical: 'https://tealdetailing.com/services' },
   openGraph: {
     title: 'Car Detailing Services & Pricing | Teal Detailing',
     description:
-      'Browse all Teal Detailing services: Economy ($109), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction and more.',
+      'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction and more.',
     url: 'https://tealdetailing.com/services',
     images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
   },
@@ -67,6 +67,18 @@ const serviceCards = [
     icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
     title: 'Pet Hair Removal',
     desc: 'Specialized rubber rakes and vacuum techniques extract embedded pet hair from every crevice.',
+  },
+  {
+    slug: 'stain-removal',
+    icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z',
+    title: 'Stain Removal',
+    desc: 'Targeted pH-balanced treatment lifts tough stains from seats, carpets, and upholstery.',
+  },
+  {
+    slug: 'engine-bay-cleaning',
+    icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4',
+    title: 'Engine Bay Cleaning',
+    desc: 'Professional degreasing that removes grime, improves appearance, and helps spot leaks early.',
   },
 ]
 

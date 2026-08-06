@@ -32,6 +32,8 @@ const areaServices = [
   { slug: 'mobile-car-detailing', name: 'Mobile Car Detailing' },
   { slug: 'paint-correction', name: 'Paint Correction' },
   { slug: 'pet-hair-removal', name: 'Pet Hair Removal' },
+  { slug: 'stain-removal', name: 'Stain Removal' },
+  { slug: 'engine-bay-cleaning', name: 'Engine Bay Cleaning' },
 ]
 
 export default function BrowardPage() {

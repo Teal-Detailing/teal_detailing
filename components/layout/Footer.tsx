@@ -11,6 +11,8 @@ const services = [
   { href: '/services/mobile-car-detailing', label: 'Mobile Car Detailing' },
   { href: '/services/paint-correction', label: 'Paint Correction' },
   { href: '/services/pet-hair-removal', label: 'Pet Hair Removal' },
+  { href: '/services/stain-removal', label: 'Stain Removal' },
+  { href: '/services/engine-bay-cleaning', label: 'Engine Bay Cleaning' },
 ]
 
 const areas = [

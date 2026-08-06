@@ -28,7 +28,7 @@ export default function Hero() {
       {/* Background photo */}
       <Image
         src="/hero-bg.png"
-        alt="Hero background"
+        alt=""
         fill
         className="object-cover object-center"
         priority

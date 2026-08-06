@@ -71,17 +71,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.variable}>
-      <Script id="ga-consent-defaults" strategy="beforeInteractive">{`
-        window.dataLayer=window.dataLayer||[];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('consent','default',{
-          analytics_storage:'denied',
-          ad_storage:'denied',
-          wait_for_update:500
-        });
-      `}</Script>
-
       <body className="font-sans antialiased bg-white text-slate-900 pb-14">
+        <Script id="ga-consent-defaults" strategy="beforeInteractive">{`
+          window.dataLayer=window.dataLayer||[];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('consent','default',{
+            analytics_storage:'denied',
+            ad_storage:'denied',
+            wait_for_update:500
+          });
+        `}</Script>
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -95,7 +95,7 @@ export default function RootLayout({
               url: 'https://tealdetailing.com',
               telephone: '+16452488292',
               email: 'info@tealdetailing.com',
-              priceRange: '$109–$249',
+              priceRange: '$99–$249',
               image: 'https://tealdetailing.com/images/icons/logo-1024.webp',
               logo: 'https://tealdetailing.com/images/icons/logo-256.webp',
               address: {
@@ -125,7 +125,7 @@ export default function RootLayout({
                 '@type': 'OfferCatalog',
                 name: 'Mobile Car Detailing Services',
                 itemListElement: [
-                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Economy Detail' }, price: '109', priceCurrency: 'USD' },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Economy Detail' }, price: '99', priceCurrency: 'USD' },
                   { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Silver Detail' }, price: '179', priceCurrency: 'USD' },
                   { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Gold Detail' }, price: '249', priceCurrency: 'USD' },
                 ],
