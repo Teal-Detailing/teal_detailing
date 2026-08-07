@@ -31,6 +31,10 @@ const showcaseImages = [
     src: '/images/gallery/showcase2/porsche-356-front.jpg',
     alt: 'Classic green Porsche 356 after full detail and paint correction by Teal Detailing',
   },
+  {
+    src: '/images/gallery/showcase2/camaro-after.jpg',
+    alt: 'Black Chevrolet Camaro after exterior detail — deep gloss finish by Teal Detailing',
+  },
 ]
 
 const wheelImages = [
@@ -46,19 +50,50 @@ const wheelImages = [
     src: '/images/gallery/showcase2/porsche-wheel-detail.jpg',
     alt: 'Classic Porsche 356 chrome wheel polished to a mirror shine by Teal Detailing',
   },
+  {
+    src: '/images/gallery/showcase2/yellow-caliper-wheel.jpg',
+    alt: 'Deep-dish wheel with yellow brake caliper after detailed rim cleaning by Teal Detailing',
+  },
 ]
 
-const exteriorBeforeAfter = [
+const wheelBeforeAfter = [
   {
-    src: '/images/gallery/exterior-ba/silverado-before.jpg',
-    alt: 'Chevrolet Silverado ZR2 before exterior detail — dust and road grime on the paint',
+    src: '/images/gallery/showcase2/wheel-before.jpg',
+    alt: 'Truck wheel before cleaning — caked in mud and road grime',
     label: 'Before',
   },
   {
-    src: '/images/gallery/exterior-ba/silverado-after.jpg',
-    alt: 'Chevrolet Silverado ZR2 after exterior detail — clean, glossy paint by Teal Detailing',
+    src: '/images/gallery/showcase2/wheel-after.jpg',
+    alt: 'Same truck wheel after deep rim cleaning — mud and grime completely removed by Teal Detailing',
     label: 'After',
   },
+]
+
+const exteriorBeforeAfterPairs = [
+  [
+    {
+      src: '/images/gallery/exterior-ba/silverado-before.jpg',
+      alt: 'Chevrolet Silverado ZR2 before exterior detail — dust and road grime on the paint',
+      label: 'Before',
+    },
+    {
+      src: '/images/gallery/exterior-ba/silverado-after.jpg',
+      alt: 'Chevrolet Silverado ZR2 after exterior detail — clean, glossy paint by Teal Detailing',
+      label: 'After',
+    },
+  ],
+  [
+    {
+      src: '/images/gallery/exterior-ba/silverado2-before.jpg',
+      alt: 'Lifted Chevrolet Silverado before exterior detail — caked in mud from off-road driving',
+      label: 'Before',
+    },
+    {
+      src: '/images/gallery/exterior-ba/silverado2-after.jpg',
+      alt: 'Same lifted Chevrolet Silverado after exterior detail — mud completely removed, paint restored by Teal Detailing',
+      label: 'After',
+    },
+  ],
 ]
 
 const interiorImages = [
@@ -119,6 +154,10 @@ const foamImages = [
   {
     src: '/images/gallery/foam2/amg-foam.jpg',
     alt: 'Mercedes-AMG fully covered in foam pre-wash under South Florida trees — Teal Detailing process',
+  },
+  {
+    src: '/images/gallery/foam2/camaro-foam.jpg',
+    alt: 'Black Chevrolet Camaro covered in foam pre-wash — Teal Detailing process',
   },
 ]
 
@@ -189,7 +228,7 @@ export default function GalleryClient() {
               <button
                 key={img.src}
                 onClick={() => openLightbox(img)}
-                className="relative aspect-[4/3] rounded-2xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-black group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
                 aria-label={`View full size: ${img.alt}`}
               >
                 <Image
@@ -197,7 +236,7 @@ export default function GalleryClient() {
                   alt={img.alt}
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="object-contain group-hover:scale-105 transition-transform duration-500"
                   priority={img.priority}
                   loading={i < 2 ? 'eager' : 'lazy'}
                 />
@@ -221,8 +260,58 @@ export default function GalleryClient() {
             <h2 id="exterior-ba-heading" className="text-3xl font-extrabold text-white">Exterior Transformations</h2>
             <p className="text-slate-400 mt-2 text-sm">Real results from a full exterior detail — no filters, no staging</p>
           </div>
-          <div role="img" aria-label="Exterior detailing before and after gallery" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {exteriorBeforeAfter.map((img) => (
+          <div className="flex flex-col gap-6">
+            {exteriorBeforeAfterPairs.map((pair, pairIndex) => (
+              <div
+                key={pairIndex}
+                role="img"
+                aria-label="Exterior detailing before and after"
+                className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+              >
+                {pair.map((img) => (
+                  <button
+                    key={img.src}
+                    onClick={() => openLightbox(img)}
+                    className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-black group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                    aria-label={`View full size: ${img.alt}`}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      sizes="(max-width: 640px) 100vw, 50vw"
+                      className="object-contain group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                        img.label === 'Before'
+                          ? 'bg-slate-700/90 text-slate-200'
+                          : 'bg-teal-700/90 text-white'
+                      }`}>
+                        {img.label}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Section 1c — Wheel Detail */}
+      <section id="wheels" className="py-20 bg-ink border-t border-white/5" aria-labelledby="wheels-heading">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-10">
+            <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Detail Work</p>
+            <h2 id="wheels-heading" className="text-3xl font-extrabold text-white">Wheel & Rim Detail</h2>
+            <p className="text-slate-400 mt-2 text-sm">Every package includes deep rim cleaning — here&apos;s what that looks like up close</p>
+          </div>
+
+          {/* Wheel before/after highlight */}
+          <div role="img" aria-label="Wheel before and after deep cleaning" className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+            {wheelBeforeAfter.map((img) => (
               <button
                 key={img.src}
                 onClick={() => openLightbox(img)}
@@ -250,17 +339,7 @@ export default function GalleryClient() {
               </button>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Section 1c — Wheel Detail */}
-      <section id="wheels" className="py-20 bg-ink border-t border-white/5" aria-labelledby="wheels-heading">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-10">
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Detail Work</p>
-            <h2 id="wheels-heading" className="text-3xl font-extrabold text-white">Wheel & Rim Detail</h2>
-            <p className="text-slate-400 mt-2 text-sm">Every package includes deep rim cleaning — here&apos;s what that looks like up close</p>
-          </div>
           <div role="img" aria-label="Wheel and rim detail gallery" className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {wheelImages.map((img) => (
               <button
@@ -366,7 +445,7 @@ export default function GalleryClient() {
               <button
                 key={img.src}
                 onClick={() => openLightbox(img)}
-                className="relative aspect-[3/4] sm:aspect-square rounded-2xl overflow-hidden group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
+                className="relative aspect-[3/4] rounded-2xl overflow-hidden bg-black group focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-400"
                 aria-label={`View full size: ${img.alt}`}
               >
                 <Image
@@ -374,10 +453,9 @@ export default function GalleryClient() {
                   alt={img.alt}
                   fill
                   sizes="(max-width: 640px) 50vw, 25vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="object-contain group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
               </button>
             ))}
           </div>
