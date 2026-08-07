@@ -1,5 +1,13 @@
 import Link from 'next/link'
 
+function discountPercent(price: string, oldPrice?: string): number | null {
+  if (!oldPrice) return null
+  const current = parseFloat(price.replace(/[^0-9.]/g, ''))
+  const original = parseFloat(oldPrice.replace(/[^0-9.]/g, ''))
+  if (!original || !current || current >= original) return null
+  return Math.round(((original - current) / original) * 100)
+}
+
 interface PricingCardProps {
   name: string
   price: string
@@ -28,7 +36,9 @@ export default function PricingCard({
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-extrabold text-slate-700">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-600 line-through">{oldPrice}</span>}
-            <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-50 text-teal-700 text-[0.9rem] font-semibold">15% off</span>
+            {discountPercent(price, oldPrice) !== null && (
+              <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-50 text-teal-700 text-[0.9rem] font-semibold">{discountPercent(price, oldPrice)}% off</span>
+            )}
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-600">{subtitle}</p>
         </div>
@@ -73,7 +83,9 @@ export default function PricingCard({
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}
-            <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">22% off</span>
+            {discountPercent(price, oldPrice) !== null && (
+              <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">{discountPercent(price, oldPrice)}% off</span>
+            )}
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-400">{subtitle}</p>
         </div>
@@ -120,7 +132,9 @@ export default function PricingCard({
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}
-            <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">25% off</span>
+            {discountPercent(price, oldPrice) !== null && (
+              <span className="px-2 py-0.5 rounded-full border border-teal-400 bg-teal-400/10 text-teal-400 text-[0.9rem] font-semibold">{discountPercent(price, oldPrice)}% off</span>
+            )}
           </div>
           <p className="text-[1rem] font-semibold mt-1 text-slate-400">{subtitle}</p>
         </div>

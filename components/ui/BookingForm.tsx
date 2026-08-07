@@ -222,7 +222,7 @@ export default function BookingForm({ location, defaultService, compact = false 
         <p className="text-sm font-bold uppercase tracking-widest text-teal-700">Free Quote</p>
         <p className="text-xl font-extrabold text-slate-900 mt-0.5">
           {location ? `Book in ${location}` : (
-            <>Book Your Detailing Today — <span className="text-teal-700 whitespace-nowrap">Get Up To 30% OFF!</span></>
+            <>Book Your Detailing Today — <span className="text-teal-700 whitespace-nowrap">Get Up To 24% OFF!</span></>
           )}
         </p>
         <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
