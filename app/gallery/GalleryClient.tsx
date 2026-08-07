@@ -159,6 +159,10 @@ const foamImages = [
     src: '/images/gallery/foam2/camaro-foam.jpg',
     alt: 'Black Chevrolet Camaro covered in foam pre-wash — Teal Detailing process',
   },
+  {
+    src: '/images/gallery/foam2/porsche-foam.jpg',
+    alt: 'Classic Porsche 356 fully covered in foam pre-wash — Teal Detailing process',
+  },
 ]
 
 type LightboxImage = { src: string; alt: string }
