@@ -112,6 +112,90 @@ export const cities: CityData[] = [
       "Crushed goldfish crackers, sandy cleats, spilled juice boxes — our Gold package's steam cleaning and odor elimination are made for exactly this kind of daily family wear. We work in your driveway while you're home, so there's no need to arrange a ride or coordinate a drop-off.",
     featuredReviewNames: ['Damion'],
   },
+  {
+    slug: 'miami-beach',
+    name: 'Miami Beach',
+    county: { slug: 'miami-dade', name: 'Miami-Dade County' },
+    metaTitle: 'Mobile Car Detailing in Miami Beach, FL',
+    metaDescription:
+      'Mobile car detailing in Miami Beach, FL. We come to your condo garage or valet stand across South Beach, Mid-Beach, and North Beach — same-day availability.',
+    heroIntro:
+      "Being on a barrier island means Miami Beach cars get hit with ocean salt spray and UV exposure worse than almost anywhere else in South Florida. Between that and the valet-and-garage reality of beachfront condo living, we built our mobile setup specifically to work without a hookup and to protect paint against exactly this kind of exposure.",
+    neighborhoods: [
+      'South Beach', 'Mid-Beach', 'North Beach', 'Sunset Harbour',
+      'Flamingo Park', 'Venetian Islands', 'Art Deco District',
+    ],
+    angleTitle: 'Built to Handle Ocean Salt Air',
+    angleBody:
+      "Cars parked steps from the ocean take on salt film fast, and it eats into unprotected paint and chrome quickly. Our ceramic coating and sealant options are chosen specifically to push back against that — and since we work in garages and valet areas without needing a hookup, your car doesn't have to sit out in it any longer than necessary.",
+  },
+  {
+    slug: 'coral-gables',
+    name: 'Coral Gables',
+    county: { slug: 'miami-dade', name: 'Miami-Dade County' },
+    metaTitle: 'Mobile Car Detailing in Coral Gables, FL',
+    metaDescription:
+      'Mobile car detailing in Coral Gables, FL. Driveway service across the Biltmore Section, Old Cutler, Gables Estates, and more — no hookup needed.',
+    heroIntro:
+      "Coral Gables' tree-lined streets and Mediterranean Revival architecture come with some of the strictest HOA and city aesthetic rules in Miami-Dade — which is exactly why a quiet, no-hose, no-generator mobile setup fits so well here. We work in your driveway without the noise or mess that can draw a neighbor's attention.",
+    neighborhoods: [
+      'Downtown Coral Gables', 'Biltmore Section', 'Old Cutler', 'Gables Estates',
+      'University Area', 'Ponce-Davis',
+    ],
+    angleTitle: 'Quiet Service for a Quiet City',
+    angleBody:
+      "Because we run on a battery station instead of a gas generator and bring our own water, there's no noise, fumes, or hose stretched across the lawn — just a clean, discreet detail in your own driveway, done the way a neighborhood like Coral Gables expects.",
+  },
+  {
+    slug: 'doral',
+    name: 'Doral',
+    county: { slug: 'miami-dade', name: 'Miami-Dade County' },
+    metaTitle: 'Mobile Car Detailing in Doral, FL',
+    metaDescription:
+      'Mobile car detailing in Doral, FL. We come to your driveway or office across Downtown Doral, Doral Isles, Costa Doral, and more — same-day availability.',
+    heroIntro:
+      "Doral's newer subdivisions and business parks mean wide driveways and plenty of covered parking — a great match for mobile detailing. Whether your car sits in a Downtown Doral driveway or an office garage near one of the business parks, we bring the full setup to you.",
+    neighborhoods: [
+      'Downtown Doral', 'Doral Isles', 'Costa Doral', 'Doral Pointe',
+      'Doral Business Park Area', 'Doral Golf Course Area',
+    ],
+    angleTitle: "Built for Doral's Driveways and Office Parks",
+    angleBody:
+      "A lot of Doral's growth is newer construction with real driveways and garage space, unlike the street parking common closer to downtown Miami — which makes it one of the easiest areas for us to work in. We also detail company vehicles and fleet cars on-site at Doral's business parks.",
+  },
+  {
+    slug: 'aventura',
+    name: 'Aventura',
+    county: { slug: 'miami-dade', name: 'Miami-Dade County' },
+    metaTitle: 'Mobile Car Detailing in Aventura, FL',
+    metaDescription:
+      'Mobile car detailing in Aventura, FL. We come to your high-rise garage or marina parking across Aventura — no hookup needed, same-day availability.',
+    heroIntro:
+      "Aventura is high-rise condo and marina living — which usually means covered garage parking, not a driveway with a hose. That's exactly the setup our mobile service is built for: we bring our own water and run equipment off a battery station, so a parking garage near the mall or a marina lot works just fine.",
+    neighborhoods: [
+      'Aventura Marina District', 'Turnberry Area', 'Williams Island', 'Biscayne Cove',
+    ],
+    angleTitle: 'Built for High-Rise Garage Parking',
+    angleBody:
+      "No outdoor spigot in a covered garage isn't a problem for us — it's the norm we're built around. We regularly detail vehicles for Aventura's high-rise residents without ever needing an outdoor hookup or bothering neighbors with noise or fumes.",
+  },
+  {
+    slug: 'west-palm-beach',
+    name: 'West Palm Beach',
+    county: { slug: 'palm-beach', name: 'Palm Beach County' },
+    metaTitle: 'Mobile Car Detailing in West Palm Beach, FL',
+    metaDescription:
+      'Mobile car detailing in West Palm Beach, FL. We come to your home or condo across Downtown, El Cid, Flamingo Park, Northwood, and more.',
+    heroIntro:
+      "West Palm Beach's mix of downtown condos and historic waterfront neighborhoods means every car's parking situation looks a little different — and our mobile setup is built to handle all of it, from a Clematis Street garage to a driveway in El Cid, without needing a single hookup from you.",
+    neighborhoods: [
+      'Downtown / Clematis District', 'El Cid', 'SoSo', 'Flamingo Park',
+      'Northwood', 'CityPlace / Rosemary District',
+    ],
+    angleTitle: 'From Downtown Condos to Historic Driveways',
+    angleBody:
+      "Whether you're in a high-rise near Clematis Street or a historic home in El Cid or Flamingo Park, we bring the same full setup — our own water, battery-powered equipment, and no need for you to be home the entire time.",
+  },
 ]
 
 export function getCityBySlug(slug: string): CityData | undefined {

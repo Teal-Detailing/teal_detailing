@@ -65,7 +65,7 @@ export default function MiamiDadePage() {
               </h2>
               <p className="text-slate-600 mb-6 leading-relaxed">
                 Our mobile detailing vans are stationed throughout the county, so we can
-                typically reach you within 24–48 hours. No travel fees within Miami-Dade.
+                typically offer same-day or next-day availability. No travel fees within Miami-Dade.
               </p>
               <div className="grid grid-cols-2 gap-2 mb-8">
                 {neighborhoods.map((n) => (

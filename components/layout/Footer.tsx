@@ -16,9 +16,16 @@ const services = [
 ]
 
 const areas = [
-  { href: '/miami-dade', label: 'Miami-Dade County' },
-  { href: '/broward', label: 'Broward County' },
-  { href: '/palm-beach', label: 'Palm Beach County' },
+  { href: '/miami/mobile-car-detailing', label: 'Miami' },
+  { href: '/miami-beach/mobile-car-detailing', label: 'Miami Beach' },
+  { href: '/coral-gables/mobile-car-detailing', label: 'Coral Gables' },
+  { href: '/doral/mobile-car-detailing', label: 'Doral' },
+  { href: '/aventura/mobile-car-detailing', label: 'Aventura' },
+  { href: '/fort-lauderdale/mobile-car-detailing', label: 'Fort Lauderdale' },
+  { href: '/hollywood-fl/mobile-car-detailing', label: 'Hollywood' },
+  { href: '/pembroke-pines/mobile-car-detailing', label: 'Pembroke Pines' },
+  { href: '/boca-raton/mobile-car-detailing', label: 'Boca Raton' },
+  { href: '/west-palm-beach/mobile-car-detailing', label: 'West Palm Beach' },
 ]
 
 export default function Footer() {
