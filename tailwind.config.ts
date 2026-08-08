@@ -32,6 +32,7 @@ const config: Config = {
         'gold-glow': '0 8px 40px rgba(201,168,76,0.25)',
         'gold-glow-hover': '0 0 40px rgba(201,168,76,0.5), 0 8px 40px rgba(201,168,76,0.3)',
         'silver-glow-hover': '0 0 40px rgba(176,184,193,0.4), 0 8px 40px rgba(176,184,193,0.25)',
+        'graphite-glow-hover': '0 0 40px rgba(148,163,184,0.3), 0 8px 40px rgba(148,163,184,0.18)',
         'phone-glow': '0 4px 24px rgba(20,184,166,0.5)',
       },
       backgroundImage: {
@@ -39,6 +40,8 @@ const config: Config = {
         'silver-gradient': 'linear-gradient(135deg, #8d9caa, #b0b8c1, #8d9caa)',
         'gold-gradient': 'linear-gradient(135deg, #c9a84c, #f0d080)',
         'gold-bar-gradient': 'linear-gradient(90deg, #c9a84c, #f0d080, #c9a84c)',
+        'graphite-gradient': 'linear-gradient(135deg, #64748b, #cbd5e1, #64748b)',
+        'graphite-bar-gradient': 'linear-gradient(90deg, #475569, #94a3b8, #475569)',
       },
     },
   },
