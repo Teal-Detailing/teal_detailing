@@ -84,14 +84,16 @@ export default function Hero() {
                   key={label}
                   className="flex items-center gap-2.5 px-3 py-3 rounded-xl bg-white/5 border border-white/10"
                 >
-                  <svg
-                    className="w-4 h-4 text-teal-400 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
-                  </svg>
+                  <div className="w-7 h-7 rounded-full bg-teal-500/20 border border-teal-500/30 flex items-center justify-center flex-shrink-0">
+                    <svg
+                      className="w-4 h-4 text-teal-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
+                    </svg>
+                  </div>
                   <span className="text-[1rem] font-semibold text-white/80">{label}</span>
                 </div>
               ))}

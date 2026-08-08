@@ -14,6 +14,7 @@ const features = [
     title: 'Premium Chemical Partners',
     description:
       'We use professional-grade products from Koch Chemie, CarPro, and Gyeon — the same brands trusted by top detailers and enthusiasts worldwide.',
+    brands: ['Koch-Chemie', 'CarPro', 'Gyeon'],
   },
   {
     iconPath:
@@ -69,6 +70,7 @@ export default function WhyChooseUs() {
               iconPath={f.iconPath}
               title={f.title}
               description={f.description}
+              brands={f.brands}
             />
           ))}
         </div>
