@@ -14,19 +14,43 @@ const carTypes = [
     id: 'sedan',
     label: 'Sedan & Coupe',
     surcharge: 0,
-    icon: (selected: boolean) => <Image src="/icons/sedan.png" alt="Sedan & Coupe" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+    icon: (selected: boolean) => (
+      <Image
+        src="/icons/sedan.png"
+        alt="Sedan & Coupe"
+        width={512}
+        height={512}
+        className={`w-16 h-16 sm:w-20 sm:h-20 object-contain transition-all duration-300 brightness-0 invert ${selected ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}
+      />
+    ),
   },
   {
     id: 'suv',
     label: 'Small SUV & Truck',
     surcharge: 10,
-    icon: (selected: boolean) => <Image src="/icons/suv.png" alt="Small SUV & Truck" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+    icon: (selected: boolean) => (
+      <Image
+        src="/icons/suv.png"
+        alt="Small SUV & Truck"
+        width={512}
+        height={512}
+        className={`w-16 h-16 sm:w-20 sm:h-20 object-contain transition-all duration-300 brightness-0 invert ${selected ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}
+      />
+    ),
   },
   {
     id: 'large',
     label: 'Large SUV, Truck & Van',
     surcharge: 20,
-    icon: (selected: boolean) => <Image src="/icons/large.png" alt="Large SUV, Truck & Van" width={512} height={512} className={`w-20 h-20 object-contain transition-all duration-200 ${selected ? '' : 'brightness-0 invert opacity-70'}`} />,
+    icon: (selected: boolean) => (
+      <Image
+        src="/icons/large.png"
+        alt="Large SUV, Truck & Van"
+        width={512}
+        height={512}
+        className={`w-16 h-16 sm:w-20 sm:h-20 object-contain transition-all duration-300 brightness-0 invert ${selected ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}
+      />
+    ),
   },
 ]
 
@@ -70,23 +94,36 @@ export default function PricingOverview() {
         <p className="text-center text-slate-400 text-sm mb-3">
           Select your vehicle size — price updates automatically below
         </p>
-        <div className="flex justify-center mb-10">
-          <div className="inline-flex flex-col sm:flex-row gap-2 bg-white/5 border border-white/10 rounded-2xl p-2 w-full sm:w-auto">
-            {carTypes.map((car, i) => (
+        <div className="flex flex-col sm:flex-row justify-center gap-3 mb-10">
+          {carTypes.map((car, i) => {
+            const selected = selectedCar === i
+            return (
               <button
                 key={car.id}
                 onClick={() => handleCarChange(i)}
-                className={`flex flex-row sm:flex-col items-center gap-3 sm:gap-1.5 px-4 py-3 rounded-xl transition-all duration-200 text-left sm:text-center ${
-                  selectedCar === i
-                    ? 'bg-teal-700 text-white shadow-glow'
-                    : 'text-white hover:bg-white/10'
+                aria-pressed={selected}
+                className={`group relative flex flex-row sm:flex-col items-center gap-4 sm:gap-3 px-6 py-5 sm:w-48 rounded-2xl overflow-hidden bg-gradient-to-b from-[#181b21] to-[#0a0c0f] ring-1 transition-all duration-300 text-left sm:text-center ${
+                  selected
+                    ? 'ring-teal-400/50 shadow-glow'
+                    : 'ring-white/10 hover:ring-white/20'
                 }`}
               >
-                <div className="flex-shrink-0">{car.icon(selectedCar === i)}</div>
-                <span className="text-xs font-semibold">{car.label}</span>
+                <span
+                  className={`absolute top-0 left-0 h-[3px] w-full bg-gradient-to-r from-teal-700 via-teal-300 to-teal-700 transition-opacity duration-300 ${
+                    selected ? 'opacity-100' : 'opacity-0'
+                  }`}
+                />
+                <div className="flex-shrink-0">{car.icon(selected)}</div>
+                <span
+                  className={`text-xs font-bold uppercase tracking-[0.15em] transition-colors duration-300 ${
+                    selected ? 'text-teal-300' : 'text-slate-400 group-hover:text-slate-300'
+                  }`}
+                >
+                  {car.label}
+                </span>
               </button>
-            ))}
-          </div>
+            )
+          })}
         </div>
 
         {/* Pricing cards */}
