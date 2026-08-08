@@ -72,39 +72,45 @@ export default function ServicesGrid() {
         </div>
 
         {/* 2-col mobile, 4-col desktop grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
           {services.map(({ slug, desc, icon, ext = 'jpg' }) => {
           const { name, price } = servicesData[slug]
           return (
             <article
               key={slug}
-              className="bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-card hover:shadow-card-hover transition-shadow flex flex-col"
+              className="group bg-white rounded-[28px] overflow-hidden border border-slate-100 shadow-card hover:shadow-2xl transition-all duration-500 flex flex-col"
             >
-              <div className="relative w-full h-48">
+              <div className="relative w-full h-52 overflow-hidden">
                 <Image
                   src={`/services/${slug}.${ext}`}
                   alt={name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
                 />
-              </div>
-              <div className="p-5 flex flex-col gap-3 flex-1">
-              <div className="flex-1">
-                <div className="flex items-center justify-between gap-2 mb-1">
-                  <h3 className="font-semibold text-slate-900 text-[1.05rem]">{name}</h3>
-                  <span className="text-[0.9rem] font-bold text-teal-700 whitespace-nowrap">{price}</span>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" />
+                <div className="absolute top-3 right-3">
+                  <span className="px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm text-teal-700 text-xs font-bold tracking-wide shadow-sm">
+                    {price}
+                  </span>
                 </div>
-                <p className="text-[0.9rem] text-slate-500 leading-relaxed">{desc}</p>
+                <div className="absolute left-5 -bottom-[22px] w-11 h-11 rounded-xl bg-ink shadow-lg flex items-center justify-center ring-4 ring-white flex-shrink-0">
+                  <svg className="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
+                  </svg>
+                </div>
               </div>
-              <Link
-                href={`/services/${slug}`}
-                className="text-[0.9rem] font-semibold text-teal-700 hover:text-teal-600 transition-colors inline-flex items-center gap-1 mt-auto"
-              >
-                Learn More<span className="sr-only"> about {name}</span>
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
+              <div className="p-5 pt-8 flex flex-col gap-2 flex-1">
+                <h3 className="font-bold text-slate-900 text-[1.1rem] tracking-tight">{name}</h3>
+                <p className="text-[0.9rem] text-slate-500 leading-relaxed flex-1">{desc}</p>
+                <Link
+                  href={`/services/${slug}`}
+                  className="inline-flex items-center gap-1.5 text-[0.9rem] font-semibold text-teal-700 hover:text-teal-600 transition-all group-hover:gap-2.5 mt-2"
+                >
+                  Learn More<span className="sr-only"> about {name}</span>
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
               </div>
             </article>
           )
