@@ -138,13 +138,13 @@ export default function ServicesPage() {
               Package Pricing
             </h2>
             <p className="text-slate-400 max-w-xl mx-auto">
-              No hidden fees. Every package includes our satisfaction guarantee.
+              Prices shown are our starting sedan rate. SUVs, trucks, and vans have a small size adjustment — no hidden fees, ever.
             </p>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-start gap-6">
             {pricingPlans.map((plan) => (
               <div key={plan.name} className="flex-1">
-                <PricingCard {...plan} />
+                <PricingCard {...plan} startingAt />
               </div>
             ))}
           </div>

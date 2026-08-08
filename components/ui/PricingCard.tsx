@@ -16,6 +16,7 @@ interface PricingCardProps {
   features: string[]
   highlightedFeatures?: string[]
   tier?: 'economy' | 'silver' | 'gold'
+  startingAt?: boolean
 }
 
 export default function PricingCard({
@@ -26,6 +27,7 @@ export default function PricingCard({
   features,
   highlightedFeatures = [],
   tier,
+  startingAt = false,
 }: PricingCardProps) {
 
   if (tier === 'economy') {
@@ -33,6 +35,7 @@ export default function PricingCard({
       <article className="flex flex-col rounded-2xl overflow-hidden bg-[#e8e8e8] border border-[#d0d0d0]">
         <div className="px-6 py-5 bg-[#d8d8d8]">
           <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-slate-600">Economy</span>
+          {startingAt && <p className="text-[0.8rem] font-semibold text-slate-500 mt-1">Starting at</p>}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-extrabold text-slate-700">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-600 line-through">{oldPrice}</span>}
@@ -80,6 +83,7 @@ export default function PricingCard({
             <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-[#b0b8c1]">Silver</span>
             <span className="inline-block w-6 h-0.5 rounded bg-gradient-to-r from-[#8d9caa] to-[#b0b8c1]" />
           </div>
+          {startingAt && <p className="text-[0.8rem] font-semibold text-slate-400 mb-1">Starting at</p>}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}
@@ -129,6 +133,7 @@ export default function PricingCard({
         <div className="h-1 w-full bg-gold-bar-gradient" />
         <div className="px-6 py-5 border-b border-white/10">
           <span className="text-[1.1rem] font-extrabold uppercase tracking-widest text-[#f0d080]">Gold</span>
+          {startingAt && <p className="text-[0.8rem] font-semibold text-slate-400 mt-1">Starting at</p>}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="text-[2.25rem] font-bold text-white">{price}</span>
             {oldPrice && <span className="text-[1.05rem] text-slate-400 line-through">{oldPrice}</span>}

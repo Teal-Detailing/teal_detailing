@@ -75,6 +75,9 @@ export default function PricingOverview() {
         </div>
 
         {/* Car type toggle */}
+        <p className="text-center text-slate-400 text-sm mb-3">
+          Select your vehicle size — price updates automatically below
+        </p>
         <div className="flex justify-center mb-10">
           <div className="inline-flex flex-col sm:flex-row gap-2 bg-white/5 border border-white/10 rounded-2xl p-2 w-full sm:w-auto">
             {carTypes.map((car, i) => (
