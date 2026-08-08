@@ -131,7 +131,7 @@ export default function PricingOverview() {
                   <tr key={plan.name} className="border-t border-white/10">
                     <th scope="row" className="px-4 py-3 text-left font-semibold text-white">{plan.name}</th>
                     {carTypes.map((car) => (
-                      <td key={car.id} className="px-4 py-3 text-right text-slate-300">
+                      <td key={car.id} className="px-4 py-3 text-right text-base sm:text-lg font-extrabold text-teal-400">
                         ${basePrices[i] + car.surcharge}
                       </td>
                     ))}
