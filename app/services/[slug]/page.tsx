@@ -33,6 +33,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
   if (!service) notFound()
 
   const pageUrl = `https://tealdetailing.com/services/${params.slug}`
+  const isPackageService = params.slug === 'mobile-car-detailing'
 
   return (
     <>
@@ -135,29 +136,54 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         </div>
       </section>
 
-      <section className="py-20 bg-ink" aria-labelledby="service-pricing-heading">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+      {isPackageService ? (
+        <section className="py-20 bg-ink" aria-labelledby="service-pricing-heading">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">
+                Pricing
+              </p>
+              <h2 id="service-pricing-heading" className="text-3xl font-extrabold text-white">
+                Choose Your Package
+              </h2>
+              <p className="mt-3 text-slate-400 max-w-xl mx-auto">
+                Prices shown are our starting sedan rate. SUVs, trucks, and vans have a small size adjustment — no hidden fees, ever.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+              {pricingPlans.map((plan) => (
+                <div key={plan.name} className="flex-1">
+                  <PricingCard {...plan} startingAt />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : 'price' in service ? (
+        <section className="py-20 bg-ink" aria-labelledby="service-pricing-heading">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">
               Pricing
             </p>
             <h2 id="service-pricing-heading" className="text-3xl font-extrabold text-white">
-              Choose Your Package
+              {service.name} Pricing
             </h2>
-            <p className="mt-3 text-slate-400 max-w-xl mx-auto">
-              Prices shown are our starting sedan rate. SUVs, trucks, and vans have a small size adjustment — no hidden fees, ever.
-            </p>
+            <div className="mt-8 inline-flex flex-col items-center gap-2 px-10 py-8 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-5xl font-extrabold text-white">{service.price}</span>
+              <p className="text-slate-400 max-w-sm mt-1">{service.priceNote}</p>
+            </div>
+            <div className="mt-8">
+              <Link
+                href={`/contact?service=${encodeURIComponent(service.name)}`}
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-base transition-all hover:shadow-glow"
+              >
+                Get Your {service.name} Quote
+              </Link>
+            </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-            {pricingPlans.map((plan) => (
-              <div key={plan.name} className="flex-1">
-                <PricingCard {...plan} startingAt />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="py-16 bg-white" aria-labelledby="areas-heading">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

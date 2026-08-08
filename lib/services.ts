@@ -4,6 +4,8 @@ export const servicesData = {
     tagline: 'The ultimate shield for your paint.',
     heroSub:
       'Nano-ceramic protection that bonds directly to your clear coat — repelling water, dirt, and UV damage for years.',
+    price: 'From $499',
+    priceNote: 'Final price depends on your vehicle\'s size and paint condition — no hidden fees.',
     what: [
       "Ceramic coating is a liquid polymer that chemically bonds to your vehicle's factory paint, creating a permanent layer of protection. Unlike traditional wax that sits on top of the paint and wears away in weeks, ceramic coating bonds at the molecular level and can last years with proper maintenance.",
       "The result is a hydrophobic surface that causes water to bead and roll off, taking dirt and grime with it. This means your car stays cleaner longer and is dramatically easier to wash. UV protection is built in, preventing oxidation and color fading from South Florida's intense sun.",
@@ -32,6 +34,8 @@ export const servicesData = {
     tagline: "Silky-smooth paint that glass can't match.",
     heroSub:
       "A clay bar treatment removes bonded contaminants that even the best car wash can't touch — leaving paint so smooth it squeaks.",
+    price: 'From $49',
+    priceNote: 'Final price depends on your vehicle\'s size and how contaminated the paint is.',
     what: [
       "Over time, your car's paint accumulates embedded contaminants — brake dust, industrial fallout, tree sap, rail dust, and road grime that bond chemically to your clear coat. Regular washing removes surface dirt but leaves these contaminants behind, making your paint feel rough and look dull.",
       'A clay bar treatment uses a pliable clay compound and lubricant to safely lift and remove these bonded particles from the surface. The result is paint that feels smooth as glass and is properly prepared to absorb wax, sealant, or ceramic coating for maximum bonding and protection.',
@@ -60,6 +64,8 @@ export const servicesData = {
     tagline: 'Showroom shine at your doorstep.',
     heroSub:
       "A comprehensive exterior treatment — hand wash, clay bar, polish, and wax — that restores your car's finish and protects it from South Florida's elements.",
+    price: 'From $69',
+    priceNote: 'Final price depends on your vehicle\'s size and condition — no hidden fees.',
     what: [
       "Exterior detailing goes far beyond a standard car wash. It's a systematic, multi-stage process designed to clean, correct, and protect every surface of your vehicle's exterior — from the paint and glass to the trim, tires, and wheels.",
       'Our exterior detail starts with a thorough hand wash using pH-balanced soap and soft microfiber mitts to avoid scratching. We follow with clay bar decontamination, iron remover for brake dust, and a light machine polish to remove surface imperfections. The finish is sealed with a premium wax or sealant to protect against UV rays, oxidation, and South Florida\'s salt air.',
@@ -88,6 +94,8 @@ export const servicesData = {
     tagline: 'See clearly. Look sharp.',
     heroSub:
       "Restore yellowed, hazy headlights to crystal-clear clarity — improving both your car's appearance and your nighttime safety.",
+    price: 'From $79',
+    priceNote: 'Final price depends on how oxidized your headlights are.',
     what: [
       "Headlights are made from polycarbonate plastic that's coated with a UV-resistant film at the factory. Over time — especially in South Florida's intense sun — that UV film breaks down, causing the plastic to oxidize and turn yellow, cloudy, or hazy. The result is reduced light output, compromised visibility at night, and a car that looks years older than it is.",
       'Our headlight restoration process uses a multi-stage wet sanding and buffing technique to remove the damaged oxidized layer, progressively refining the surface until it\'s crystal clear. We finish with a UV-resistant sealant to protect the restored surface from re-yellowing for years to come.',
@@ -116,6 +124,8 @@ export const servicesData = {
     tagline: 'A fresh start for every surface inside.',
     heroSub:
       'Deep clean every interior surface — hot-water extraction, leather conditioning, odor elimination — leaving your cabin feeling brand new.',
+    price: 'From $69',
+    priceNote: 'Final price depends on your vehicle\'s size and condition — no hidden fees.',
     what: [
       "Interior detailing is a thorough, deep-clean of every surface inside your vehicle. It goes far beyond vacuuming and wiping — it's a systematic process that removes dirt, stains, bacteria, and odors from every crevice, fabric, and hard surface in your cabin.",
       "Our interior detail begins with a full vacuum of all seats, carpets, floor mats, trunk, and under-seat areas. We then use hot-water extraction on fabric surfaces to lift embedded dirt and stains that surface cleaning can't touch. Leather surfaces are cleaned with pH-balanced products and conditioned to prevent cracking and drying. Dashboard, console, door panels, and all hard surfaces are cleaned and protected with UV-resistant dressing.",
@@ -172,6 +182,8 @@ export const servicesData = {
     tagline: 'Erase the past. Reveal perfection.',
     heroSub:
       'Machine polishing removes swirl marks, light scratches, water spots, and oxidation — revealing the deep, mirror-like finish your paint was always capable of.',
+    price: 'From $199',
+    priceNote: 'Final price depends on your vehicle\'s size and how much correction the paint needs.',
     what: [
       'Paint correction is the process of using machine polishers and specialized compounds to remove surface-level paint defects from your clear coat. These defects — swirl marks from improper washing, light scratches, water spots, bird dropping etching, and oxidation — scatter light rather than reflecting it cleanly, giving paint a dull, hazy, or spider-webbed appearance.',
       'Our correction process uses dual-action polishers with progressively finer compounds and polishes, carefully removing only as much clear coat as necessary to eliminate each defect. The result is a surface that reflects light uniformly and deeply — the hallmark of truly corrected paint.',
@@ -200,6 +212,8 @@ export const servicesData = {
     tagline: 'Because your car deserves better than fur.',
     heroSub:
       'Specialized tools and techniques to extract embedded pet hair from every seat, carpet, and crevice — completely and without damaging your upholstery.',
+    price: 'From $39',
+    priceNote: 'Final price depends on your vehicle\'s size and how much pet hair is embedded.',
     what: [
       'Pet hair in a car is notoriously difficult to remove. Unlike surface debris, pet hair weaves into fabric fibers and works its way into every gap between cushions, under seats, and into carpet pile. Standard vacuuming often moves it around more than it removes it.',
       'Our pet hair removal service uses a combination of specialized rubber rakes, compressed air, and professional-grade vacuum tools designed specifically for pet hair extraction. We work methodically through every seat, seat back, carpet section, trunk, and hard-to-reach area — including under seats and between console gaps.',
@@ -228,6 +242,8 @@ export const servicesData = {
     tagline: 'Tough stains, gone for good.',
     heroSub:
       'Targeted treatment to lift stubborn stains from seats, carpets, and upholstery — restoring a fresh, spotless interior without damaging your fabric.',
+    price: 'From $99',
+    priceNote: 'Final price depends on the number and severity of stains.',
     what: [
       'Spills, food stains, dirt, and mystery marks work their way deep into seat fabric and carpet fibers, where a quick wipe-down or standard vacuum can\'t reach. Left untreated, these stains set in permanently and can leave lingering odors behind.',
       'Our stain removal process starts by identifying the stain type and selecting the right pH-balanced treatment — avoiding harsh chemicals that can discolor or weaken fabric. We use hot-water extraction and targeted agitation to break down the stain and lift it out of the fibers, not just push it around.',
@@ -256,6 +272,8 @@ export const servicesData = {
     tagline: 'A cleaner engine bay, easier to inspect and maintain.',
     heroSub:
       'Professional degreasing and detailing of your engine bay — removes built-up grime, improves under-hood appearance, and helps you spot leaks early.',
+    price: 'From $99',
+    priceNote: 'Final price depends on your engine bay\'s size and how much grime has built up.',
     what: [
       "Your engine bay collects road grime, oil residue, and dust that build up over time, making it harder to spot leaks, worn hoses, or other issues during routine checks. A dirty engine bay can also mask the source of a problem when something does go wrong.",
       "Our engine bay cleaning service uses safe, water-controlled degreasing methods designed specifically for engine compartments — all sensitive electrical components and connections are carefully covered and protected before any product is applied.",

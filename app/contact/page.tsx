@@ -53,9 +53,11 @@ const infoCards = [
 export default function ContactPage({
   searchParams,
 }: {
-  searchParams: { plan?: string }
+  searchParams: { plan?: string; service?: string }
 }) {
-  const defaultService = searchParams?.plan ? (planMap[searchParams.plan] ?? undefined) : undefined
+  const defaultService = searchParams?.plan
+    ? (planMap[searchParams.plan] ?? undefined)
+    : (searchParams?.service ?? undefined)
   return (
     <>
       {/* Hero */}
