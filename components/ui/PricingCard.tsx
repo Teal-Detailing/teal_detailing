@@ -111,7 +111,7 @@ export default function PricingCard({
             href="/contact?plan=Silver"
             className="mt-6 block w-full text-center py-2.5 rounded-xl font-semibold text-[1.05rem] text-[#0f1117] transition-all bg-silver-gradient"
           >
-            Book Most Popular One
+            Book Silver
           </Link>
         </div>
       </article>

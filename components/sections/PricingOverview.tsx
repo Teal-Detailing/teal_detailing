@@ -108,6 +108,40 @@ export default function PricingOverview() {
           ))}
         </div>
 
+        {/* Full price list — always rendered so every vehicle-size price is visible, not just the selected tab */}
+        <div className="mt-10">
+          <h3 className="text-center text-white font-bold text-lg mb-1">Full Price List by Vehicle Size</h3>
+          <p className="text-center text-slate-400 text-sm mb-5">
+            Every price, every size, up front — no need to ask.
+          </p>
+          <div className="overflow-x-auto rounded-2xl border border-white/10">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-white/5">
+                  <th scope="col" className="px-4 py-3 text-left font-semibold text-slate-300">Package</th>
+                  {carTypes.map((car) => (
+                    <th key={car.id} scope="col" className="px-4 py-3 text-right font-semibold text-slate-300">
+                      {car.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {pricingPlans.map((plan, i) => (
+                  <tr key={plan.name} className="border-t border-white/10">
+                    <th scope="row" className="px-4 py-3 text-left font-semibold text-white">{plan.name}</th>
+                    {carTypes.map((car) => (
+                      <td key={car.id} className="px-4 py-3 text-right text-slate-300">
+                        ${basePrices[i] + car.surcharge}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* Add-on banner */}
         <div className="mt-6 rounded-2xl border-2 border-teal-500 overflow-hidden flex flex-col sm:flex-row items-stretch">
           <div className="flex flex-col items-center justify-center px-6 py-4 gap-0.5">
