@@ -76,7 +76,7 @@ export default function BookingForm({ location, defaultService, compact = false 
     phone: '',
     email: '',
     vehicleType: '',
-    service: defaultService ?? '',
+    services: defaultService ? [defaultService] : [] as string[],
     timeSlot: '',
     message: '',
   })
@@ -93,9 +93,36 @@ export default function BookingForm({ location, defaultService, compact = false 
     const newSurcharge = vehicleSurcharges[newType] ?? 0
     const newPackages = getPackageOptions(newSurcharge)
     const oldPackages = getPackageOptions(vehicleSurcharges[form.vehicleType] ?? 0)
-    const pkgIndex = oldPackages.indexOf(form.service)
-    const newService = pkgIndex !== -1 ? newPackages[pkgIndex] : form.service
-    setForm(prev => ({ ...prev, vehicleType: newType, service: newService }))
+    setForm(prev => ({
+      ...prev,
+      vehicleType: newType,
+      services: prev.services.map(s => {
+        const idx = oldPackages.indexOf(s)
+        return idx !== -1 ? newPackages[idx] : s
+      }),
+    }))
+  }
+
+  function togglePackage(option: string) {
+    const packageOptions = getPackageOptions(vehicleSurcharges[form.vehicleType] ?? 0)
+    setForm(prev => {
+      const withoutPackages = prev.services.filter(s => !packageOptions.includes(s))
+      const isSelected = prev.services.includes(option)
+      return { ...prev, services: isSelected ? withoutPackages : [...withoutPackages, option] }
+    })
+  }
+
+  function toggleExtraService(option: string) {
+    setForm(prev => ({
+      ...prev,
+      services: prev.services.includes(option)
+        ? prev.services.filter(s => s !== option)
+        : [...prev.services, option],
+    }))
+  }
+
+  function removeService(option: string) {
+    setForm(prev => ({ ...prev, services: prev.services.filter(s => s !== option) }))
   }
 
   function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -124,12 +151,17 @@ export default function BookingForm({ location, defaultService, compact = false 
       setError('Please select a preferred time of day.')
       return
     }
+    if (!compact && form.services.length === 0) {
+      setError('Please select at least one service.')
+      return
+    }
     setSubmitting(true)
     setError('')
 
     const formName = compact ? 'quote-compact' : 'quote-full'
     const slot = timeSlots.find(t => t.value === form.timeSlot)
     const timeLabel = slot ? `${slot.label} (${slot.hours})` : form.timeSlot
+    const serviceLabel = form.services.join(' + ')
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -137,14 +169,14 @@ export default function BookingForm({ location, defaultService, compact = false 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           access_key: 'dfe29cf1-1805-4522-b998-a41c2c100e2f',
-          subject: `New Booking Request — ${form.service || 'General Inquiry'}`,
+          subject: `New Booking Request — ${serviceLabel || 'General Inquiry'}`,
           from_name: 'Teal Detailing Website',
           botcheck: false,
           name: form.name,
           phone: form.phone,
           email: form.email || 'info@tealdetailing.com',
           vehicle_type: form.vehicleType || 'not provided',
-          service: form.service || 'not provided',
+          service: serviceLabel || 'not provided',
           date: selectedDate ? formatDisplayDate(selectedDate) : 'not provided',
           time_slot: timeLabel || 'not provided',
           location: location || 'not provided',
@@ -166,10 +198,6 @@ export default function BookingForm({ location, defaultService, compact = false 
     }
   }
 
-  function clearService() {
-    setForm(prev => ({ ...prev, service: '' }))
-  }
-
   if (submitted) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-12 px-6 text-center">
@@ -188,14 +216,16 @@ export default function BookingForm({ location, defaultService, compact = false 
             <span>{timeSlots.find(t => t.value === form.timeSlot)?.label}</span>
           </div>
         )}
-        {form.service && (
-          <p className="text-xs text-teal-700 font-medium">Package: {form.service}</p>
+        {form.services.length > 0 && (
+          <p className="text-xs text-teal-700 font-medium">
+            {form.services.length === 1 ? 'Service' : 'Services'}: {form.services.join(', ')}
+          </p>
         )}
         <button
           onClick={() => {
             setSubmitted(false)
             setSelectedDate(undefined)
-            setForm({ name:'', phone:'', email:'', vehicleType:'', service:'', timeSlot:'', message:'' })
+            setForm({ name:'', phone:'', email:'', vehicleType:'', services:[], timeSlot:'', message:'' })
           }}
           className="text-teal-700 text-sm font-medium underline underline-offset-2"
         >
@@ -207,8 +237,6 @@ export default function BookingForm({ location, defaultService, compact = false 
 
   const currentSurcharge = vehicleSurcharges[form.vehicleType] ?? 0
   const currentPackageOptions = getPackageOptions(currentSurcharge)
-  const allServiceOptions = [...currentPackageOptions, ...extraServices]
-  const selectedPackage = currentPackageOptions.includes(form.service) ? form.service : null
   const formName = compact ? 'quote-compact' : 'quote-full'
 
   return (
@@ -228,27 +256,25 @@ export default function BookingForm({ location, defaultService, compact = false 
         <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
       </div>
 
-      {/* Pre-selected package banner */}
-      {selectedPackage && (
-        <div
-          className={`flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium ${
-            getPackageAccent(selectedPackage)
-          }`}
-        >
-          <div className="flex items-center gap-2">
-            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-            </svg>
-            <span>{selectedPackage}</span>
-          </div>
-          <button
-            type="button"
-            onClick={clearService}
-            className="text-current opacity-50 hover:opacity-100 transition-opacity text-lg leading-none"
-            aria-label="Clear selection"
-          >
-            ×
-          </button>
+      {/* Selected services summary */}
+      {form.services.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {form.services.map(s => (
+            <div
+              key={s}
+              className={`flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded-full border text-sm font-medium ${getPackageAccent(s)}`}
+            >
+              <span>{s}</span>
+              <button
+                type="button"
+                onClick={() => removeService(s)}
+                className="text-current opacity-50 hover:opacity-100 transition-opacity text-lg leading-none"
+                aria-label={`Remove ${s}`}
+              >
+                ×
+              </button>
+            </div>
+          ))}
         </div>
       )}
 
@@ -305,40 +331,73 @@ export default function BookingForm({ location, defaultService, compact = false 
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="vehicleType" className="block text-sm font-semibold text-slate-700 mb-1">
-                Vehicle Type *
-              </label>
-              <select
-                id="vehicleType"
-                name="vehicleType"
-                required
-                value={form.vehicleType}
-                onChange={handleVehicleTypeChange}
-                className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
-              >
-                <option value="">Select…</option>
-                {vehicleTypes.map(v => <option key={v} value={v}>{v}</option>)}
-              </select>
+          <div>
+            <label htmlFor="vehicleType" className="block text-sm font-semibold text-slate-700 mb-1">
+              Vehicle Type *
+            </label>
+            <select
+              id="vehicleType"
+              name="vehicleType"
+              required
+              value={form.vehicleType}
+              onChange={handleVehicleTypeChange}
+              className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+            >
+              <option value="">Select…</option>
+              {vehicleTypes.map(v => <option key={v} value={v}>{v}</option>)}
+            </select>
+          </div>
+
+          <div>
+            <span className="block text-sm font-semibold text-slate-700 mb-1">
+              Service(s) Needed *
+            </span>
+            <p className="text-xs text-slate-500 mb-2">
+              Pick a package and/or any add-ons — you can select more than one.
+            </p>
+
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Package</p>
+            <div className="flex flex-wrap gap-2 mb-3">
+              {currentPackageOptions.map(opt => {
+                const isSelected = form.services.includes(opt)
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => togglePackage(opt)}
+                    aria-pressed={isSelected}
+                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                      isSelected
+                        ? 'bg-teal-700 border-teal-700 text-white'
+                        : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                )
+              })}
             </div>
-            <div>
-              <label htmlFor="service" className="block text-sm font-semibold text-slate-700 mb-1">
-                Service Needed *
-              </label>
-              <select
-                id="service"
-                name="service"
-                required
-                value={form.service}
-                onChange={handleChange}
-                className={`w-full px-3 py-3 text-base font-medium rounded-lg border bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition ${
-                  selectedPackage ? 'border-teal-400 ring-1 ring-teal-300' : 'border-slate-200'
-                }`}
-              >
-                <option value="">Select…</option>
-                {allServiceOptions.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-1.5">Additional Services</p>
+            <div className="flex flex-wrap gap-2">
+              {extraServices.map(opt => {
+                const isSelected = form.services.includes(opt)
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => toggleExtraService(opt)}
+                    aria-pressed={isSelected}
+                    className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                      isSelected
+                        ? 'bg-teal-700 border-teal-700 text-white'
+                        : 'border-slate-200 text-slate-600 hover:border-teal-300 hover:bg-slate-50'
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </>
