@@ -10,14 +10,14 @@ import FAQ from '@/components/sections/FAQ'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Premium Mobile Car Detailing in South Florida',
+  title: 'Mobile Car Detailing Miami & South Florida | Teal Detailing',
   description:
-    'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $99.',
+    'Mobile car detailing at your home, office or condo in Miami-Dade, Broward & Palm Beach. Interior detailing, ceramic coating, paint correction & more. Get a free quote.',
   alternates: { canonical: 'https://tealdetailing.com' },
   openGraph: {
-    title: 'Teal Detailing — Premium Mobile Car Detailing in South Florida',
+    title: 'Mobile Car Detailing Miami & South Florida | Teal Detailing',
     description:
-      'Teal Detailing brings 5-star mobile car detailing to your home or office across Miami-Dade, Broward, and Palm Beach. Economy, Silver & Gold packages starting at $99.',
+      'Mobile car detailing at your home, office or condo in Miami-Dade, Broward & Palm Beach. Interior detailing, ceramic coating, paint correction & more. Get a free quote.',
     url: 'https://tealdetailing.com',
     images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
   },

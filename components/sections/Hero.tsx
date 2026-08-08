@@ -53,11 +53,11 @@ export default function Hero() {
             {/* Headline */}
             <div className="space-y-3">
               <h1 className="text-4xl sm:text-5xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.1] text-white">
-                Premium Mobile Car Detailing{' '}
-                <span className="text-gradient-teal">in Miami, Broward, Palm&nbsp;Beach</span>
+                Mobile Car Detailing{' '}
+                <span className="text-gradient-teal">in Miami &amp; South&nbsp;Florida</span>
               </h1>
               <p className="text-slate-300 leading-relaxed max-w-2xl text-[1rem] lg:text-[1.5rem] font-bold">
-                Teal Detailing brings professional mobile car detailing directly to your location across South Florida. Specializing in:
+                Professional mobile auto detailing at your home, office or condo. Serving Miami-Dade, Broward and Palm Beach with interior detailing, exterior detailing, ceramic coating and paint correction.
               </p>
               <div className="flex flex-wrap gap-x-2 gap-y-1 text-slate-300 font-sans text-[0.85rem] lg:text-[1.25rem] font-bold">
                 {[

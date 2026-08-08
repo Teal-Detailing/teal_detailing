@@ -253,7 +253,7 @@ export default function BookingForm({ location, defaultService, compact = false 
             <>Book Your Detailing Today — <span className="text-teal-700 whitespace-nowrap">Get Up To 24% OFF!</span></>
           )}
         </p>
-        <p className="text-sm text-slate-500 mt-0.5">We come to you — same day availability</p>
+        <p className="text-sm text-slate-500 mt-0.5">We come to you — same-day appointments when available</p>
       </div>
 
       {/* Selected services summary */}
