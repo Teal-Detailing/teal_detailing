@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { PHONE_DISPLAY } from '@/lib/constants'
 
-const faqs = [
+const baseFaqs = [
   {
     q: 'How does mobile car detailing work? Do I need to provide water or electricity?',
     a: "No — we bring everything with us. Our team arrives with its own water supply and powers all equipment off a battery station instead of a gasoline generator, so there's no noise, no fumes, and nothing you need to hook up. Just give us a place to park and we handle the rest.",
@@ -46,7 +46,12 @@ const faqs = [
   },
 ]
 
-export default function FAQ() {
+interface FAQProps {
+  extra?: { q: string; a: string }[]
+}
+
+export default function FAQ({ extra = [] }: FAQProps) {
+  const faqs = [...baseFaqs, ...extra]
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (

@@ -17,10 +17,11 @@ export const metadata: Metadata = {
 }
 
 const neighborhoods = [
-  'Boca Raton', 'West Palm Beach', 'Delray Beach', 'Boynton Beach',
-  'Lake Worth', 'Wellington', 'Palm Beach Gardens', 'Jupiter',
-  'Royal Palm Beach', 'Greenacres', 'Riviera Beach', 'North Palm Beach',
-  'Palm Beach', 'Tequesta', 'Loxahatchee', 'Lantana',
+  { name: 'Boca Raton', href: '/boca-raton/mobile-car-detailing' },
+  { name: 'West Palm Beach' }, { name: 'Delray Beach' }, { name: 'Boynton Beach' },
+  { name: 'Lake Worth' }, { name: 'Wellington' }, { name: 'Palm Beach Gardens' }, { name: 'Jupiter' },
+  { name: 'Royal Palm Beach' }, { name: 'Greenacres' }, { name: 'Riviera Beach' }, { name: 'North Palm Beach' },
+  { name: 'Palm Beach' }, { name: 'Tequesta' }, { name: 'Loxahatchee' }, { name: 'Lantana' },
 ]
 
 const areaServices = [
@@ -69,9 +70,15 @@ export default function PalmBeachPage() {
               </p>
               <div className="grid grid-cols-2 gap-2 mb-8">
                 {neighborhoods.map((n) => (
-                  <div key={n} className="flex items-center gap-2 text-sm text-slate-700">
+                  <div key={n.name} className="flex items-center gap-2 text-sm text-slate-700">
                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
-                    {n}
+                    {n.href ? (
+                      <Link href={n.href} className="hover:text-teal-700 hover:underline transition-colors">
+                        {n.name}
+                      </Link>
+                    ) : (
+                      n.name
+                    )}
                   </div>
                 ))}
               </div>

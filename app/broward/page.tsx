@@ -17,10 +17,13 @@ export const metadata: Metadata = {
 }
 
 const neighborhoods = [
-  'Fort Lauderdale', 'Hollywood', 'Pembroke Pines', 'Miramar',
-  'Weston', 'Davie', 'Plantation', 'Sunrise',
-  'Coral Springs', 'Pompano Beach', 'Deerfield Beach', 'Hallandale Beach',
-  'Dania Beach', 'Tamarac', 'Margate', 'Coconut Creek',
+  { name: 'Fort Lauderdale', href: '/fort-lauderdale/mobile-car-detailing' },
+  { name: 'Hollywood', href: '/hollywood-fl/mobile-car-detailing' },
+  { name: 'Pembroke Pines', href: '/pembroke-pines/mobile-car-detailing' },
+  { name: 'Miramar' },
+  { name: 'Weston' }, { name: 'Davie' }, { name: 'Plantation' }, { name: 'Sunrise' },
+  { name: 'Coral Springs' }, { name: 'Pompano Beach' }, { name: 'Deerfield Beach' }, { name: 'Hallandale Beach' },
+  { name: 'Dania Beach' }, { name: 'Tamarac' }, { name: 'Margate' }, { name: 'Coconut Creek' },
 ]
 
 const areaServices = [
@@ -68,9 +71,15 @@ export default function BrowardPage() {
               </p>
               <div className="grid grid-cols-2 gap-2 mb-8">
                 {neighborhoods.map((n) => (
-                  <div key={n} className="flex items-center gap-2 text-sm text-slate-700">
+                  <div key={n.name} className="flex items-center gap-2 text-sm text-slate-700">
                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
-                    {n}
+                    {n.href ? (
+                      <Link href={n.href} className="hover:text-teal-700 hover:underline transition-colors">
+                        {n.name}
+                      </Link>
+                    ) : (
+                      n.name
+                    )}
                   </div>
                 ))}
               </div>

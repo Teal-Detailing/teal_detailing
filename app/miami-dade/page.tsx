@@ -17,10 +17,11 @@ export const metadata: Metadata = {
 }
 
 const neighborhoods = [
-  'Brickell', 'Coral Gables', 'Coconut Grove', 'Doral',
-  'Kendall', 'Hialeah', 'Miami Beach', 'South Beach',
-  'Aventura', 'North Miami', 'Pinecrest', 'Palmetto Bay',
-  'Key Biscayne', 'Westchester', 'Sweetwater', 'Miami Gardens',
+  { name: 'Miami', href: '/miami/mobile-car-detailing' },
+  { name: 'Brickell' }, { name: 'Coral Gables' }, { name: 'Coconut Grove' }, { name: 'Doral' },
+  { name: 'Kendall' }, { name: 'Hialeah' }, { name: 'Miami Beach' }, { name: 'South Beach' },
+  { name: 'Aventura' }, { name: 'North Miami' }, { name: 'Pinecrest' }, { name: 'Palmetto Bay' },
+  { name: 'Key Biscayne' }, { name: 'Westchester' }, { name: 'Sweetwater' }, { name: 'Miami Gardens' },
 ]
 
 const areaServices = [
@@ -68,9 +69,15 @@ export default function MiamiDadePage() {
               </p>
               <div className="grid grid-cols-2 gap-2 mb-8">
                 {neighborhoods.map((n) => (
-                  <div key={n} className="flex items-center gap-2 text-sm text-slate-700">
+                  <div key={n.name} className="flex items-center gap-2 text-sm text-slate-700">
                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500 flex-shrink-0" />
-                    {n}
+                    {n.href ? (
+                      <Link href={n.href} className="hover:text-teal-700 hover:underline transition-colors">
+                        {n.name}
+                      </Link>
+                    ) : (
+                      n.name
+                    )}
                   </div>
                 ))}
               </div>
