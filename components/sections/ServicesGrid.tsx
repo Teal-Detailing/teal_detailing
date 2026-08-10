@@ -4,7 +4,7 @@ import { servicesData, type ServiceSlug } from '@/lib/services'
 
 type SpecialtySlug = Exclude<ServiceSlug, 'mobile-car-detailing'>
 
-const services: { slug: SpecialtySlug; ext?: string; desc: string }[] = [
+const services: { slug: SpecialtySlug; ext?: string; desc: string; focus?: string }[] = [
   {
     slug: 'stain-removal',
     ext: 'webp',
@@ -30,6 +30,7 @@ const services: { slug: SpecialtySlug; ext?: string; desc: string }[] = [
   {
     slug: 'interior-detailing',
     desc: 'Deep clean every surface — hot-water extraction, leather conditioning, and odor elimination.',
+    focus: 'object-bottom',
   },
   {
     slug: 'engine-bay-cleaning',
@@ -64,7 +65,7 @@ export default function ServicesGrid() {
 
         {/* 2-col mobile, 4-col desktop grid */}
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-          {services.map(({ slug, desc, ext = 'jpg' }) => {
+          {services.map(({ slug, desc, ext = 'jpg', focus = 'object-center' }) => {
           const { name, price } = servicesData[slug]
           return (
             <article
@@ -76,7 +77,7 @@ export default function ServicesGrid() {
                   src={`/services/${slug}.${ext}`}
                   alt={name}
                   fill
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                  className={`object-cover ${focus} transition-transform duration-700 ease-out group-hover:scale-110`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" />
                 <div className="absolute top-3 right-3">
