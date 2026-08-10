@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import DatePicker, { formatDisplayDate } from './DatePicker'
-import { PHONE_DISPLAY } from '@/lib/constants'
+import { PHONE_DISPLAY, PHOTO_SMS_HREF } from '@/lib/constants'
 
 interface BookingFormProps {
   location?: string
@@ -76,6 +76,8 @@ export default function BookingForm({ location, defaultService, compact = false 
     phone: '',
     email: '',
     vehicleType: '',
+    vehicle: '',
+    zip: '',
     services: defaultService ? [defaultService] : [] as string[],
     timeSlot: '',
     message: '',
@@ -139,6 +141,10 @@ export default function BookingForm({ location, defaultService, compact = false 
     setForm(prev => ({ ...prev, phone: formatted }))
   }
 
+  function handleZipChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 5)
+    setForm(prev => ({ ...prev, zip: digits }))
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -162,6 +168,9 @@ export default function BookingForm({ location, defaultService, compact = false 
     const slot = timeSlots.find(t => t.value === form.timeSlot)
     const timeLabel = slot ? `${slot.label} (${slot.hours})` : form.timeSlot
     const serviceLabel = form.services.join(' + ')
+    const subject = compact
+      ? `New Quote Request — ${form.vehicle || 'Vehicle not specified'}`
+      : `New Booking Request — ${serviceLabel || 'General Inquiry'}`
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -169,13 +178,15 @@ export default function BookingForm({ location, defaultService, compact = false 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           access_key: 'dfe29cf1-1805-4522-b998-a41c2c100e2f',
-          subject: `New Booking Request — ${serviceLabel || 'General Inquiry'}`,
+          subject,
           from_name: 'Teal Detailing Website',
           botcheck: false,
           name: form.name,
           phone: form.phone,
           email: form.email || 'info@tealdetailing.com',
           vehicle_type: form.vehicleType || 'not provided',
+          vehicle: form.vehicle || 'not provided',
+          zip: form.zip || 'not provided',
           service: serviceLabel || 'not provided',
           date: selectedDate ? formatDisplayDate(selectedDate) : 'not provided',
           time_slot: timeLabel || 'not provided',
@@ -199,6 +210,48 @@ export default function BookingForm({ location, defaultService, compact = false 
   }
 
   if (submitted) {
+    const resetForm = () => {
+      setSubmitted(false)
+      setSelectedDate(undefined)
+      setForm({ name: '', phone: '', email: '', vehicleType: '', vehicle: '', zip: '', services: [], timeSlot: '', message: '' })
+    }
+
+    if (compact) {
+      return (
+        <div className="flex flex-col items-center justify-center gap-4 py-12 px-6 text-center">
+          <div className="w-16 h-16 rounded-full bg-teal-500/10 flex items-center justify-center">
+            <svg className="w-8 h-8 text-teal-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h3 className="text-xl font-semibold text-slate-900">Request Received!</h3>
+          <p className="text-slate-600 text-sm leading-relaxed max-w-xs">
+            Thanks{form.name ? `, ${form.name.split(' ')[0]}` : ''}! Send us a photo of your vehicle for the fastest quote.
+          </p>
+          <a
+            href={PHOTO_SMS_HREF}
+            className="inline-flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl bg-teal-700 hover:bg-teal-800 text-white font-bold text-base transition-all duration-200 hover:shadow-glow active:scale-[0.98]"
+          >
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.06 0-2.077-.162-3.02-.46L3 21l1.54-4.03A7.955 7.955 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+            Text Vehicle Photos
+          </a>
+          <button
+            onClick={resetForm}
+            className="text-teal-700 text-sm font-medium underline underline-offset-2"
+          >
+            Submit another request
+          </button>
+        </div>
+      )
+    }
+
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-12 px-6 text-center">
         <div className="w-16 h-16 rounded-full bg-teal-500/10 flex items-center justify-center">
@@ -222,11 +275,7 @@ export default function BookingForm({ location, defaultService, compact = false 
           </p>
         )}
         <button
-          onClick={() => {
-            setSubmitted(false)
-            setSelectedDate(undefined)
-            setForm({ name:'', phone:'', email:'', vehicleType:'', services:[], timeSlot:'', message:'' })
-          }}
+          onClick={resetForm}
           className="text-teal-700 text-sm font-medium underline underline-offset-2"
         >
           Submit another request
@@ -311,6 +360,45 @@ export default function BookingForm({ location, defaultService, compact = false 
           />
         </div>
       </div>
+
+      {/* Vehicle + ZIP — compact form only */}
+      {compact && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label htmlFor="vehicle" className="block text-sm font-semibold text-slate-700 mb-1">
+              Vehicle *
+            </label>
+            <input
+              id="vehicle"
+              name="vehicle"
+              type="text"
+              required
+              value={form.vehicle}
+              onChange={handleChange}
+              placeholder="e.g. 2021 Honda Accord"
+              className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+            />
+          </div>
+          <div>
+            <label htmlFor="zip" className="block text-sm font-semibold text-slate-700 mb-1">
+              ZIP Code *
+            </label>
+            <input
+              id="zip"
+              name="zip"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]{5}"
+              maxLength={5}
+              required
+              value={form.zip}
+              onChange={handleZipChange}
+              placeholder="33101"
+              className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition"
+            />
+          </div>
+        </div>
+      )}
 
       {/* Full form fields */}
       {!compact && (
@@ -443,25 +531,23 @@ export default function BookingForm({ location, defaultService, compact = false 
         </div>
       )}
 
-      {/* Notes */}
-      <div>
-        <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-1">
-          {compact ? 'Notes' : 'Additional Notes'}
-        </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={2}
-          value={form.message}
-          onChange={handleChange}
-          placeholder={
-            compact
-              ? 'Any details about your vehicle or service needs…'
-              : 'Location, special requests, or anything else we should know…'
-          }
-          className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
-        />
-      </div>
+      {/* Notes — full form only */}
+      {!compact && (
+        <div>
+          <label htmlFor="message" className="block text-sm font-semibold text-slate-700 mb-1">
+            Additional Notes
+          </label>
+          <textarea
+            id="message"
+            name="message"
+            rows={2}
+            value={form.message}
+            onChange={handleChange}
+            placeholder="Location, special requests, or anything else we should know…"
+            className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
+          />
+        </div>
+      )}
 
       {error && (
         <p className="text-xs text-red-600 text-center">{error}</p>

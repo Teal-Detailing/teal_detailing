@@ -7,3 +7,6 @@ const SMS_BODY = "Hi Teal Detailing, I'd like a quote for my vehicle."
 // The "?&" combo (rather than a plain "?") is a widely-used cross-platform
 // quirk that reliably pre-fills the body on both iOS and Android.
 export const SMS_HREF = `sms:+16452488292?&body=${encodeURIComponent(SMS_BODY)}`
+
+const PHOTO_SMS_BODY = 'Hi Teal Detailing, here are photos of my vehicle for a quote:'
+export const PHOTO_SMS_HREF = `sms:+16452488292?&body=${encodeURIComponent(PHOTO_SMS_BODY)}`
