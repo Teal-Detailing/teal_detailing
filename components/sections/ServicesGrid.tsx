@@ -78,7 +78,7 @@ export default function ServicesGrid() {
           return (
             <article
               key={slug}
-              className="group bg-white rounded-[28px] overflow-hidden border border-slate-100 shadow-card hover:shadow-2xl transition-all duration-500 flex flex-col"
+              className="group relative bg-white rounded-[28px] overflow-hidden border border-slate-100 shadow-card hover:shadow-2xl transition-all duration-500 flex flex-col"
             >
               <div className="relative w-full h-52 overflow-hidden">
                 <Image
@@ -93,11 +93,11 @@ export default function ServicesGrid() {
                     {price}
                   </span>
                 </div>
-                <div className="absolute left-5 -bottom-[22px] w-11 h-11 rounded-xl bg-ink shadow-lg flex items-center justify-center ring-4 ring-white flex-shrink-0">
-                  <svg className="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
-                  </svg>
-                </div>
+              </div>
+              <div className="absolute left-5 top-[186px] w-11 h-11 rounded-xl bg-ink shadow-lg flex items-center justify-center ring-4 ring-white flex-shrink-0 z-10">
+                <svg className="w-5 h-5 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d={icon} />
+                </svg>
               </div>
               <div className="p-5 pt-8 flex flex-col gap-2 flex-1">
                 <h3 className="font-bold text-slate-900 text-[1.1rem] tracking-tight">{name}</h3>
