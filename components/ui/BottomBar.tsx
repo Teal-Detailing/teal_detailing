@@ -34,77 +34,49 @@ export default function BottomBar() {
 
   const hideCTA = pathname === '/contact'
 
-  function handleViewPricing() {
-    if (pathname === '/') {
-      document.getElementById('packages')?.scrollIntoView({ behavior: 'smooth' })
-    } else {
-      window.location.href = '/#packages'
-    }
-  }
-
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col">
-      {/* CTA Bar — mobile: Call / Text / Book */}
+      {/* CTA Bar — Call / Text / Book */}
       {!hideCTA && (
-        <div className="lg:hidden bg-ink/95 backdrop-blur-md border-t border-slate-800">
-          <div className="max-w-6xl mx-auto px-4 py-3 grid grid-cols-3 gap-2">
-            <a
-              href={PHONE_HREF}
-              className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-semibold transition-colors"
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                />
-              </svg>
-              Call
-            </a>
-            <a
-              href={SMS_HREF}
-              className="flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-semibold transition-colors"
-            >
-              <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.06 0-2.077-.162-3.02-.46L3 21l1.54-4.03A7.955 7.955 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-                />
-              </svg>
-              Text
-            </a>
-            <Link
-              href="/contact"
-              className="flex items-center justify-center px-2 py-2.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
-            >
-              Book
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* CTA Bar — desktop: View Pricing / Book Now */}
-      {!hideCTA && (
-        <div className="hidden lg:block bg-ink/95 backdrop-blur-md border-t border-slate-800">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-            <p className="text-xs text-slate-400 flex-1 leading-tight">
+        <div className="bg-ink/95 backdrop-blur-md border-t border-slate-800">
+          <div className="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center gap-3">
+            <p className="hidden sm:block text-xs text-slate-400 flex-1 leading-tight">
               Mobile detailing · Miami-Dade · Broward · Palm Beach
             </p>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleViewPricing}
-                className="text-center px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-medium transition-colors"
+            <div className="grid grid-cols-3 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+              <a
+                href={PHONE_HREF}
+                className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-semibold sm:font-medium transition-colors"
               >
-                View Pricing
-              </button>
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                  />
+                </svg>
+                Call
+              </a>
+              <a
+                href={SMS_HREF}
+                className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-teal-500 hover:text-teal-400 text-sm font-semibold sm:font-medium transition-colors"
+              >
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.06 0-2.077-.162-3.02-.46L3 21l1.54-4.03A7.955 7.955 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
+                Text
+              </a>
               <Link
                 href="/contact"
-                className="text-center px-5 py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
+                className="flex items-center justify-center px-3 sm:px-5 py-2.5 sm:py-2 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-sm font-semibold transition-colors"
               >
-                Book Now
+                Book
               </Link>
             </div>
           </div>
