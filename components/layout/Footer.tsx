@@ -149,7 +149,7 @@ export default function Footer() {
               href="/contact"
               className="mt-5 inline-flex items-center justify-center w-full py-2.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold transition-colors"
             >
-              Book Now
+              Get My Quote
             </Link>
           </div>
         </div>

@@ -151,7 +151,7 @@ export default function MiamiDadeServicePage({ params }: { params: { service: st
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm transition-all hover:shadow-glow">
-              Book Online
+              Book My Detail
             </Link>
             <a href={PHONE_HREF} className="px-6 py-3 rounded-xl border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-colors">
               Call {PHONE_DISPLAY}

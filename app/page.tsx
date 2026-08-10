@@ -75,7 +75,7 @@ export default function HomePage() {
               href="/contact"
               className="inline-flex items-center justify-center px-8 py-3.5 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold transition-all hover:shadow-glow"
             >
-              Book Your Detail
+              Book My Detail
             </Link>
             <a
               href={PHONE_HREF}
