@@ -26,12 +26,12 @@ const carTypes = [
   },
   {
     id: 'suv',
-    label: 'Small SUV & Truck',
+    label: 'SUV',
     surcharge: 10,
     icon: (selected: boolean) => (
       <Image
         src="/icons/suv.png"
-        alt="Small SUV & Truck"
+        alt="SUV"
         width={512}
         height={512}
         className={`w-16 h-16 sm:w-20 sm:h-20 object-contain transition-all duration-300 brightness-0 invert ${selected ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}
@@ -40,12 +40,12 @@ const carTypes = [
   },
   {
     id: 'large',
-    label: 'Large SUV, Truck & Van',
+    label: 'Large / 3-Row SUV, Truck & Van',
     surcharge: 20,
     icon: (selected: boolean) => (
       <Image
         src="/icons/large.png"
-        alt="Large SUV, Truck & Van"
+        alt="Large / 3-Row SUV, Truck & Van"
         width={512}
         height={512}
         className={`w-16 h-16 sm:w-20 sm:h-20 object-contain transition-all duration-300 brightness-0 invert ${selected ? 'opacity-100' : 'opacity-40 group-hover:opacity-60'}`}
