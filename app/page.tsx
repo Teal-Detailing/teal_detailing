@@ -7,6 +7,7 @@ import WhyChooseUs from '@/components/sections/WhyChooseUs'
 import ServicesGrid from '@/components/sections/ServicesGrid'
 import Reviews from '@/components/sections/Reviews'
 import HowItWorks from '@/components/sections/HowItWorks'
+import WhyTeal from '@/components/sections/WhyTeal'
 import FAQ from '@/components/sections/FAQ'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
@@ -29,6 +30,7 @@ export default function HomePage() {
     <>
       <Hero />
       <PricingOverview />
+      <WhyTeal />
       <HowItWorks />
       <ServiceAreas />
       <ServicesGrid />
