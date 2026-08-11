@@ -25,7 +25,7 @@ const services: { slug: SpecialtySlug; ext?: string; desc: string; focus?: strin
   },
   {
     slug: 'exterior-detailing',
-    desc: 'Full hand wash, clay bar, polish, and wax to restore your car\'s showroom shine.',
+    desc: 'Full hand wash, clay bar, gloss enhancement, and wax to restore your car\'s showroom shine.',
   },
   {
     slug: 'interior-detailing',

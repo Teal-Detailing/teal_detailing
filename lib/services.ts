@@ -63,12 +63,12 @@ export const servicesData = {
     name: 'Exterior Detailing',
     tagline: 'Showroom shine at your doorstep.',
     heroSub:
-      "A comprehensive exterior treatment — hand wash, clay bar, polish, and wax — that restores your car's finish and protects it from South Florida's elements.",
+      "A comprehensive exterior treatment — hand wash, clay bar, gloss enhancement, and wax — that restores your car's finish and protects it from South Florida's elements.",
     price: 'From $69',
     priceNote: 'Final price depends on your vehicle\'s size and condition — no hidden fees.',
     what: [
       "Exterior detailing goes far beyond a standard car wash. It's a systematic, multi-stage process designed to clean, correct, and protect every surface of your vehicle's exterior — from the paint and glass to the trim, tires, and wheels.",
-      'Our exterior detail starts with a thorough hand wash using pH-balanced soap and soft microfiber mitts to avoid scratching. We follow with clay bar decontamination, iron remover for brake dust, and a light machine polish to remove surface imperfections. The finish is sealed with a premium wax or sealant to protect against UV rays, oxidation, and South Florida\'s salt air.',
+      'Our exterior detail starts with a thorough hand wash using pH-balanced soap and soft microfiber mitts to avoid scratching. We follow with clay bar decontamination, iron remover for brake dust, and a light gloss enhancement pass to boost shine. The finish is sealed with a premium wax or sealant to protect against UV rays, oxidation, and South Florida\'s salt air.',
       "The difference between a car wash and a proper exterior detail is visible immediately — and it lasts. Your paint will look deeper, feel smoother, and stay cleaner far longer after a professional exterior detail from Teal.",
     ],
     why: [
