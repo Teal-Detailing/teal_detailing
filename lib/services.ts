@@ -7,7 +7,7 @@ export const servicesData = {
     price: 'From $499',
     priceNote: 'Final price depends on your vehicle\'s size and paint condition — no hidden fees.',
     what: [
-      "Ceramic coating is a liquid polymer that chemically bonds to your vehicle's factory paint, creating a permanent layer of protection. Unlike traditional wax that sits on top of the paint and wears away in weeks, ceramic coating bonds at the molecular level and can last years with proper maintenance.",
+      "Ceramic coating is a liquid polymer that chemically bonds to your vehicle's factory paint, creating a durable, long-lasting protective layer. Unlike traditional wax that sits on top of the paint and wears away in weeks, ceramic coating bonds at the molecular level and can last years with proper maintenance.",
       "The result is a hydrophobic surface that causes water to bead and roll off, taking dirt and grime with it. This means your car stays cleaner longer and is dramatically easier to wash. UV protection is built in, preventing oxidation and color fading from South Florida's intense sun.",
       "Teal's ceramic coating service includes full paint decontamination, a one-step machine polish to remove minor imperfections, and precise application by our certified technicians — ensuring the coating bonds perfectly and performs for the long haul.",
     ],
@@ -98,8 +98,8 @@ export const servicesData = {
     priceNote: 'Final price depends on how oxidized your headlights are.',
     what: [
       "Headlights are made from polycarbonate plastic that's coated with a UV-resistant film at the factory. Over time — especially in South Florida's intense sun — that UV film breaks down, causing the plastic to oxidize and turn yellow, cloudy, or hazy. The result is reduced light output, compromised visibility at night, and a car that looks years older than it is.",
-      'Our headlight restoration process uses a multi-stage wet sanding and buffing technique to remove the damaged oxidized layer, progressively refining the surface until it\'s crystal clear. We finish with a UV-resistant sealant to protect the restored surface from re-yellowing for years to come.',
-      'The visual transformation is dramatic. Headlights that looked beyond repair often come out looking factory-new. And beyond aesthetics, properly restored headlights can improve your light output by as much as 70%, making nighttime driving significantly safer.',
+      'Our headlight restoration process uses a multi-stage wet sanding and buffing technique to remove the damaged oxidized layer, progressively refining the surface until it\'s crystal clear. We finish with a UV-resistant sealant that helps protect the restored surface against premature re-yellowing.',
+      'The visual transformation is dramatic. Headlights that looked beyond repair often come out looking factory-new. And beyond aesthetics, restoring oxidized headlights can significantly improve nighttime light output and visibility.',
     ],
     why: [
       {
@@ -110,7 +110,7 @@ export const servicesData = {
       {
         icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
         title: 'UV Sealant Included',
-        desc: 'Every restoration is sealed with a UV-resistant coating to prevent re-yellowing for years.',
+        desc: 'Every restoration is sealed with a UV-resistant coating that helps prevent premature re-yellowing.',
       },
       {
         icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',

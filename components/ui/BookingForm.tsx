@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import Script from 'next/script'
 import DatePicker, { formatDisplayDate } from './DatePicker'
 import { PHONE_DISPLAY, PHOTO_SMS_HREF } from '@/lib/constants'
@@ -624,6 +625,13 @@ export default function BookingForm({ location, defaultService, compact = false 
       </button>
       <p className="text-center text-sm text-slate-500">
         No commitment · We respond in 15 minutes
+      </p>
+      <p className="text-center text-xs text-slate-500">
+        By submitting, you agree that Teal Detailing may contact you regarding your
+        request by call, text, or email.{' '}
+        <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-slate-700">
+          Privacy Policy
+        </Link>
       </p>
     </form>
   )

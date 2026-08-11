@@ -40,9 +40,9 @@ const values = [
 
 const stats = [
   { value: '700+', label: 'Happy Customers' },
-  { value: '5★', label: 'Average Rating' },
+  { value: '5.0★', label: 'Google Rating' },
   { value: '3', label: 'Counties Served' },
-  { value: '100%', label: 'Satisfaction Rate' },
+  { value: '48 HR', label: 'Satisfaction Guarantee' },
 ]
 
 export default function AboutPage() {
