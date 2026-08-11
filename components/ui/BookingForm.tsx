@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Script from 'next/script'
 import DatePicker, { formatDisplayDate } from './DatePicker'
 import { PHONE_DISPLAY, PHOTO_SMS_HREF } from '@/lib/constants'
+
+const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY
 
 interface BookingFormProps {
   location?: string
@@ -70,6 +73,37 @@ export default function BookingForm({ location, defaultService, compact = false 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
+  const [captchaToken, setCaptchaToken] = useState('')
+  const captchaContainerRef = useRef<HTMLDivElement>(null)
+  const captchaWidgetId = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!RECAPTCHA_SITE_KEY || !captchaContainerRef.current) return
+
+    const render = () => {
+      if (!captchaContainerRef.current || captchaWidgetId.current !== null || !window.grecaptcha) return
+      captchaWidgetId.current = window.grecaptcha.render(captchaContainerRef.current, {
+        sitekey: RECAPTCHA_SITE_KEY,
+        callback: (token: string) => setCaptchaToken(token),
+        'expired-callback': () => setCaptchaToken(''),
+      })
+    }
+
+    // The script's own load event fires before window.grecaptcha.render is
+    // actually ready (its internal async init lags behind) — poll instead.
+    if (window.grecaptcha?.render) {
+      render()
+    } else {
+      const timer = setInterval(() => {
+        if (window.grecaptcha?.render) {
+          clearInterval(timer)
+          render()
+        }
+      }, 150)
+      return () => clearInterval(timer)
+    }
+  }, [])
+
 
   const [form, setForm] = useState({
     name: '',
@@ -161,6 +195,12 @@ export default function BookingForm({ location, defaultService, compact = false 
       setError('Please select at least one service.')
       return
     }
+
+    if (RECAPTCHA_SITE_KEY && !captchaToken) {
+      setError('Please complete the reCAPTCHA challenge.')
+      return
+    }
+
     setSubmitting(true)
     setError('')
 
@@ -181,6 +221,7 @@ export default function BookingForm({ location, defaultService, compact = false 
           subject,
           from_name: 'Teal Detailing Website',
           botcheck: false,
+          ...(captchaToken ? { 'g-recaptcha-response': captchaToken } : {}),
           name: form.name,
           phone: form.phone,
           email: form.email || 'info@tealdetailing.com',
@@ -206,7 +247,15 @@ export default function BookingForm({ location, defaultService, compact = false 
       setError(`Something went wrong. Please call us at ${PHONE_DISPLAY} or try again.`)
     } finally {
       setSubmitting(false)
+      resetCaptcha()
     }
+  }
+
+  function resetCaptcha() {
+    if (captchaWidgetId.current !== null && window.grecaptcha) {
+      window.grecaptcha.reset(captchaWidgetId.current)
+    }
+    setCaptchaToken('')
   }
 
   if (submitted) {
@@ -547,6 +596,19 @@ export default function BookingForm({ location, defaultService, compact = false 
             className="w-full px-3 py-3 text-base font-medium rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-transparent transition resize-none"
           />
         </div>
+      )}
+
+      {/* Spam protection — Google reCAPTCHA v2 */}
+      {RECAPTCHA_SITE_KEY && (
+        <>
+          <Script
+            src="https://www.google.com/recaptcha/api.js?render=explicit"
+            strategy="lazyOnload"
+          />
+          <div className="flex justify-center overflow-hidden">
+            <div ref={captchaContainerRef} />
+          </div>
+        </>
       )}
 
       {error && (
