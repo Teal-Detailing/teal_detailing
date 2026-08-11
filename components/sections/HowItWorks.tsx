@@ -3,8 +3,8 @@ import { Fragment } from 'react'
 const steps = [
   {
     number: '1',
-    title: 'Choose Your Package',
-    desc: 'Choose Economy, Silver or Gold in under a minute.',
+    title: 'Choose Your Package or Service',
+    desc: 'Pick Economy, Silver, Gold, or the standalone service your vehicle needs.',
     duration: '~30 seconds',
   },
   {
@@ -17,7 +17,7 @@ const steps = [
     number: '3',
     title: 'We Come Fully Equipped',
     desc: 'We arrive with water, power, premium products, and quiet battery-powered equipment. No hoses. No loud generators. No setup required.',
-    duration: '~2–4 hours',
+    duration: 'Typical detailing package: 1–4 hours',
   },
   {
     number: '4',
@@ -52,7 +52,7 @@ export default function HowItWorks() {
                 </div>
                 <h3 className="font-bold text-white text-lg mt-1">{step.title}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed flex-1">{step.desc}</p>
-                <span className="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold whitespace-nowrap">
+                <span className="px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/30 text-teal-300 text-xs font-semibold text-center">
                   {step.duration}
                 </span>
               </div>
