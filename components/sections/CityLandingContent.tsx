@@ -206,7 +206,7 @@ export default function CityLandingContent({ city }: { city: CityData }) {
             Ready to Book in {city.name}?
           </h2>
           <p className="text-slate-300 mb-6 text-sm">
-            Same-day availability · No travel fees · 5-star service guaranteed
+            Same-day appointments when available · No travel fees · 5-star service guaranteed
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/contact" className="px-6 py-3 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-sm transition-all hover:shadow-glow">

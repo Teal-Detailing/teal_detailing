@@ -24,7 +24,7 @@ export const cities: CityData[] = [
     county: { slug: 'miami-dade', name: 'Miami-Dade County' },
     metaTitle: 'Mobile Car Detailing in Miami, FL',
     metaDescription:
-      'Mobile car detailing in Miami, FL. We come to your condo, office, or valet garage — no water or electricity hookup needed. Same-day availability, 5-star rated.',
+      'Mobile car detailing in Miami, FL. We come to your condo, office, or valet garage — no water or electricity hookup needed. Same-day appointments when available, 5-star rated.',
     heroIntro:
       "Most Miami cars live between a condo garage and a valet stand, not a driveway with a hose. That's exactly why mobile detailing works so well here — our team brings its own water and power, so a high-rise parking garage or a metered street spot is all we need to get your car looking showroom-fresh.",
     neighborhoods: [
@@ -66,7 +66,7 @@ export const cities: CityData[] = [
     county: { slug: 'broward', name: 'Broward County' },
     metaTitle: 'Mobile Car Detailing in Hollywood, FL',
     metaDescription:
-      'Mobile car detailing in Hollywood, FL — serving Hollywood Beach, Downtown Hollywood, and surrounding neighborhoods. We come to you, same-day availability.',
+      'Mobile car detailing in Hollywood, FL — serving Hollywood Beach, Downtown Hollywood, and surrounding neighborhoods. We come to you, same-day appointments when available.',
     heroIntro:
       "Living near Hollywood Beach means sand and salt spray find their way into every seat crease and floor mat faster than almost anywhere else in Broward. Whether you're a few blocks from the Broadwalk or further inland near Downtown Hollywood, we bring a full mobile setup to wherever your car is parked.",
     neighborhoods: [
@@ -100,7 +100,7 @@ export const cities: CityData[] = [
     county: { slug: 'broward', name: 'Broward County' },
     metaTitle: 'Mobile Car Detailing in Pembroke Pines, FL',
     metaDescription:
-      'Mobile car detailing in Pembroke Pines, FL. We come to your driveway across Chapel Trail, Silver Lakes, Pembroke Falls, and more — same-day availability.',
+      'Mobile car detailing in Pembroke Pines, FL. We come to your driveway across Chapel Trail, Silver Lakes, Pembroke Falls, and more — same-day appointments when available.',
     heroIntro:
       "Pembroke Pines is a driveway city — wide, family-friendly, and full of the SUVs and minivans that actually need the deepest interior cleaning. We bring the full setup right to your driveway, so you don't have to load the kids back into a dirty car just to drop it off somewhere else.",
     neighborhoods: [
@@ -118,7 +118,7 @@ export const cities: CityData[] = [
     county: { slug: 'miami-dade', name: 'Miami-Dade County' },
     metaTitle: 'Mobile Car Detailing in Miami Beach, FL',
     metaDescription:
-      'Mobile car detailing in Miami Beach, FL. We come to your condo garage or valet stand across South Beach, Mid-Beach, and North Beach — same-day availability.',
+      'Mobile car detailing in Miami Beach, FL. We come to your condo garage or valet stand across South Beach, Mid-Beach, and North Beach — same-day appointments when available.',
     heroIntro:
       "Being on a barrier island means Miami Beach cars get hit with ocean salt spray and UV exposure worse than almost anywhere else in South Florida. Between that and the valet-and-garage reality of beachfront condo living, we built our mobile setup specifically to work without a hookup and to protect paint against exactly this kind of exposure.",
     neighborhoods: [
@@ -152,7 +152,7 @@ export const cities: CityData[] = [
     county: { slug: 'miami-dade', name: 'Miami-Dade County' },
     metaTitle: 'Mobile Car Detailing in Doral, FL',
     metaDescription:
-      'Mobile car detailing in Doral, FL. We come to your driveway or office across Downtown Doral, Doral Isles, Costa Doral, and more — same-day availability.',
+      'Mobile car detailing in Doral, FL. We come to your driveway or office across Downtown Doral, Doral Isles, Costa Doral, and more — same-day appointments when available.',
     heroIntro:
       "Doral's newer subdivisions and business parks mean wide driveways and plenty of covered parking — a great match for mobile detailing. Whether your car sits in a Downtown Doral driveway or an office garage near one of the business parks, we bring the full setup to you.",
     neighborhoods: [
@@ -169,7 +169,7 @@ export const cities: CityData[] = [
     county: { slug: 'miami-dade', name: 'Miami-Dade County' },
     metaTitle: 'Mobile Car Detailing in Aventura, FL',
     metaDescription:
-      'Mobile car detailing in Aventura, FL. We come to your high-rise garage or marina parking across Aventura — no hookup needed, same-day availability.',
+      'Mobile car detailing in Aventura, FL. We come to your high-rise garage or marina parking across Aventura — no hookup needed, same-day appointments when available.',
     heroIntro:
       "Aventura is high-rise condo and marina living — which usually means covered garage parking, not a driveway with a hose. That's exactly the setup our mobile service is built for: we bring our own water and run equipment off a battery station, so a parking garage near the mall or a marina lot works just fine.",
     neighborhoods: [
