@@ -173,16 +173,52 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               <span className="text-5xl font-extrabold text-white">{service.price}</span>
               <p className="text-slate-400 max-w-sm mt-1">{service.priceNote}</p>
             </div>
-            <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
-              {service.why.map(({ title }) => (
-                <li key={title} className="flex items-center gap-1.5 text-sm text-slate-300">
-                  <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {title}
-                </li>
-              ))}
-            </ul>
+            {'included' in service ? (
+              <div className="mt-8 text-left max-w-sm mx-auto">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Included</p>
+                <ul className="space-y-1.5 mb-6">
+                  {service.included.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-slate-300">
+                      <svg className="w-4 h-4 text-teal-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                      </svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                {service.addOns.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-400 mb-2">Available Add-Ons</p>
+                    <ul className="space-y-1.5">
+                      {service.addOns.map((item) => (
+                        <li key={item} className="flex items-center justify-between gap-2 text-sm text-slate-400">
+                          <span className="flex items-center gap-2">
+                            <svg className="w-4 h-4 text-slate-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            {item}
+                          </span>
+                          <span className="text-[0.65rem] font-semibold uppercase tracking-wide text-slate-400 border border-slate-600 rounded-full px-2 py-0.5 flex-shrink-0">
+                            Add-on
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </div>
+            ) : (
+              <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
+                {service.why.map(({ title }) => (
+                  <li key={title} className="flex items-center gap-1.5 text-sm text-slate-300">
+                    <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                    </svg>
+                    {title}
+                  </li>
+                ))}
+              </ul>
+            )}
             <div className="mt-8">
               <Link
                 href={`/contact?service=${encodeURIComponent(service.name)}`}
