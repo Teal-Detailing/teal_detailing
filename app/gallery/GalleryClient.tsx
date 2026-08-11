@@ -310,7 +310,7 @@ export default function GalleryClient() {
           <div className="mb-10">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-2">Detail Work</p>
             <h2 id="wheels-heading" className="text-3xl font-extrabold text-white">Wheel & Rim Detail</h2>
-            <p className="text-slate-400 mt-2 text-sm">Every package includes deep rim cleaning — here&apos;s what that looks like up close</p>
+            <p className="text-slate-400 mt-2 text-sm">Wheel cleaning is included with every detailing package — here&apos;s what that looks like up close</p>
           </div>
 
           {/* Wheel before/after highlight */}
