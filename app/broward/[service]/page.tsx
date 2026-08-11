@@ -36,6 +36,7 @@ export default function BrowardServicePage({ params }: { params: { service: stri
   if (!service) notFound()
 
   const pageUrl = `https://tealdetailing.com/${COUNTY_SLUG}/${params.service}`
+  const isPackageService = params.service === 'mobile-car-detailing'
 
   return (
     <>
@@ -120,26 +121,65 @@ export default function BrowardServicePage({ params }: { params: { service: stri
         </div>
       </section>
 
-      <section className="py-20 bg-ink" aria-labelledby="pricing-heading">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+      {isPackageService ? (
+        <section className="py-20 bg-ink" aria-labelledby="pricing-heading">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">Pricing</p>
+              <h2 id="pricing-heading" className="text-3xl font-extrabold text-white">
+                Choose Your Package
+              </h2>
+              <p className="mt-3 text-slate-400 max-w-xl mx-auto">
+                Prices shown are our starting sedan rate. SUVs, trucks, and vans have a small size adjustment — no hidden fees, ever.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+              {pricingPlans.map((plan) => (
+                <div key={plan.name} className="flex-1">
+                  <PricingCard {...plan} startingAt />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : 'price' in service ? (
+        <section className="py-20 bg-ink" aria-labelledby="pricing-heading">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-teal-400 mb-3">Pricing</p>
             <h2 id="pricing-heading" className="text-3xl font-extrabold text-white">
-              Choose Your Package
+              {service.name} Pricing
             </h2>
-            <p className="mt-3 text-slate-400 max-w-xl mx-auto">
-              Prices shown are our starting sedan rate. SUVs, trucks, and vans have a small size adjustment — no hidden fees, ever.
+            <div className="mt-8 inline-flex flex-col items-center gap-2 px-10 py-8 rounded-2xl bg-white/5 border border-white/10">
+              <span className="text-5xl font-extrabold text-white">{service.price}</span>
+              <p className="text-slate-400 max-w-sm mt-1">{service.priceNote}</p>
+            </div>
+            <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              {service.why.map(({ title }) => (
+                <li key={title} className="flex items-center gap-1.5 text-sm text-slate-300">
+                  <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {title}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <Link
+                href={`/contact?service=${encodeURIComponent(service.name)}`}
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl bg-teal-700 hover:bg-teal-600 text-white font-semibold text-base transition-all hover:shadow-glow"
+              >
+                Get Your {service.name} Quote
+              </Link>
+            </div>
+            <p className="mt-4 text-sm text-slate-500">
+              Looking for a regular detail?{' '}
+              <Link href={`/${COUNTY_SLUG}/mobile-car-detailing`} className="text-teal-400 hover:text-teal-300 underline underline-offset-2">
+                View Economy, Silver &amp; Gold packages →
+              </Link>
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-            {pricingPlans.map((plan) => (
-              <div key={plan.name} className="flex-1">
-                <PricingCard {...plan} startingAt />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section className="bg-hero-gradient py-14">
         <div className="max-w-3xl mx-auto px-4 text-center">

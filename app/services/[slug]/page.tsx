@@ -173,6 +173,16 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               <span className="text-5xl font-extrabold text-white">{service.price}</span>
               <p className="text-slate-400 max-w-sm mt-1">{service.priceNote}</p>
             </div>
+            <ul className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              {service.why.map(({ title }) => (
+                <li key={title} className="flex items-center gap-1.5 text-sm text-slate-300">
+                  <svg className="w-4 h-4 text-teal-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {title}
+                </li>
+              ))}
+            </ul>
             <div className="mt-8">
               <Link
                 href={`/contact?service=${encodeURIComponent(service.name)}`}
@@ -181,6 +191,12 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
                 Get Your {service.name} Quote
               </Link>
             </div>
+            <p className="mt-4 text-sm text-slate-500">
+              Looking for a regular detail?{' '}
+              <Link href="/services/mobile-car-detailing" className="text-teal-400 hover:text-teal-300 underline underline-offset-2">
+                View Economy, Silver &amp; Gold packages →
+              </Link>
+            </p>
           </div>
         </section>
       ) : null}
