@@ -95,7 +95,7 @@ export default function AboutPage() {
             <p>
               Starting with a single van and a commitment to quality, Teal Detailing quickly
               built a reputation across Miami-Dade. Word spread to Broward, then Palm Beach.
-              Today, our team of certified detailers serves hundreds of vehicles each month —
+              Today, our team of professionally trained detailers serves hundreds of vehicles each month —
               from daily drivers to weekend exotics.
             </p>
             <p>

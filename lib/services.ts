@@ -9,12 +9,12 @@ export const servicesData = {
     what: [
       "Ceramic coating is a liquid polymer that chemically bonds to your vehicle's factory paint, creating a durable, long-lasting protective layer. Unlike traditional wax that sits on top of the paint and wears away in weeks, ceramic coating bonds at the molecular level and can last years with proper maintenance.",
       "The result is a hydrophobic surface that causes water to bead and roll off, taking dirt and grime with it. This means your car stays cleaner longer and is dramatically easier to wash. UV protection is built in, preventing oxidation and color fading from South Florida's intense sun.",
-      "Teal's ceramic coating service includes full paint decontamination, a one-step machine polish to remove minor imperfections, and precise application by our certified technicians — ensuring the coating bonds perfectly and performs for the long haul.",
+      "Teal's ceramic coating service includes full paint decontamination, a one-step machine polish to remove minor imperfections, and precise application by our professionally trained technicians — ensuring the coating bonds perfectly and performs for the long haul.",
     ],
     why: [
       {
         icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
-        title: 'Certified Application',
+        title: 'Professionally Trained Technicians',
         desc: 'Our technicians are trained in proper surface preparation and coating application for a flawless bond.',
       },
       {
@@ -192,7 +192,7 @@ export const servicesData = {
     why: [
       {
         icon: 'M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z',
-        title: 'Certified Technicians',
+        title: 'Professionally Trained Technicians',
         desc: 'Our polishing technicians are trained to correct paint safely, without burning through your clear coat.',
       },
       {
