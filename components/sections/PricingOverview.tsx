@@ -4,9 +4,10 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
+import PackageDisclaimer from '@/components/ui/PackageDisclaimer'
 import { pricingPlans } from '@/lib/plans'
 
-const basePrices = [99, 179, 249]
+const basePrices = [99, 179, 259]
 const baseOldPrices = [129, 229, 329]
 
 const carTypes = [
@@ -136,6 +137,8 @@ export default function PricingOverview() {
             </div>
           ))}
         </div>
+
+        <PackageDisclaimer />
 
         {/* Full price list — always rendered so every vehicle-size price is visible, not just the selected tab */}
         <div className="mt-10">

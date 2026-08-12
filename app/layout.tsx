@@ -99,7 +99,7 @@ export default function RootLayout({
               url: 'https://tealdetailing.com',
               telephone: '+16452488292',
               email: 'info@tealdetailing.com',
-              priceRange: '$99–$249',
+              priceRange: '$99–$259',
               image: 'https://tealdetailing.com/images/icons/logo-1024.webp',
               logo: 'https://tealdetailing.com/images/icons/logo-256.webp',
               address: {
@@ -131,7 +131,7 @@ export default function RootLayout({
                 itemListElement: [
                   { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Economy Detail' }, price: '99', priceCurrency: 'USD' },
                   { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Silver Detail' }, price: '179', priceCurrency: 'USD' },
-                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Gold Detail' }, price: '249', priceCurrency: 'USD' },
+                  { '@type': 'Offer', itemOffered: { '@type': 'Service', name: 'Gold Detail' }, price: '259', priceCurrency: 'USD' },
                 ],
               },
             }),

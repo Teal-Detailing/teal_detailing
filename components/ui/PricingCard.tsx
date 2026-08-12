@@ -8,12 +8,18 @@ function discountPercent(price: string, oldPrice?: string): number | null {
   return Math.round(((original - current) / original) * 100)
 }
 
+interface FeatureSection {
+  title: string
+  items: string[]
+}
+
 interface PricingCardProps {
   name: string
   price: string
   oldPrice?: string
   subtitle: string
-  features: string[]
+  features?: string[]
+  featureSections?: FeatureSection[]
   highlightedFeatures?: string[]
   tier?: 'economy' | 'silver' | 'gold'
   startingAt?: boolean
@@ -27,6 +33,7 @@ const tierStyles = {
     accentBorder: 'border-slate-400/50',
     accentBg: 'bg-slate-300',
     accentText: 'text-slate-300',
+    featureText: 'text-slate-400',
     glow: 'hover:shadow-graphite-glow-hover',
     button: 'bg-graphite-gradient text-[#0f1117] hover:brightness-110',
     badge: null as { label: string } | null,
@@ -38,6 +45,7 @@ const tierStyles = {
     accentBorder: 'border-[#b0b8c1]/60',
     accentBg: 'bg-[#b0b8c1]',
     accentText: 'text-[#cfd8e3]',
+    featureText: 'text-slate-300',
     glow: 'hover:shadow-silver-glow-hover',
     button: 'bg-silver-gradient text-[#0f1117] hover:brightness-110',
     badge: { label: 'Most Popular' },
@@ -49,6 +57,7 @@ const tierStyles = {
     accentBorder: 'border-[#c9a84c]/60',
     accentBg: 'bg-[#f0d080]',
     accentText: 'text-[#f0d080]',
+    featureText: 'text-slate-400',
     glow: 'hover:shadow-gold-glow-hover',
     button: 'bg-gold-gradient text-[#1a1200] hover:brightness-110',
     badge: { label: 'Best Value' },
@@ -61,12 +70,43 @@ export default function PricingCard({
   oldPrice,
   subtitle,
   features,
+  featureSections,
   highlightedFeatures = [],
   tier = 'economy',
   startingAt = false,
 }: PricingCardProps) {
   const style = tierStyles[tier]
   const discount = discountPercent(price, oldPrice)
+
+  function renderFeatureItem(feature: string) {
+    const isHighlighted = highlightedFeatures.includes(feature)
+    return (
+      <li key={feature} className="flex items-start gap-3">
+        <span
+          className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
+            isHighlighted ? `${style.accentBg} border-transparent` : `border ${style.accentBorder}`
+          }`}
+        >
+          <svg
+            className={`w-2.5 h-2.5 ${isHighlighted ? 'text-[#0f1117]' : style.accentText}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+        </span>
+        <span
+          className={`text-[0.95rem] leading-snug ${
+            isHighlighted ? 'text-white font-semibold' : `${style.featureText} font-medium`
+          }`}
+        >
+          {feature}
+        </span>
+      </li>
+    )
+  }
 
   return (
     <article
@@ -122,37 +162,24 @@ export default function PricingCard({
 
       {/* Features */}
       <div className="px-8 pt-6 pb-8 flex flex-col flex-1">
-        <ul className="space-y-3 flex-1">
-          {features.map((feature) => {
-            const isHighlighted = highlightedFeatures.includes(feature)
-            return (
-              <li key={feature} className="flex items-start gap-3">
-                <span
-                  className={`mt-0.5 w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    isHighlighted ? `${style.accentBg} border-transparent` : `border ${style.accentBorder}`
-                  }`}
-                >
-                  <svg
-                    className={`w-2.5 h-2.5 ${isHighlighted ? 'text-[#0f1117]' : style.accentText}`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={3}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                </span>
-                <span
-                  className={`text-[0.95rem] leading-snug ${
-                    isHighlighted ? 'text-white font-semibold' : 'text-slate-400 font-medium'
-                  }`}
-                >
-                  {feature}
-                </span>
-              </li>
-            )
-          })}
-        </ul>
+        {featureSections ? (
+          <div className="space-y-5 flex-1">
+            {featureSections.map((section) => (
+              <div key={section.title}>
+                <p className={`text-[0.7rem] font-bold uppercase tracking-[0.15em] ${style.accentText} mb-2.5`}>
+                  {section.title}
+                </p>
+                <ul className="space-y-3">
+                  {section.items.map((feature) => renderFeatureItem(feature))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <ul className="space-y-3 flex-1">
+            {(features ?? []).map((feature) => renderFeatureItem(feature))}
+          </ul>
+        )}
 
         <Link
           href={`/contact?plan=${encodeURIComponent(name)}`}

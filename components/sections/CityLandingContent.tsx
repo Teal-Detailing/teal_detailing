@@ -5,6 +5,7 @@ import { reviews } from '@/lib/reviews'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 import BookingForm from '@/components/ui/BookingForm'
 import PricingCard from '@/components/ui/PricingCard'
+import PackageDisclaimer from '@/components/ui/PackageDisclaimer'
 import Reviews from '@/components/sections/Reviews'
 import FAQ from '@/components/sections/FAQ'
 
@@ -164,6 +165,7 @@ export default function CityLandingContent({ city }: { city: CityData }) {
               </div>
             ))}
           </div>
+          <PackageDisclaimer />
         </div>
       </section>
 

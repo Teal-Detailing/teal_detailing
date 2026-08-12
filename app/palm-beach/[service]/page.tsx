@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { servicesData, serviceSlugs } from '@/lib/services'
 import { pricingPlans } from '@/lib/plans'
 import PricingCard from '@/components/ui/PricingCard'
+import PackageDisclaimer from '@/components/ui/PackageDisclaimer'
 import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 
 const COUNTY = 'Palm Beach County'
@@ -140,6 +141,7 @@ export default function PalmBeachServicePage({ params }: { params: { service: st
                 </div>
               ))}
             </div>
+            <PackageDisclaimer />
           </div>
         </section>
       ) : 'price' in service ? (

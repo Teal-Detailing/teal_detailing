@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import PricingCard from '@/components/ui/PricingCard'
+import PackageDisclaimer from '@/components/ui/PackageDisclaimer'
 import Reviews from '@/components/sections/Reviews'
 import BookingForm from '@/components/ui/BookingForm'
 import { pricingPlans } from '@/lib/plans'
@@ -9,12 +10,12 @@ import { pricingPlans } from '@/lib/plans'
 export const metadata: Metadata = {
   title: 'Car Detailing Services & Pricing',
   description:
-    'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
+    'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($259), ceramic coating, clay bar, paint correction, headlight restoration and more across South Florida.',
   alternates: { canonical: 'https://tealdetailing.com/services' },
   openGraph: {
     title: 'Car Detailing Services & Pricing | Teal Detailing',
     description:
-      'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($249), ceramic coating, clay bar, paint correction and more.',
+      'Browse all Teal Detailing services: Economy ($99), Silver ($179), Gold ($259), ceramic coating, clay bar, paint correction and more.',
     url: 'https://tealdetailing.com/services',
     images: [{ url: '/images/icons/logo-1024.webp', width: 1024, height: 1024, alt: 'Teal Detailing' }],
   },
@@ -148,6 +149,7 @@ export default function ServicesPage() {
               </div>
             ))}
           </div>
+          <PackageDisclaimer />
         </div>
       </section>
 

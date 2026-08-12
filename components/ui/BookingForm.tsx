@@ -52,7 +52,7 @@ function getPackageOptions(surcharge: number) {
   return [
     `Economy Detail ($${99 + surcharge})`,
     `Silver Detail ($${179 + surcharge})`,
-    `Gold Detail ($${249 + surcharge})`,
+    `Gold Detail ($${259 + surcharge})`,
   ]
 }
 
