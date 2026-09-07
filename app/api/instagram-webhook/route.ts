@@ -32,7 +32,7 @@ async function getInstagramUsername(senderId: string): Promise<string | null> {
   if (!accessToken) return null;
   try {
     const res = await fetch(
-      `https://graph.facebook.com/v21.0/${senderId}?fields=name,username&access_token=${accessToken}`
+      `https://graph.instagram.com/v21.0/${senderId}?fields=name,username&access_token=${accessToken}`
     );
     if (!res.ok) return null;
     const data = await res.json();
