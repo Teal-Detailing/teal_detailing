@@ -79,6 +79,8 @@ export async function POST(request: NextRequest) {
     return new NextResponse("Bad Request", { status: 400 });
   }
 
+  console.log("Instagram webhook payload:", JSON.stringify(payload));
+
   if (payload.object === "instagram") {
     for (const entry of payload.entry ?? []) {
       for (const event of entry.messaging ?? []) {
