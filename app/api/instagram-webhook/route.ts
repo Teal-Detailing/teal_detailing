@@ -1,0 +1,85 @@
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "node:crypto";
+
+// Meta's webhook verification handshake (GET request when you register the webhook URL).
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const mode = searchParams.get("hub.mode");
+  const token = searchParams.get("hub.verify_token");
+  const challenge = searchParams.get("hub.challenge");
+
+  if (mode === "subscribe" && token === process.env.META_VERIFY_TOKEN) {
+    return new NextResponse(challenge, { status: 200 });
+  }
+  return new NextResponse("Forbidden", { status: 403 });
+}
+
+function verifySignature(rawBody: string, signatureHeader: string | null): boolean {
+  const appSecret = process.env.META_APP_SECRET;
+  if (!appSecret) return true; // signature check skipped until META_APP_SECRET is set
+  if (!signatureHeader) return false;
+
+  const expected =
+    "sha256=" + crypto.createHmac("sha256", appSecret).update(rawBody).digest("hex");
+
+  const a = Buffer.from(expected);
+  const b = Buffer.from(signatureHeader);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+async function appendRowToSheet(row: Record<string, unknown>) {
+  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
+  if (!webAppUrl) return;
+  await fetch(webAppUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(row),
+  }).catch((err) => console.error("Failed to append row to Google Sheet:", err));
+}
+
+async function notifyTelegram(text: string) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!botToken || !chatId) return;
+  await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, text }),
+  }).catch((err) => console.error("Failed to send Telegram notification:", err));
+}
+
+// Meta calls this every time a new Instagram DM event fires.
+export async function POST(request: NextRequest) {
+  const rawBody = await request.text();
+
+  if (!verifySignature(rawBody, request.headers.get("x-hub-signature-256"))) {
+    return new NextResponse("Invalid signature", { status: 403 });
+  }
+
+  let payload: any;
+  try {
+    payload = JSON.parse(rawBody);
+  } catch {
+    return new NextResponse("Bad Request", { status: 400 });
+  }
+
+  if (payload.object === "instagram") {
+    for (const entry of payload.entry ?? []) {
+      for (const event of entry.messaging ?? []) {
+        const senderId = event.sender?.id;
+        const text = event.message?.text;
+        if (!senderId || !text) continue; // skip read receipts, reactions, etc.
+
+        const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
+
+        await Promise.all([
+          appendRowToSheet({ timestamp, senderId, message: text }),
+          notifyTelegram(`New Instagram DM from ${senderId}:\n${text}`),
+        ]);
+      }
+    }
+  }
+
+  // Meta requires a fast 200 response regardless of downstream outcome.
+  return new NextResponse("EVENT_RECEIVED", { status: 200 });
+}
