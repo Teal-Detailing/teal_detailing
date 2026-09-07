@@ -27,6 +27,22 @@ function verifySignature(rawBody: string, signatureHeader: string | null): boole
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
+async function getInstagramUsername(senderId: string): Promise<string | null> {
+  const accessToken = process.env.META_PAGE_ACCESS_TOKEN;
+  if (!accessToken) return null;
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v21.0/${senderId}?fields=name,username&access_token=${accessToken}`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.username ?? data.name ?? null;
+  } catch (err) {
+    console.error("Failed to resolve Instagram username:", err);
+    return null;
+  }
+}
+
 async function appendRowToSheet(row: Record<string, unknown>) {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
@@ -71,10 +87,12 @@ export async function POST(request: NextRequest) {
         if (!senderId || !text) continue; // skip read receipts, reactions, etc.
 
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
+        const username = await getInstagramUsername(senderId);
+        const displayName = username ? `@${username}` : senderId;
 
         await Promise.all([
-          appendRowToSheet({ timestamp, senderId, message: text }),
-          notifyTelegram(`New Instagram DM from ${senderId}:\n${text}`),
+          appendRowToSheet({ timestamp, username: username ?? senderId, senderId, message: text }),
+          notifyTelegram(`New Instagram DM from ${displayName}:\n${text}`),
         ]);
       }
     }
