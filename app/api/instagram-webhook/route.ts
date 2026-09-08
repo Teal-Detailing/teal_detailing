@@ -43,6 +43,21 @@ async function getInstagramUsername(senderId: string): Promise<string | null> {
   }
 }
 
+function describeMessage(message: any): string | null {
+  if (message?.text) return message.text;
+  const attachments = message?.attachments;
+  if (Array.isArray(attachments) && attachments.length > 0) {
+    return attachments
+      .map((a: any) => {
+        const type = a?.type ?? "attachment";
+        const url = a?.payload?.url;
+        return url ? `[${type}] ${url}` : `[${type}]`;
+      })
+      .join(", ");
+  }
+  return null;
+}
+
 async function appendRowToSheet(row: Record<string, unknown>) {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
@@ -83,16 +98,16 @@ export async function POST(request: NextRequest) {
     for (const entry of payload.entry ?? []) {
       for (const event of entry.messaging ?? []) {
         const senderId = event.sender?.id;
-        const text = event.message?.text;
-        if (!senderId || !text) continue; // skip read receipts, reactions, etc.
+        const message = describeMessage(event.message);
+        if (!senderId || !message || event.message?.is_echo) continue; // skip read receipts, reactions, and our own replies
 
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
         const username = await getInstagramUsername(senderId);
         const displayName = username ? `@${username}` : senderId;
 
         await Promise.all([
-          appendRowToSheet({ timestamp, username: username ?? senderId, senderId, message: text }),
-          notifyTelegram(`New Instagram DM from ${displayName}:\n${text}`),
+          appendRowToSheet({ timestamp, username: username ?? senderId, senderId, message }),
+          notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`),
         ]);
       }
     }
