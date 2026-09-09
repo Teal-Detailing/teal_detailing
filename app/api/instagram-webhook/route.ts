@@ -58,29 +58,26 @@ function describeMessage(message: any): string | null {
   return null;
 }
 
-async function isDuplicateMessage(mid: string | undefined): Promise<boolean> {
-  if (!mid) return false;
+// Returns whether the row was actually inserted (false if it was a duplicate
+// mid). The check-and-insert happens atomically inside a single locked Apps
+// Script call, since a separate pre-check GET is racy under near-simultaneous
+// redeliveries of the same event.
+async function appendRowToSheet(row: Record<string, unknown>): Promise<boolean> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
-  if (!webAppUrl) return false;
+  if (!webAppUrl) return true;
   try {
-    const res = await fetch(`${webAppUrl}?checkMid=${encodeURIComponent(mid)}`);
-    if (!res.ok) return false;
+    const res = await fetch(webAppUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(row),
+    });
+    if (!res.ok) return true; // fail open - don't silently drop a real message on an error
     const data = await res.json();
-    return !!data.duplicate;
+    return data.inserted !== false;
   } catch (err) {
-    console.error("Failed to check duplicate message:", err);
-    return false;
+    console.error("Failed to append row to Google Sheet:", err);
+    return true; // fail open
   }
-}
-
-async function appendRowToSheet(row: Record<string, unknown>) {
-  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
-  if (!webAppUrl) return;
-  await fetch(webAppUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(row),
-  }).catch((err) => console.error("Failed to append row to Google Sheet:", err));
 }
 
 async function notifyTelegram(text: string) {
@@ -119,20 +116,22 @@ export async function POST(request: NextRequest) {
         if (!customerId || !message) continue; // skip read receipts, reactions, etc.
 
         const mid: string | undefined = event.message?.mid;
-        if (await isDuplicateMessage(mid)) continue; // Meta redelivers events; mid stays stable across retries
-
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
         const username = await getInstagramUsername(customerId);
         const displayName = username ? `@${username}` : customerId;
         const direction = isEcho ? "outgoing" : "incoming";
 
-        const tasks = [
-          appendRowToSheet({ timestamp, direction, username: username ?? customerId, senderId: customerId, message, mid }),
-        ];
-        if (!isEcho) {
-          tasks.push(notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`));
+        const inserted = await appendRowToSheet({
+          timestamp,
+          direction,
+          username: username ?? customerId,
+          senderId: customerId,
+          message,
+          mid,
+        });
+        if (inserted && !isEcho) {
+          await notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`);
         }
-        await Promise.all(tasks);
         // Lead extraction (AI call + sheet upsert) runs separately via a scheduled
         // function - doing it here would risk this webhook timing out with Meta.
       }
