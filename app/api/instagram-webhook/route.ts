@@ -58,6 +58,21 @@ function describeMessage(message: any): string | null {
   return null;
 }
 
+async function isDuplicateMessage(mid: string | undefined): Promise<boolean> {
+  if (!mid) return false;
+  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
+  if (!webAppUrl) return false;
+  try {
+    const res = await fetch(`${webAppUrl}?checkMid=${encodeURIComponent(mid)}`);
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.duplicate;
+  } catch (err) {
+    console.error("Failed to check duplicate message:", err);
+    return false;
+  }
+}
+
 async function appendRowToSheet(row: Record<string, unknown>) {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
@@ -103,13 +118,16 @@ export async function POST(request: NextRequest) {
         const message = describeMessage(event.message);
         if (!customerId || !message) continue; // skip read receipts, reactions, etc.
 
+        const mid: string | undefined = event.message?.mid;
+        if (await isDuplicateMessage(mid)) continue; // Meta redelivers events; mid stays stable across retries
+
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
         const username = await getInstagramUsername(customerId);
         const displayName = username ? `@${username}` : customerId;
         const direction = isEcho ? "outgoing" : "incoming";
 
         const tasks = [
-          appendRowToSheet({ timestamp, direction, username: username ?? customerId, senderId: customerId, message }),
+          appendRowToSheet({ timestamp, direction, username: username ?? customerId, senderId: customerId, message, mid }),
         ];
         if (!isEcho) {
           tasks.push(notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`));
