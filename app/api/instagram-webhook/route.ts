@@ -97,18 +97,24 @@ export async function POST(request: NextRequest) {
   if (payload.object === "instagram") {
     for (const entry of payload.entry ?? []) {
       for (const event of entry.messaging ?? []) {
-        const senderId = event.sender?.id;
+        const isEcho = !!event.message?.is_echo;
+        // For our own replies (echoes), the customer is the recipient, not the sender.
+        const customerId = isEcho ? event.recipient?.id : event.sender?.id;
         const message = describeMessage(event.message);
-        if (!senderId || !message || event.message?.is_echo) continue; // skip read receipts, reactions, and our own replies
+        if (!customerId || !message) continue; // skip read receipts, reactions, etc.
 
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
-        const username = await getInstagramUsername(senderId);
-        const displayName = username ? `@${username}` : senderId;
+        const username = await getInstagramUsername(customerId);
+        const displayName = username ? `@${username}` : customerId;
+        const direction = isEcho ? "outgoing" : "incoming";
 
-        await Promise.all([
-          appendRowToSheet({ timestamp, username: username ?? senderId, senderId, message }),
-          notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`),
-        ]);
+        const tasks = [
+          appendRowToSheet({ timestamp, direction, username: username ?? customerId, senderId: customerId, message }),
+        ];
+        if (!isEcho) {
+          tasks.push(notifyTelegram(`New Instagram DM from ${displayName}:\n${message}`));
+        }
+        await Promise.all(tasks);
       }
     }
   }
