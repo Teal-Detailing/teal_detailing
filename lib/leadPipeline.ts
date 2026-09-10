@@ -42,6 +42,8 @@ export async function extractLeadInfo(conversationText: string): Promise<Record<
         "- package: one of Economy, Silver, Gold, Custom if a specific package was discussed, " +
         "otherwise empty\n" +
         '- price: the dollar amount discussed/quoted, formatted like "$179", otherwise empty\n' +
+        "- serviceDescription: a short human-readable summary of the specific services agreed on, " +
+        'e.g. "Headlight restoration + interior + exterior", otherwise empty\n' +
         "- customerName: the customer's real name if they gave it, otherwise empty\n" +
         "- address: the service address (where the detailing will happen) if given, otherwise empty\n" +
         "- vehicle: a detailed vehicle description if given, e.g. \"2018 Honda Civic Sedan\" " +
