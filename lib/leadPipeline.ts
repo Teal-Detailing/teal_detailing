@@ -32,7 +32,9 @@ export async function extractLeadInfo(conversationText: string): Promise<Record<
         '- phone: customer\'s phone number if given\n' +
         "- carType: one of Sedan, SUV, Truck, Van, or empty if unknown\n" +
         "- stepStatus: current stage of the conversation - one of: Asking Car Type, " +
-        "Describing Condition, Asking Info, Package Sent, Booked\n" +
+        "Describing Condition, Asking Info, Package Sent, Booked. Only use \"Booked\" once the " +
+        "customer has explicitly confirmed the appointment (e.g. replied \"I confirm\" or clearly " +
+        "agreed to the offered date/time) - an offer merely being sent is still \"Package Sent\".\n" +
         "- outcome: \"Not Interested\" ONLY if the customer has clearly declined or backed out, " +
         "otherwise empty\n" +
         "- condition: a number 1-10 ONLY if the customer explicitly rated their car's condition " +
@@ -40,6 +42,12 @@ export async function extractLeadInfo(conversationText: string): Promise<Record<
         "- package: one of Economy, Silver, Gold, Custom if a specific package was discussed, " +
         "otherwise empty\n" +
         '- price: the dollar amount discussed/quoted, formatted like "$179", otherwise empty\n' +
+        "- customerName: the customer's real name if they gave it, otherwise empty\n" +
+        "- address: the service address (where the detailing will happen) if given, otherwise empty\n" +
+        "- vehicle: a detailed vehicle description if given, e.g. \"2018 Honda Civic Sedan\" " +
+        "(year/make/model, more specific than carType), otherwise empty\n" +
+        "- appointmentDateTime: the confirmed appointment date and time if discussed, e.g. " +
+        "\"Friday, September 11, 2026 at 9 AM\", otherwise empty\n" +
         "- notes: any other useful detail (language spoken, special requests, quirks), " +
         "otherwise empty",
       messages: [{ role: "user", content: conversationText }],
