@@ -143,9 +143,16 @@ export default async () => {
   ]);
   if (!s) return new Response("No summary available", { status: 200 });
 
+  const stepBreakdown = s.todaysLeadsByStep as Record<string, number> | undefined;
+  const stepLines = stepBreakdown
+    ? Object.entries(stepBreakdown)
+        .map(([step, count]) => `  • ${step}: ${count}`)
+        .join("\n")
+    : "  (none)";
+
   let text =
     `📊 Daily Summary — Teal Detailing\n\n` +
-    `Total Leads: ${s.totalLeads}\n` +
+    `Today's Leads: ${s.todaysLeads}\n${stepLines}\n\n` +
     `Booked: ${s.totalBooked}\n` +
     `Completed: ${s.totalCompleted}\n` +
     `Lost (Not Interested + No Response): ${s.totalLost}\n` +
@@ -178,10 +185,10 @@ export default async () => {
   return new Response("Sent", { status: 200 });
 };
 
-// 9pm Eastern Daylight Time = 01:00 UTC. Netlify's scheduler runs in UTC and
-// does not auto-adjust for DST, so this will drift to 8pm once EST kicks in
-// (and back to 9pm when EDT resumes) - shift to "0 2 * * *" during EST if
-// you want it pinned to 9pm year-round.
+// 11pm Eastern Daylight Time = 03:00 UTC. Netlify's scheduler runs in UTC and
+// does not auto-adjust for DST, so this will drift to 10pm once EST kicks in
+// (and back to 11pm when EDT resumes) - shift to "0 4 * * *" during EST if
+// you want it pinned to 11pm year-round.
 export const config: Config = {
-  schedule: "0 1 * * *",
+  schedule: "0 3 * * *",
 };

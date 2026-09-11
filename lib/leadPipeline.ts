@@ -51,7 +51,11 @@ export async function extractLeadInfo(conversationText: string): Promise<Record<
         "- appointmentDateTime: the confirmed appointment date and time if discussed, e.g. " +
         "\"Friday, September 11, 2026 at 9 AM\", otherwise empty\n" +
         "- notes: any other useful detail (language spoken, special requests, quirks), " +
-        "otherwise empty",
+        "otherwise empty\n" +
+        "- isLead: false ONLY if this conversation is clearly spam/phishing (generic bot-like " +
+        "promos, suspicious links, obviously automated outreach) OR is clearly not a business " +
+        "inquiry at all (e.g. only sharing Instagram Reels/memes back and forth, personal chat " +
+        "with no mention of car detailing services) - otherwise true",
       messages: [{ role: "user", content: conversationText }],
     });
     const textBlock = response.content.find((b) => b.type === "text");
@@ -85,6 +89,20 @@ export async function fetchUnprocessedSenders(): Promise<{ senderId: string; use
   } catch (err) {
     console.error("Failed to fetch unprocessed senders:", err);
     return [];
+  }
+}
+
+export async function fetchIgnoredSenders(): Promise<Set<string>> {
+  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
+  if (!webAppUrl) return new Set();
+  try {
+    const res = await fetch(`${webAppUrl}?ignoredSenders=1`);
+    if (!res.ok) return new Set();
+    const ids: string[] = await res.json();
+    return new Set(ids.map(String));
+  } catch (err) {
+    console.error("Failed to fetch ignored senders:", err);
+    return new Set();
   }
 }
 
