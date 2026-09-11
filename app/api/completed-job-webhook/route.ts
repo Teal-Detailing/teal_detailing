@@ -116,7 +116,10 @@ async function replyToTelegram(chatId: number, text: string) {
 }
 
 async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): Promise<string | null> {
-  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
+  // Separate script/deployment from GOOGLE_SHEETS_WEBAPP_URL - the completed-jobs
+  // spreadsheet lives in a different Google account, so it needs its own
+  // container-bound script running under that account's own authorization.
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
     const res = await fetch(webAppUrl, {
