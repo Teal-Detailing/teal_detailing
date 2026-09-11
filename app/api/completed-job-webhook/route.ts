@@ -6,13 +6,23 @@ const PACKAGE_PRICES: Record<string, number> = {
   gold: 259,
 };
 
+const EXPENSE_BUTTON_LABEL = "📝 Expense";
+const MAIN_KEYBOARD = {
+  keyboard: [[EXPENSE_BUTTON_LABEL]],
+  resize_keyboard: true,
+};
+
 function todayInEastern(): { display: string; iso: string } {
+  return dateInEastern(new Date());
+}
+
+function dateInEastern(date: Date): { display: string; iso: string } {
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
     month: "numeric",
     day: "numeric",
-  }).formatToParts(new Date());
+  }).formatToParts(date);
   const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
   const month = get("month");
   const day = get("day");
@@ -25,14 +35,7 @@ function todayInEastern(): { display: string; iso: string } {
 
 function addDaysIsoEastern(days: number): string {
   const future = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(future);
-  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
-  return `${get("year")}-${get("month").padStart(2, "0")}-${get("day").padStart(2, "0")}`;
+  return dateInEastern(future).iso;
 }
 
 function parseNumber(v: string): number {
@@ -99,23 +102,6 @@ function parseCompletedJobText(text: string) {
   };
 }
 
-function parseExpenseText(text: string) {
-  const withoutCommand = text.replace(/^\/expense(@\w+)?\s*\n?/i, "");
-  const lines = withoutCommand.split("\n").map((l) => l.trim());
-  const [category = "", priceRaw = "", paymentMethod = "", whoPaid = "", notes = ""] = lines;
-
-  const { display: expenseDate } = todayInEastern();
-
-  return {
-    category,
-    price: parseNumber(priceRaw),
-    expenseDate,
-    paymentMethod,
-    whoPaid,
-    notes,
-  };
-}
-
 async function verifyAndParse(request: NextRequest): Promise<any | null> {
   const secret = process.env.COMPLETED_JOB_WEBHOOK_SECRET;
   const headerSecret = request.headers.get("x-telegram-bot-api-secret-token");
@@ -127,14 +113,37 @@ async function verifyAndParse(request: NextRequest): Promise<any | null> {
   }
 }
 
-async function replyToTelegram(chatId: number, text: string) {
+async function sendMessage(chatId: number, text: string, replyMarkup?: Record<string, unknown>) {
   const botToken = process.env.COMPLETED_JOB_BOT_TOKEN;
   if (!botToken) return;
   await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text }),
-  }).catch((err) => console.error("Failed to reply to Telegram:", err));
+    body: JSON.stringify({ chat_id: chatId, text, reply_markup: replyMarkup }),
+  }).catch((err) => console.error("Failed to send Telegram message:", err));
+}
+
+async function replyToTelegram(chatId: number, text: string) {
+  await sendMessage(chatId, text, MAIN_KEYBOARD);
+}
+
+async function answerCallbackQuery(callbackQueryId: string) {
+  const botToken = process.env.COMPLETED_JOB_BOT_TOKEN;
+  if (!botToken) return;
+  await fetch(`https://api.telegram.org/bot${botToken}/answerCallbackQuery`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ callback_query_id: callbackQueryId }),
+  }).catch((err) => console.error("Failed to answer callback query:", err));
+}
+
+function inlineKeyboard(options: string[], prefix: string, perRow = 2) {
+  const buttons = options.map((opt) => ({ text: opt, callback_data: `${prefix}:${opt}` }));
+  const rows: { text: string; callback_data: string }[][] = [];
+  for (let i = 0; i < buttons.length; i += perRow) {
+    rows.push(buttons.slice(i, i + perRow));
+  }
+  return { inline_keyboard: rows };
 }
 
 async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): Promise<string | null> {
@@ -158,14 +167,82 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): P
   }
 }
 
-async function logExpense(expense: ReturnType<typeof parseExpenseText>): Promise<boolean> {
+type ExpenseSession = {
+  step: "category" | "price" | "date" | "custom_date" | "payment" | "who_paid" | "notes";
+  category?: string;
+  price?: number;
+  expenseDate?: string;
+  paymentMethod?: string;
+  whoPaid?: string;
+};
+
+async function fetchExpenseOptions(): Promise<{ categories: string[]; paymentMethods: string[]; whoPaid: string[] }> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  const empty = { categories: [], paymentMethods: [], whoPaid: [] };
+  if (!webAppUrl) return empty;
+  try {
+    const res = await fetch(`${webAppUrl}?listExpenseOptions=1`);
+    if (!res.ok) return empty;
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to fetch expense options:", err);
+    return empty;
+  }
+}
+
+async function getExpenseSession(chatId: number): Promise<ExpenseSession | null> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return null;
+  try {
+    const res = await fetch(webAppUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "get_expense_session", chatId }),
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to get expense session:", err);
+    return null;
+  }
+}
+
+async function setExpenseSession(chatId: number, session: ExpenseSession) {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return;
+  await fetch(webAppUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "set_expense_session", chatId, session }),
+  }).catch((err) => console.error("Failed to set expense session:", err));
+}
+
+async function clearExpenseSession(chatId: number) {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return;
+  await fetch(webAppUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "clear_expense_session", chatId }),
+  }).catch((err) => console.error("Failed to clear expense session:", err));
+}
+
+async function logExpense(session: ExpenseSession, notes: string): Promise<boolean> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return false;
   try {
     const res = await fetch(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "log_expense", ...expense }),
+      body: JSON.stringify({
+        action: "log_expense",
+        category: session.category,
+        price: session.price,
+        expenseDate: session.expenseDate,
+        paymentMethod: session.paymentMethod,
+        whoPaid: session.whoPaid,
+        notes,
+      }),
     });
     if (!res.ok) return false;
     const data = await res.json();
@@ -176,16 +253,112 @@ async function logExpense(expense: ReturnType<typeof parseExpenseText>): Promise
   }
 }
 
+async function startExpenseFlow(chatId: number) {
+  const options = await fetchExpenseOptions();
+  if (options.categories.length === 0) {
+    await replyToTelegram(chatId, "⚠️ No categories found yet in the Expenses sheet - add one manually first.");
+    return;
+  }
+  await setExpenseSession(chatId, { step: "category" });
+  await sendMessage(chatId, "Which category?", inlineKeyboard(options.categories, "cat"));
+}
+
+async function handleExpenseCallback(chatId: number, callbackData: string) {
+  const sepIndex = callbackData.indexOf(":");
+  const kind = callbackData.slice(0, sepIndex);
+  const value = callbackData.slice(sepIndex + 1);
+  const session = (await getExpenseSession(chatId)) ?? { step: "category" };
+
+  if (kind === "cat") {
+    session.category = value;
+    session.step = "price";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Category: ${value}\n\nEnter the price ($):`);
+  } else if (kind === "date") {
+    if (value === "today") {
+      session.expenseDate = todayInEastern().display;
+    } else if (value === "yesterday") {
+      session.expenseDate = dateInEastern(new Date(Date.now() - 24 * 60 * 60 * 1000)).display;
+    } else {
+      session.step = "custom_date";
+      await setExpenseSession(chatId, session);
+      await sendMessage(chatId, "Type the date (MM/DD/YYYY):");
+      return;
+    }
+    const options = await fetchExpenseOptions();
+    session.step = "payment";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay"));
+  } else if (kind === "pay") {
+    session.paymentMethod = value;
+    const options = await fetchExpenseOptions();
+    session.step = "who_paid";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Payment: ${value}\n\nWho paid?`, inlineKeyboard(options.whoPaid, "who"));
+  } else if (kind === "who") {
+    session.whoPaid = value;
+    session.step = "notes";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Who paid: ${value}\n\nAny notes? (or send "-" to skip)`);
+  }
+}
+
+async function handleExpenseTextStep(chatId: number, session: ExpenseSession, text: string) {
+  if (session.step === "price") {
+    session.price = parseNumber(text);
+    session.step = "date";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Price: $${session.price.toFixed(2)}\n\nWhich date?`, {
+      inline_keyboard: [
+        [
+          { text: "Today", callback_data: "date:today" },
+          { text: "Yesterday", callback_data: "date:yesterday" },
+        ],
+        [{ text: "Pick a date", callback_data: "date:custom" }],
+      ],
+    });
+  } else if (session.step === "custom_date") {
+    session.expenseDate = text.trim();
+    const options = await fetchExpenseOptions();
+    session.step = "payment";
+    await setExpenseSession(chatId, session);
+    await sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay"));
+  } else if (session.step === "notes") {
+    const notes = text.trim() === "-" ? "" : text.trim();
+    const ok = await logExpense(session, notes);
+    await clearExpenseSession(chatId);
+    if (ok) {
+      await replyToTelegram(
+        chatId,
+        `✅ Logged expense: ${session.category} - $${(session.price ?? 0).toFixed(2)} (${session.paymentMethod}, ${session.whoPaid})`
+      );
+    } else {
+      await replyToTelegram(chatId, "⚠️ Something went wrong logging that expense - check the sheet.");
+    }
+  }
+}
+
 export async function POST(request: NextRequest) {
   const update = await verifyAndParse(request);
   if (!update) return new NextResponse("Forbidden", { status: 403 });
+
+  const callbackQuery = update.callback_query;
+  if (callbackQuery) {
+    const chatId: number | undefined = callbackQuery.message?.chat?.id;
+    const data: string | undefined = callbackQuery.data;
+    await answerCallbackQuery(callbackQuery.id);
+    if (chatId && data) {
+      await handleExpenseCallback(chatId, data);
+    }
+    return new NextResponse("OK", { status: 200 });
+  }
 
   const message = update.message;
   const text: string | undefined = message?.text;
   const chatId: number | undefined = message?.chat?.id;
   const trimmed = text?.trim() ?? "";
   const isJobCommand = /^\/job(@\w+)?\b/i.test(trimmed);
-  const isExpenseCommand = /^\/expense(@\w+)?\b/i.test(trimmed);
+  const isExpenseStart = /^\/expense(@\w+)?\b/i.test(trimmed) || trimmed === EXPENSE_BUTTON_LABEL;
 
   if (isJobCommand && text && chatId) {
     const job = parseCompletedJobText(text);
@@ -202,20 +375,15 @@ export async function POST(request: NextRequest) {
         await replyToTelegram(chatId, "⚠️ Something went wrong logging that job - check the sheet.");
       }
     }
-  } else if (isExpenseCommand && text && chatId) {
-    const expense = parseExpenseText(text);
-    if (!expense.category) {
-      await replyToTelegram(chatId, "⚠️ Couldn't read that - make sure category is the first line after /expense.");
-    } else {
-      const ok = await logExpense(expense);
-      if (ok) {
-        await replyToTelegram(
-          chatId,
-          `✅ Logged expense: ${expense.category} - $${expense.price.toFixed(2)} (${expense.paymentMethod}, ${expense.whoPaid})`
-        );
-      } else {
-        await replyToTelegram(chatId, "⚠️ Something went wrong logging that expense - check the sheet.");
-      }
+  } else if (isExpenseStart && chatId) {
+    await startExpenseFlow(chatId);
+  } else if (text && chatId) {
+    // Not a command - only act on it if there's an active /expense session
+    // awaiting free-text input (price, custom date, or notes). Otherwise
+    // ignore silently, so normal group chat never gets misread as data entry.
+    const session = await getExpenseSession(chatId);
+    if (session && ["price", "custom_date", "notes"].includes(session.step)) {
+      await handleExpenseTextStep(chatId, session, text);
     }
   }
 
