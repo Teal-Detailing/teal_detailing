@@ -137,6 +137,19 @@ async function answerCallbackQuery(callbackQueryId: string) {
   }).catch((err) => console.error("Failed to answer callback query:", err));
 }
 
+// Strips the inline keyboard off a message the moment its button is tapped -
+// gives instant feedback (no more "is this frozen?") and makes a repeat tap
+// on the same message impossible once the client re-renders.
+async function stripInlineKeyboard(chatId: number, messageId: number) {
+  const botToken = process.env.COMPLETED_JOB_BOT_TOKEN;
+  if (!botToken) return;
+  await fetch(`https://api.telegram.org/bot${botToken}/editMessageReplyMarkup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, message_id: messageId, reply_markup: { inline_keyboard: [] } }),
+  }).catch((err) => console.error("Failed to strip inline keyboard:", err));
+}
+
 function inlineKeyboard(options: string[], prefix: string, perRow = 2) {
   const buttons = options.map((opt) => ({ text: opt, callback_data: `${prefix}:${opt}` }));
   const rows: { text: string; callback_data: string }[][] = [];
@@ -167,6 +180,8 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): P
   }
 }
 
+type ExpenseOptions = { categories: string[]; paymentMethods: string[]; whoPaid: string[] };
+
 type ExpenseSession = {
   step: "category" | "price" | "date" | "custom_date" | "payment" | "who_paid" | "notes";
   category?: string;
@@ -174,9 +189,12 @@ type ExpenseSession = {
   expenseDate?: string;
   paymentMethod?: string;
   whoPaid?: string;
+  // Cached once at flow start so later steps never re-fetch them - each
+  // Apps Script round trip is the main source of latency in this flow.
+  options?: ExpenseOptions;
 };
 
-async function fetchExpenseOptions(): Promise<{ categories: string[]; paymentMethods: string[]; whoPaid: string[] }> {
+async function fetchExpenseOptions(): Promise<ExpenseOptions> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   const empty = { categories: [], paymentMethods: [], whoPaid: [] };
   if (!webAppUrl) return empty;
@@ -259,21 +277,44 @@ async function startExpenseFlow(chatId: number) {
     await replyToTelegram(chatId, "⚠️ No categories found yet in the Expenses sheet - add one manually first.");
     return;
   }
-  await setExpenseSession(chatId, { step: "category" });
-  await sendMessage(chatId, "Which category?", inlineKeyboard(options.categories, "cat"));
+  await Promise.all([
+    setExpenseSession(chatId, { step: "category", options }),
+    sendMessage(chatId, "Which category?", inlineKeyboard(options.categories, "cat")),
+  ]);
 }
 
-async function handleExpenseCallback(chatId: number, callbackData: string) {
+// Each callback carries the step it expects to act on (via `kind`). If the
+// session has already moved past that step, this is a stale duplicate from
+// mashing a button before the keyboard visually disappeared - drop it rather
+// than re-running the transition and sending a repeat prompt.
+const EXPECTED_STEP: Record<string, ExpenseSession["step"]> = {
+  cat: "category",
+  date: "date",
+  pay: "payment",
+  who: "who_paid",
+};
+
+async function handleExpenseCallback(chatId: number, callbackData: string, messageId: number) {
   const sepIndex = callbackData.indexOf(":");
   const kind = callbackData.slice(0, sepIndex);
   const value = callbackData.slice(sepIndex + 1);
-  const session = (await getExpenseSession(chatId)) ?? { step: "category" };
+
+  const [session] = await Promise.all([
+    getExpenseSession(chatId).then((s): ExpenseSession => s ?? { step: "category" }),
+    stripInlineKeyboard(chatId, messageId),
+  ]);
+
+  if (session.step !== EXPECTED_STEP[kind]) return;
+
+  const options = session.options ?? (await fetchExpenseOptions());
 
   if (kind === "cat") {
     session.category = value;
     session.step = "price";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Category: ${value}\n\nEnter the price ($):`);
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Category: ${value}\n\nEnter the price ($):`),
+    ]);
   } else if (kind === "date") {
     if (value === "today") {
       session.expenseDate = todayInEastern().display;
@@ -281,25 +322,28 @@ async function handleExpenseCallback(chatId: number, callbackData: string) {
       session.expenseDate = dateInEastern(new Date(Date.now() - 24 * 60 * 60 * 1000)).display;
     } else {
       session.step = "custom_date";
-      await setExpenseSession(chatId, session);
-      await sendMessage(chatId, "Type the date (MM/DD/YYYY):");
+      await Promise.all([setExpenseSession(chatId, session), sendMessage(chatId, "Type the date (MM/DD/YYYY):")]);
       return;
     }
-    const options = await fetchExpenseOptions();
     session.step = "payment";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay"));
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay")),
+    ]);
   } else if (kind === "pay") {
     session.paymentMethod = value;
-    const options = await fetchExpenseOptions();
     session.step = "who_paid";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Payment: ${value}\n\nWho paid?`, inlineKeyboard(options.whoPaid, "who"));
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Payment: ${value}\n\nWho paid?`, inlineKeyboard(options.whoPaid, "who")),
+    ]);
   } else if (kind === "who") {
     session.whoPaid = value;
     session.step = "notes";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Who paid: ${value}\n\nAny notes? (or send "-" to skip)`);
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Who paid: ${value}\n\nAny notes? (or send "-" to skip)`),
+    ]);
   }
 }
 
@@ -307,26 +351,29 @@ async function handleExpenseTextStep(chatId: number, session: ExpenseSession, te
   if (session.step === "price") {
     session.price = parseNumber(text);
     session.step = "date";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Price: $${session.price.toFixed(2)}\n\nWhich date?`, {
-      inline_keyboard: [
-        [
-          { text: "Today", callback_data: "date:today" },
-          { text: "Yesterday", callback_data: "date:yesterday" },
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Price: $${session.price.toFixed(2)}\n\nWhich date?`, {
+        inline_keyboard: [
+          [
+            { text: "Today", callback_data: "date:today" },
+            { text: "Yesterday", callback_data: "date:yesterday" },
+          ],
+          [{ text: "Pick a date", callback_data: "date:custom" }],
         ],
-        [{ text: "Pick a date", callback_data: "date:custom" }],
-      ],
-    });
+      }),
+    ]);
   } else if (session.step === "custom_date") {
     session.expenseDate = text.trim();
-    const options = await fetchExpenseOptions();
+    const options = session.options ?? (await fetchExpenseOptions());
     session.step = "payment";
-    await setExpenseSession(chatId, session);
-    await sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay"));
+    await Promise.all([
+      setExpenseSession(chatId, session),
+      sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay")),
+    ]);
   } else if (session.step === "notes") {
     const notes = text.trim() === "-" ? "" : text.trim();
-    const ok = await logExpense(session, notes);
-    await clearExpenseSession(chatId);
+    const [ok] = await Promise.all([logExpense(session, notes), clearExpenseSession(chatId)]);
     if (ok) {
       await replyToTelegram(
         chatId,
@@ -345,11 +392,13 @@ export async function POST(request: NextRequest) {
   const callbackQuery = update.callback_query;
   if (callbackQuery) {
     const chatId: number | undefined = callbackQuery.message?.chat?.id;
+    const messageId: number | undefined = callbackQuery.message?.message_id;
     const data: string | undefined = callbackQuery.data;
-    await answerCallbackQuery(callbackQuery.id);
-    if (chatId && data) {
-      await handleExpenseCallback(chatId, data);
+    const tasks: Promise<unknown>[] = [answerCallbackQuery(callbackQuery.id)];
+    if (chatId && data && messageId) {
+      tasks.push(handleExpenseCallback(chatId, data, messageId));
     }
+    await Promise.all(tasks);
     return new NextResponse("OK", { status: 200 });
   }
 
