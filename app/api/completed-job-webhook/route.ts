@@ -41,7 +41,12 @@ function parseNumber(v: string): number {
 }
 
 function parseCompletedJobText(text: string) {
-  const lines = text.split("\n").map((l) => l.trim());
+  // Strip a leading "/job" (optionally "/job@botname") command line - this is
+  // what makes the bot receive the message at all in a group (Telegram always
+  // delivers commands to bots regardless of privacy mode), and it doubles as
+  // a clear signal this message is actually a job report, not group chatter.
+  const withoutCommand = text.replace(/^\/job(@\w+)?\s*\n?/i, "");
+  const lines = withoutCommand.split("\n").map((l) => l.trim());
   const [
     customer = "",
     phone = "",
@@ -143,11 +148,12 @@ export async function POST(request: NextRequest) {
   const message = update.message;
   const text: string | undefined = message?.text;
   const chatId: number | undefined = message?.chat?.id;
+  const isJobCommand = !!text && /^\/job(@\w+)?\b/i.test(text.trim());
 
-  if (text && chatId) {
+  if (isJobCommand && text && chatId) {
     const job = parseCompletedJobText(text);
     if (!job.customer) {
-      await replyToTelegram(chatId, "⚠️ Couldn't read that - make sure customer name is the first line.");
+      await replyToTelegram(chatId, "⚠️ Couldn't read that - make sure customer name is the first line after /job.");
     } else {
       const jobId = await logCompletedJob(job);
       if (jobId) {
