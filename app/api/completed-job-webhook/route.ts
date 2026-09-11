@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStore } from "@netlify/blobs";
 
 const PACKAGE_PRICES: Record<string, number> = {
   economy: 99,
@@ -224,17 +225,27 @@ async function fetchExpenseOptions(): Promise<ExpenseOptions> {
   }
 }
 
+// Session bookkeeping for the /expense flow is pure ephemeral state we
+// invented ourselves - it doesn't need to touch Google Sheets at all, so it
+// lives in Netlify's own key-value store instead of round-tripping through
+// Apps Script on every button tap (Apps Script is orders of magnitude slower
+// and was the actual cause of the flow hanging/timing out).
+const EXPENSE_SESSION_TTL_MS = 30 * 60 * 1000;
+
+function expenseSessionStore() {
+  return getStore("expense-sessions");
+}
+
 async function getExpenseSession(chatId: number): Promise<ExpenseSession | null> {
-  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
-  if (!webAppUrl) return null;
   try {
-    const res = await fetchAppsScript(webAppUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "get_expense_session", chatId }),
-    });
-    if (!res.ok) return null;
-    return await res.json();
+    const raw = await expenseSessionStore().get(String(chatId), { type: "json" });
+    if (!raw) return null;
+    const { session, savedAt } = raw as { session: ExpenseSession; savedAt: number };
+    if (Date.now() - savedAt > EXPENSE_SESSION_TTL_MS) {
+      await expenseSessionStore().delete(String(chatId));
+      return null;
+    }
+    return session;
   } catch (err) {
     console.error("Failed to get expense session:", err);
     return null;
@@ -242,23 +253,19 @@ async function getExpenseSession(chatId: number): Promise<ExpenseSession | null>
 }
 
 async function setExpenseSession(chatId: number, session: ExpenseSession) {
-  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
-  if (!webAppUrl) return;
-  await fetchAppsScript(webAppUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "set_expense_session", chatId, session }),
-  }).catch((err) => console.error("Failed to set expense session:", err));
+  try {
+    await expenseSessionStore().setJSON(String(chatId), { session, savedAt: Date.now() });
+  } catch (err) {
+    console.error("Failed to set expense session:", err);
+  }
 }
 
 async function clearExpenseSession(chatId: number) {
-  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
-  if (!webAppUrl) return;
-  await fetchAppsScript(webAppUrl, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "clear_expense_session", chatId }),
-  }).catch((err) => console.error("Failed to clear expense session:", err));
+  try {
+    await expenseSessionStore().delete(String(chatId));
+  } catch (err) {
+    console.error("Failed to clear expense session:", err);
+  }
 }
 
 async function logExpense(session: ExpenseSession, notes: string): Promise<boolean> {
