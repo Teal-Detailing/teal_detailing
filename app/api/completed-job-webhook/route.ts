@@ -99,6 +99,23 @@ function parseCompletedJobText(text: string) {
   };
 }
 
+function parseExpenseText(text: string) {
+  const withoutCommand = text.replace(/^\/expense(@\w+)?\s*\n?/i, "");
+  const lines = withoutCommand.split("\n").map((l) => l.trim());
+  const [category = "", priceRaw = "", paymentMethod = "", whoPaid = "", notes = ""] = lines;
+
+  const { display: expenseDate } = todayInEastern();
+
+  return {
+    category,
+    price: parseNumber(priceRaw),
+    expenseDate,
+    paymentMethod,
+    whoPaid,
+    notes,
+  };
+}
+
 async function verifyAndParse(request: NextRequest): Promise<any | null> {
   const secret = process.env.COMPLETED_JOB_WEBHOOK_SECRET;
   const headerSecret = request.headers.get("x-telegram-bot-api-secret-token");
@@ -141,6 +158,24 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): P
   }
 }
 
+async function logExpense(expense: ReturnType<typeof parseExpenseText>): Promise<boolean> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return false;
+  try {
+    const res = await fetch(webAppUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "log_expense", ...expense }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.ok;
+  } catch (err) {
+    console.error("Failed to log expense:", err);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   const update = await verifyAndParse(request);
   if (!update) return new NextResponse("Forbidden", { status: 403 });
@@ -148,7 +183,9 @@ export async function POST(request: NextRequest) {
   const message = update.message;
   const text: string | undefined = message?.text;
   const chatId: number | undefined = message?.chat?.id;
-  const isJobCommand = !!text && /^\/job(@\w+)?\b/i.test(text.trim());
+  const trimmed = text?.trim() ?? "";
+  const isJobCommand = /^\/job(@\w+)?\b/i.test(trimmed);
+  const isExpenseCommand = /^\/expense(@\w+)?\b/i.test(trimmed);
 
   if (isJobCommand && text && chatId) {
     const job = parseCompletedJobText(text);
@@ -163,6 +200,21 @@ export async function POST(request: NextRequest) {
         );
       } else {
         await replyToTelegram(chatId, "⚠️ Something went wrong logging that job - check the sheet.");
+      }
+    }
+  } else if (isExpenseCommand && text && chatId) {
+    const expense = parseExpenseText(text);
+    if (!expense.category) {
+      await replyToTelegram(chatId, "⚠️ Couldn't read that - make sure category is the first line after /expense.");
+    } else {
+      const ok = await logExpense(expense);
+      if (ok) {
+        await replyToTelegram(
+          chatId,
+          `✅ Logged expense: ${expense.category} - $${expense.price.toFixed(2)} (${expense.paymentMethod}, ${expense.whoPaid})`
+        );
+      } else {
+        await replyToTelegram(chatId, "⚠️ Something went wrong logging that expense - check the sheet.");
       }
     }
   }
