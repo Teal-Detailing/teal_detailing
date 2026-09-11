@@ -233,7 +233,11 @@ async function fetchExpenseOptions(): Promise<ExpenseOptions> {
 const EXPENSE_SESSION_TTL_MS = 30 * 60 * 1000;
 
 function expenseSessionStore() {
-  return getStore("expense-sessions");
+  // "strong" consistency because every step immediately reads back the write
+  // from the step before it - the default "eventual" consistency can return
+  // stale data on that tight a read-after-write gap, which looks exactly like
+  // the flow silently swallowing your answer.
+  return getStore({ name: "expense-sessions", consistency: "strong" });
 }
 
 async function getExpenseSession(chatId: number): Promise<ExpenseSession | null> {
