@@ -113,6 +113,22 @@ async function verifyAndParse(request: NextRequest): Promise<any | null> {
   }
 }
 
+// Apps Script web apps can hang well past Netlify's function timeout (cold
+// starts, LockService contention). Without this, a slow call gets silently
+// killed along with the whole request - no error, no message, just nothing.
+// Aborting early lets us tell the user to retry instead of going dark.
+const APPS_SCRIPT_TIMEOUT_MS = 8000;
+
+async function fetchAppsScript(url: string, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), APPS_SCRIPT_TIMEOUT_MS);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function sendMessage(chatId: number, text: string, replyMarkup?: Record<string, unknown>) {
   const botToken = process.env.COMPLETED_JOB_BOT_TOKEN;
   if (!botToken) return;
@@ -166,7 +182,7 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): P
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
-    const res = await fetch(webAppUrl, {
+    const res = await fetchAppsScript(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "log_completed_job", ...job }),
@@ -199,7 +215,7 @@ async function fetchExpenseOptions(): Promise<ExpenseOptions> {
   const empty = { categories: [], paymentMethods: [], whoPaid: [] };
   if (!webAppUrl) return empty;
   try {
-    const res = await fetch(`${webAppUrl}?listExpenseOptions=1`);
+    const res = await fetchAppsScript(`${webAppUrl}?listExpenseOptions=1`);
     if (!res.ok) return empty;
     return await res.json();
   } catch (err) {
@@ -212,7 +228,7 @@ async function getExpenseSession(chatId: number): Promise<ExpenseSession | null>
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
-    const res = await fetch(webAppUrl, {
+    const res = await fetchAppsScript(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "get_expense_session", chatId }),
@@ -228,7 +244,7 @@ async function getExpenseSession(chatId: number): Promise<ExpenseSession | null>
 async function setExpenseSession(chatId: number, session: ExpenseSession) {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return;
-  await fetch(webAppUrl, {
+  await fetchAppsScript(webAppUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "set_expense_session", chatId, session }),
@@ -238,7 +254,7 @@ async function setExpenseSession(chatId: number, session: ExpenseSession) {
 async function clearExpenseSession(chatId: number) {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return;
-  await fetch(webAppUrl, {
+  await fetchAppsScript(webAppUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "clear_expense_session", chatId }),
@@ -249,7 +265,7 @@ async function logExpense(session: ExpenseSession, notes: string): Promise<boole
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return false;
   try {
-    const res = await fetch(webAppUrl, {
+    const res = await fetchAppsScript(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -299,11 +315,20 @@ async function handleExpenseCallback(chatId: number, callbackData: string, messa
   const kind = callbackData.slice(0, sepIndex);
   const value = callbackData.slice(sepIndex + 1);
 
-  const [session] = await Promise.all([
-    getExpenseSession(chatId).then((s): ExpenseSession => s ?? { step: "category" }),
+  const [fetchedSession] = await Promise.all([
+    getExpenseSession(chatId),
     stripInlineKeyboard(chatId, messageId),
   ]);
 
+  // null means the lookup itself failed (timeout/error), not "no session yet" -
+  // surface that instead of silently defaulting, so a real failure doesn't
+  // look identical to a dropped stale-duplicate tap.
+  if (fetchedSession === null) {
+    await replyToTelegram(chatId, "⚠️ Lost track of your /expense progress (connection hiccup) - tap 📝 Expense to restart.");
+    return;
+  }
+
+  const session = fetchedSession;
   if (session.step !== EXPECTED_STEP[kind]) return;
 
   const options = session.options ?? (await fetchExpenseOptions());
