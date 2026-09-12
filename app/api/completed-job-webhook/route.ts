@@ -179,7 +179,9 @@ function inlineKeyboard(options: string[], prefix: string, perRow = 2) {
   return { inline_keyboard: rows };
 }
 
-async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>, photoLink: string): Promise<string | null> {
+type LogJobResult = { jobId: string; row: number };
+
+async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): Promise<LogJobResult | null> {
   // Separate script/deployment from GOOGLE_SHEETS_WEBAPP_URL - the completed-jobs
   // spreadsheet lives in a different Google account, so it needs its own
   // container-bound script running under that account's own authorization.
@@ -189,11 +191,12 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>, ph
     const res = await fetchAppsScript(webAppUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "log_completed_job", ...job, photoLink }),
+      body: JSON.stringify({ action: "log_completed_job", ...job }),
     });
     if (!res.ok) return null;
     const data = await res.json();
-    return data.jobId ?? null;
+    if (!data.jobId || !data.row) return null;
+    return { jobId: data.jobId, row: data.row };
   } catch (err) {
     console.error("Failed to log completed job:", err);
     return null;
@@ -241,13 +244,27 @@ async function clearPendingJob(chatId: number) {
   }
 }
 
-async function finishJob(chatId: number, job: PendingJob, photoLink: string, uploadFailed: boolean) {
-  const [jobId] = await Promise.all([logCompletedJob(job, photoLink), clearPendingJob(chatId)]);
-  if (jobId) {
-    const warning = uploadFailed ? "\n\n⚠️ (photo upload failed - logged without a photo)" : "";
-    await replyToTelegram(chatId, `✅ Logged ${jobId}: ${job.customer} - ${job.packageName} - $${job.total.toFixed(0)} total${warning}`);
+// Writes the job row FIRST and confirms it immediately - the core record
+// must never be held hostage by a slow photo upload. The photo (if any) is
+// attached as a fast follow-up afterward, via attachJobPhoto.
+async function finishJob(chatId: number, job: PendingJob): Promise<LogJobResult | null> {
+  const [result] = await Promise.all([logCompletedJob(job), clearPendingJob(chatId)]);
+  if (result) {
+    await replyToTelegram(chatId, `✅ Logged ${result.jobId}: ${job.customer} - ${job.packageName} - $${job.total.toFixed(0)} total`);
   } else {
     await replyToTelegram(chatId, "⚠️ Something went wrong logging that job - check the sheet.");
+  }
+  return result;
+}
+
+async function attachJobPhoto(chatId: number, row: number, photos: { file_id: string; width: number; height: number }[]) {
+  const folderId = process.env.DRIVE_CUSTOMER_PHOTOS_FOLDER_ID;
+  const file = await downloadTelegramFile(largestPhotoFileId(photos));
+  const url = file && folderId ? await uploadPhotoToDrive(folderId, file) : null;
+  if (url && (await updatePhotoLink("jobs", row, url))) {
+    await sendMessage(chatId, "📸 Photo attached.");
+  } else {
+    await sendMessage(chatId, "⚠️ Photo upload failed - the job is logged, just without a photo.");
   }
 }
 
@@ -298,6 +315,28 @@ async function uploadPhotoToDrive(
   } catch (err) {
     console.error("Failed to upload photo to Drive:", err);
     return null;
+  }
+}
+
+async function updatePhotoLink(sheet: "jobs" | "expenses", row: number, link: string): Promise<boolean> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return false;
+  try {
+    const res = await fetchAppsScript(
+      webAppUrl,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "update_photo_link", sheet, row, link }),
+      },
+      APPS_SCRIPT_UPLOAD_TIMEOUT_MS
+    );
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.ok;
+  } catch (err) {
+    console.error("Failed to update photo link:", err);
+    return false;
   }
 }
 
@@ -387,9 +426,11 @@ async function clearExpenseSession(chatId: number) {
   }
 }
 
-async function logExpense(session: ExpenseSession, notes: string, receiptLink: string): Promise<boolean> {
+type LogExpenseResult = { row: number };
+
+async function logExpense(session: ExpenseSession, notes: string): Promise<LogExpenseResult | null> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
-  if (!webAppUrl) return false;
+  if (!webAppUrl) return null;
   try {
     const res = await fetchAppsScript(webAppUrl, {
       method: "POST",
@@ -402,29 +443,43 @@ async function logExpense(session: ExpenseSession, notes: string, receiptLink: s
         paymentMethod: session.paymentMethod,
         whoPaid: session.whoPaid,
         notes,
-        receiptLink,
       }),
     });
-    if (!res.ok) return false;
+    if (!res.ok) return null;
     const data = await res.json();
-    return !!data.ok;
+    if (!data.ok || !data.row) return null;
+    return { row: data.row };
   } catch (err) {
     console.error("Failed to log expense:", err);
-    return false;
+    return null;
   }
 }
 
-async function finishExpense(chatId: number, session: ExpenseSession, receiptLink: string, uploadFailed: boolean) {
+// Writes the expense row FIRST and confirms it immediately, same reasoning
+// as finishJob - the receipt photo is a best-effort follow-up, never a
+// precondition for the actual expense being recorded.
+async function finishExpense(chatId: number, session: ExpenseSession): Promise<LogExpenseResult | null> {
   const notes = session.notes ?? "";
-  const [ok] = await Promise.all([logExpense(session, notes, receiptLink), clearExpenseSession(chatId)]);
-  if (ok) {
-    const warning = uploadFailed ? "\n\n⚠️ (photo upload failed - logged without a receipt)" : "";
+  const [result] = await Promise.all([logExpense(session, notes), clearExpenseSession(chatId)]);
+  if (result) {
     await replyToTelegram(
       chatId,
-      `✅ Logged expense: ${session.category} - $${(session.price ?? 0).toFixed(2)} (${session.paymentMethod}, ${session.whoPaid})${warning}`
+      `✅ Logged expense: ${session.category} - $${(session.price ?? 0).toFixed(2)} (${session.paymentMethod}, ${session.whoPaid})`
     );
   } else {
     await replyToTelegram(chatId, "⚠️ Something went wrong logging that expense - check the sheet.");
+  }
+  return result;
+}
+
+async function attachExpenseReceipt(chatId: number, row: number, photos: { file_id: string; width: number; height: number }[]) {
+  const folderId = process.env.DRIVE_RECEIPTS_FOLDER_ID;
+  const file = await downloadTelegramFile(largestPhotoFileId(photos));
+  const url = file && folderId ? await uploadPhotoToDrive(folderId, file) : null;
+  if (url && (await updatePhotoLink("expenses", row, url))) {
+    await sendMessage(chatId, "📸 Receipt attached.");
+  } else {
+    await sendMessage(chatId, "⚠️ Receipt upload failed - the expense is logged, just without a receipt.");
   }
 }
 
@@ -614,27 +669,23 @@ export async function POST(request: NextRequest) {
   } else if (chatId && photos && photos.length > 0) {
     const pendingJob = await getPendingJob(chatId);
     if (pendingJob) {
-      const file = await downloadTelegramFile(largestPhotoFileId(photos));
-      const folderId = process.env.DRIVE_CUSTOMER_PHOTOS_FOLDER_ID;
-      const url = file && folderId ? await uploadPhotoToDrive(folderId, file) : null;
-      await finishJob(chatId, pendingJob, url || "", !url);
+      const result = await finishJob(chatId, pendingJob);
+      if (result) await attachJobPhoto(chatId, result.row, photos);
     } else {
       const expenseSession = await getExpenseSession(chatId);
       if (expenseSession && expenseSession.step === "photo") {
-        const file = await downloadTelegramFile(largestPhotoFileId(photos));
-        const folderId = process.env.DRIVE_RECEIPTS_FOLDER_ID;
-        const url = file && folderId ? await uploadPhotoToDrive(folderId, file) : null;
-        await finishExpense(chatId, expenseSession, url || "", !url);
+        const result = await finishExpense(chatId, expenseSession);
+        if (result) await attachExpenseReceipt(chatId, result.row, photos);
       }
     }
   } else if (isSkipCommand && chatId) {
     const pendingJob = await getPendingJob(chatId);
     if (pendingJob) {
-      await finishJob(chatId, pendingJob, "", false);
+      await finishJob(chatId, pendingJob);
     } else {
       const expenseSession = await getExpenseSession(chatId);
       if (expenseSession && expenseSession.step === "photo") {
-        await finishExpense(chatId, expenseSession, "", false);
+        await finishExpense(chatId, expenseSession);
       }
     }
   } else if (text && chatId) {
