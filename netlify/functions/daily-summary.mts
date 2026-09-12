@@ -1,6 +1,12 @@
 import type { Config } from "@netlify/functions";
 
-const COMPLETED_JOBS_SHEET_ID = "1g4MsYYgTgIo2NuFZcyYcqVhyh8tD0GZ13vW31nXq0JE";
+// Flat weekly targets from Plan vs Fact - kept here rather than parsed out of
+// that sheet, since these are fixed figures, not something that varies week
+// to week.
+const WEEKLY_REVENUE_TARGET = 2000;
+const WEEKLY_EXPENSE_TARGET = 700;
+const BOOKING_RATE_TARGET_PCT = 20;
+const COMPLETION_RATE_TARGET_PCT = 13;
 
 async function fetchDailySummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
@@ -28,98 +34,19 @@ async function fetchBookingSummary(): Promise<Record<string, unknown> | null> {
   }
 }
 
-// Parses CSV text respecting quoted fields with embedded commas (e.g. addresses).
-function parseCsv(text: string): string[][] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let inQuotes = false;
-  for (let i = 0; i < text.length; i++) {
-    const c = text[i];
-    if (inQuotes) {
-      if (c === '"') {
-        if (text[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        field += c;
-      }
-    } else if (c === '"') {
-      inQuotes = true;
-    } else if (c === ",") {
-      row.push(field);
-      field = "";
-    } else if (c === "\n" || c === "\r") {
-      if (c === "\r" && text[i + 1] === "\n") i++;
-      row.push(field);
-      field = "";
-      rows.push(row);
-      row = [];
-    } else {
-      field += c;
-    }
-  }
-  if (field !== "" || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-  return rows;
-}
-
-function parseMoney(v: string | undefined): number {
-  const n = parseFloat(String(v || "").replace(/[^0-9.]/g, ""));
-  return isNaN(n) ? 0 : n;
-}
-
-function todayInEastern(): string {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/New_York",
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  }).formatToParts(new Date());
-  const get = (type: string) => parts.find((p) => p.type === type)?.value ?? "";
-  return `${get("month")}/${get("day")}/${get("year")}`;
-}
-
-async function fetchCompletedJobsSummary(): Promise<Record<string, unknown> | null> {
+// Reads directly from the Apps Script bound to the SAME spreadsheet the
+// /job and /expense bot writes to (Copy of TRANSACTIONS) - not the old
+// original business-account sheet the digest used to read via public CSV
+// export, which was a different, disconnected copy.
+async function fetchDailyOpsSummary(): Promise<Record<string, unknown> | null> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return null;
   try {
-    const res = await fetch(`https://docs.google.com/spreadsheets/d/${COMPLETED_JOBS_SHEET_ID}/export?format=csv`);
+    const res = await fetch(`${webAppUrl}?dailyOpsSummary=1`);
     if (!res.ok) return null;
-    const text = await res.text();
-    const rows = parseCsv(text).slice(1).filter((r) => (r[0] || "").trim() !== "");
-
-    const today = todayInEastern();
-    let jobsToday = 0;
-    let revenueToday = 0;
-    let revenueAllTime = 0;
-    let reviewsSent = 0;
-
-    for (const r of rows) {
-      const jobDate = (r[0] || "").trim();
-      const total = parseMoney(r[16]);
-      const reviewSent = (r[19] || "").trim().toLowerCase() === "yes";
-
-      revenueAllTime += total;
-      if (reviewSent) reviewsSent++;
-      if (jobDate === today) {
-        jobsToday++;
-        revenueToday += total;
-      }
-    }
-
-    return {
-      jobsToday,
-      revenueToday,
-      totalJobsAllTime: rows.length,
-      revenueAllTime,
-      reviewsSent,
-    };
+    return await res.json();
   } catch (err) {
-    console.error("Failed to fetch completed jobs summary:", err);
+    console.error("Failed to fetch daily ops summary:", err);
     return null;
   }
 }
@@ -135,51 +62,80 @@ async function notifyTelegram(text: string) {
   }).catch((err) => console.error("Failed to send Telegram notification:", err));
 }
 
+// 1 (Sunday) through 7 (Saturday) - how far into the Sun-Sat week "today" is,
+// used to prorate a weekly target into an "expected by now" figure.
+function daysElapsedInWeekEastern(): number {
+  const weekday = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short" }).format(new Date());
+  const order = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const idx = order.indexOf(weekday);
+  return idx === -1 ? 7 : idx + 1;
+}
+
+// "lowerIsBetter" flips the ✅/⚠️ framing for expenses, where spending LESS
+// than the prorated target is the good outcome, not the bad one.
+function paceLine(label: string, actual: number, weeklyTarget: number, daysElapsed: number, lowerIsBetter: boolean): string {
+  const expected = weeklyTarget * (daysElapsed / 7);
+  const diff = actual - expected;
+  const onTrack = lowerIsBetter ? diff <= 0 : diff >= 0;
+  const diffAbs = Math.abs(diff).toFixed(0);
+  const direction = lowerIsBetter ? (onTrack ? "under" : "over") : (onTrack ? "ahead of" : "behind");
+  const icon = onTrack ? "✅" : "⚠️";
+  return `${label}: $${actual.toFixed(0)} of $${weeklyTarget} planned (${icon} $${diffAbs} ${direction} pace)`;
+}
+
+function rateLine(label: string, actualPct: number, targetPct: number): string {
+  const diff = actualPct - targetPct;
+  const sign = diff >= 0 ? "+" : "";
+  return `${label}: ${actualPct.toFixed(1)}% (target ${targetPct}%, ${sign}${diff.toFixed(1)} pts)`;
+}
+
 export default async () => {
-  const [s, b, c] = await Promise.all([
-    fetchDailySummary(),
-    fetchBookingSummary(),
-    fetchCompletedJobsSummary(),
-  ]);
+  const [s, b, c] = await Promise.all([fetchDailySummary(), fetchBookingSummary(), fetchDailyOpsSummary()]);
   if (!s) return new Response("No summary available", { status: 200 });
 
   const stepBreakdown = s.todaysLeadsByStep as Record<string, number> | undefined;
-  const stepLines = stepBreakdown
-    ? Object.entries(stepBreakdown)
-        .map(([step, count]) => `  • ${step}: ${count}`)
-        .join("\n")
+  const stepLines = stepBreakdown && Object.keys(stepBreakdown).length > 0
+    ? Object.entries(stepBreakdown).map(([step, count]) => `  • ${step}: ${count}`).join("\n")
     : "  (none)";
 
   let text =
     `📊 Daily Summary — Teal Detailing\n\n` +
-    `Today's Leads: ${s.todaysLeads}\n${stepLines}\n\n` +
-    `Booked: ${s.totalBooked}\n` +
-    `Completed: ${s.totalCompleted}\n` +
-    `Lost (Not Interested + No Response): ${s.totalLost}\n` +
-    `Need Follow-Up: ${s.totalNeedFollowUp}\n\n` +
-    `Booking Rate: ${s.bookingRate}\n` +
-    `Completion Rate: ${s.completionRate}\n` +
-    `Revenue (Completed Jobs): ${s.totalRevenue}\n\n` +
-    `Avg Response Time: ${s.avgResponseMinutes} min\n` +
-    `Median Response Time: ${s.medianResponseMinutes} min`;
+    `Today's Leads: ${s.todaysLeads}\n${stepLines}\n\n`;
 
   if (b) {
-    text +=
-      `\n\n📅 Bookings\n` +
-      `New Bookings Today: ${b.bookingsToday}\n` +
-      `Today's Booking Value: $${Number(b.valueToday).toFixed(0)}\n` +
-      `Total Bookings (all-time): ${b.totalBookings}`;
+    text += `Today's Bookings: ${b.bookingsToday} ($${Number(b.valueToday).toFixed(0)})\n`;
+  }
+  if (c) {
+    text += `Today's Completed Jobs: ${c.jobsToday} ($${Number(c.revenueToday).toFixed(0)})\n`;
+    text += `Today's Expenses: $${Number(c.expensesToday).toFixed(0)}\n`;
   }
 
+  const daysElapsed = daysElapsedInWeekEastern();
+  text += `\n📅 Week-to-Date (Sun–Sat)\n`;
+
   if (c) {
-    text +=
-      `\n\n✅ Completed Jobs\n` +
-      `Jobs Completed Today: ${c.jobsToday}\n` +
-      `Today's Revenue: $${Number(c.revenueToday).toFixed(0)}\n` +
-      `All-Time Jobs: ${c.totalJobsAllTime}\n` +
-      `All-Time Revenue: $${Number(c.revenueAllTime).toFixed(0)}\n` +
-      `Reviews Requested & Sent: ${c.reviewsSent}`;
+    text += paceLine("Revenue", Number(c.weekRevenue), WEEKLY_REVENUE_TARGET, daysElapsed, false) + "\n";
+    text += paceLine("Expenses", Number(c.weekExpenses), WEEKLY_EXPENSE_TARGET, daysElapsed, true) + "\n";
   }
+
+  const weekLeads = Number(s.weekLeads ?? 0);
+  const weekBooked = Number(s.weekBooked ?? 0);
+  const weekCompleted = Number(s.weekCompleted ?? 0);
+  if (weekLeads > 0) {
+    const bookingRatePct = (weekBooked / weekLeads) * 100;
+    const completionRatePct = (weekCompleted / weekLeads) * 100;
+    text +=
+      `Leads: ${weekLeads}\n` +
+      `  ${rateLine("Booking Rate", bookingRatePct, BOOKING_RATE_TARGET_PCT)}\n` +
+      `  ${rateLine("Completion Rate", completionRatePct, COMPLETION_RATE_TARGET_PCT)}\n`;
+  } else {
+    text += `Leads: 0 so far this week\n`;
+  }
+
+  text +=
+    `\n⏱ Response Times\n` +
+    `Avg: ${s.avgResponseMinutes} min\n` +
+    `Median: ${s.medianResponseMinutes} min`;
 
   await notifyTelegram(text);
   return new Response("Sent", { status: 200 });
