@@ -54,10 +54,12 @@ export async function setLeadState(customerId: string, state: Record<string, unk
   }).catch((err) => console.error("Failed to set lead state:", err));
 }
 
-// System prompt is static and identical across every call, so it's marked
-// cacheable - Anthropic charges roughly 10% of normal input price on a cache
-// hit, which matters a lot given how often this runs (every 2 min per lead
-// with new activity).
+// Not marked cache_control: this prompt is ~640 tokens, below Haiku's
+// ~2048-token minimum for a cacheable segment - the marker would be silently
+// ignored, and padding the prompt just to clear that bar would cost more
+// than it could ever save. The real savings comes from sending only new
+// messages per call (see extractLeadInfo/fetchConversationHistory), not from
+// caching this already-small, already-cheap fixed instruction block.
 const LEAD_EXTRACTION_SYSTEM_PROMPT =
   "Extract lead information from this Instagram DM conversation with a mobile car " +
   "detailing business. Respond with ONLY a JSON object (no markdown, no commentary) with " +
@@ -111,7 +113,7 @@ export async function extractLeadInfo(
     const response = await client.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 512,
-      system: [{ type: "text", text: LEAD_EXTRACTION_SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+      system: LEAD_EXTRACTION_SYSTEM_PROMPT,
       messages: [{ role: "user", content: userContent }],
     });
     const textBlock = response.content.find((b) => b.type === "text");
