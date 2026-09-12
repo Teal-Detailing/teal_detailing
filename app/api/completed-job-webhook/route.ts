@@ -130,10 +130,16 @@ async function verifyAndParse(request: NextRequest): Promise<any | null> {
 // starts, LockService contention). Without this, a slow call gets silently
 // killed along with the whole request - no error, no message, just nothing.
 // Aborting early lets us tell the user to retry instead of going dark.
-const APPS_SCRIPT_TIMEOUT_MS = 8000;
+//
+// 8s was too tight in practice: a plain sheet write (log_completed_job /
+// log_expense, no photo involved) has repeatedly taken longer than that on
+// Apps Script's side while still succeeding - our client gave up and showed
+// "something went wrong" even though the row was written moments later. Bumped
+// to give normal Apps Script slowness room without misreporting it as failure.
+const APPS_SCRIPT_TIMEOUT_MS = 15000;
 // Photo uploads carry a base64 payload plus an actual Drive write, both
 // slower than the plain sheet-row calls the default timeout is tuned for.
-const APPS_SCRIPT_UPLOAD_TIMEOUT_MS = 20000;
+const APPS_SCRIPT_UPLOAD_TIMEOUT_MS = 25000;
 
 async function fetchAppsScript(url: string, init?: RequestInit, timeoutMs: number = APPS_SCRIPT_TIMEOUT_MS): Promise<Response> {
   const controller = new AbortController();
