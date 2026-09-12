@@ -89,6 +89,9 @@ function parseCompletedJobText(text: string) {
     address,
     packageName,
     basePrice,
+    // Preserved so a later package-name correction (see recomputeJobPricing)
+    // can respect an explicit "(\$123)" override instead of discarding it.
+    overridePrice,
     discount,
     totalPackagePrice,
     addOns: addOns || "None",
@@ -101,6 +104,15 @@ function parseCompletedJobText(text: string) {
     reminderDate,
     notes,
   };
+}
+
+function recomputeJobPricing(job: PendingJob): PendingJob {
+  const basePrice = job.overridePrice ?? PACKAGE_PRICES[job.packageName.toLowerCase()] ?? 0;
+  const discountPct = parseNumber(job.discount);
+  const totalPackagePrice = discountPct ? basePrice * (1 - discountPct / 100) : basePrice;
+  const subtotal = totalPackagePrice + job.addOnPrice;
+  const total = subtotal + job.tip;
+  return { ...job, basePrice, totalPackagePrice, subtotal, total };
 }
 
 async function verifyAndParse(request: NextRequest): Promise<any | null> {
@@ -205,42 +217,94 @@ async function logCompletedJob(job: ReturnType<typeof parseCompletedJobText>): P
 
 type PendingJob = ReturnType<typeof parseCompletedJobText>;
 
-// Pending "awaiting a photo" state for /job, mirroring the expense session
-// below but keyed by its own store since /job's shape (parsed all at once
-// from a fixed text template) doesn't fit the step-by-step ExpenseSession.
-function jobPhotoStore() {
-  return getStore({ name: "job-photo-sessions", consistency: "strong" });
-}
+type JobFieldKey = "vehicleType" | "packageName" | "addOns" | "paymentType" | "source";
 
-async function getPendingJob(chatId: number): Promise<PendingJob | null> {
+type JobOptions = Record<JobFieldKey, string[]>;
+
+const JOB_FIELD_LABELS: Record<JobFieldKey, string> = {
+  vehicleType: "Vehicle Type",
+  packageName: "Package",
+  addOns: "Add-Ons",
+  paymentType: "Payment Type",
+  source: "Source",
+};
+
+// null means the call itself failed - kept distinct from "no options defined"
+// for the same reason as fetchExpenseOptions.
+async function fetchJobOptions(): Promise<JobOptions | null> {
+  const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
+  if (!webAppUrl) return null;
   try {
-    const raw = await jobPhotoStore().get(String(chatId), { type: "json" });
-    if (!raw) return null;
-    const { job, savedAt } = raw as { job: PendingJob; savedAt: number };
-    if (Date.now() - savedAt > EXPENSE_SESSION_TTL_MS) {
-      await jobPhotoStore().delete(String(chatId));
+    const res = await fetchAppsScript(`${webAppUrl}?listJobOptions=1`);
+    if (!res.ok) {
+      console.error("listJobOptions returned non-ok status:", res.status);
       return null;
     }
-    return job;
+    const data = await res.json();
+    if (!data || !Array.isArray(data.vehicleType)) {
+      console.error("listJobOptions returned unexpected shape:", data);
+      return null;
+    }
+    return data;
   } catch (err) {
-    console.error("Failed to get pending job:", err);
+    console.error("Failed to fetch job options:", err);
     return null;
   }
 }
 
-async function setPendingJob(chatId: number, job: PendingJob) {
+// Case/whitespace-insensitive match against the sheet's actual dropdown list,
+// returning the list's own canonical spelling (not whatever casing the user
+// typed) so what lands in the sheet exactly matches the validation rule.
+function findValidValue(value: string, options: string[]): string | null {
+  const trimmed = value.trim().toLowerCase();
+  return options.find((o) => o.trim().toLowerCase() === trimmed) ?? null;
+}
+
+type JobSession = {
+  job: PendingJob;
+  // Fields still needing a valid pick, in the order they'll be asked about.
+  // Empty means the job is fully valid and ready for the photo step.
+  invalidFields: JobFieldKey[];
+  options: JobOptions;
+};
+
+// Session state for /job, mirroring the expense session below but keyed by
+// its own store since /job's shape (parsed all at once from a fixed text
+// template, then possibly corrected field-by-field) doesn't fit
+// ExpenseSession's step-by-step shape.
+function jobSessionStore() {
+  return getStore({ name: "job-photo-sessions", consistency: "strong" });
+}
+
+async function getJobSession(chatId: number): Promise<JobSession | null> {
   try {
-    await jobPhotoStore().setJSON(String(chatId), { job, savedAt: Date.now() });
+    const raw = await jobSessionStore().get(String(chatId), { type: "json" });
+    if (!raw) return null;
+    const { session, savedAt } = raw as { session: JobSession; savedAt: number };
+    if (Date.now() - savedAt > EXPENSE_SESSION_TTL_MS) {
+      await jobSessionStore().delete(String(chatId));
+      return null;
+    }
+    return session;
   } catch (err) {
-    console.error("Failed to set pending job:", err);
+    console.error("Failed to get job session:", err);
+    return null;
   }
 }
 
-async function clearPendingJob(chatId: number) {
+async function setJobSession(chatId: number, session: JobSession) {
   try {
-    await jobPhotoStore().delete(String(chatId));
+    await jobSessionStore().setJSON(String(chatId), { session, savedAt: Date.now() });
   } catch (err) {
-    console.error("Failed to clear pending job:", err);
+    console.error("Failed to set job session:", err);
+  }
+}
+
+async function clearJobSession(chatId: number) {
+  try {
+    await jobSessionStore().delete(String(chatId));
+  } catch (err) {
+    console.error("Failed to clear job session:", err);
   }
 }
 
@@ -248,13 +312,93 @@ async function clearPendingJob(chatId: number) {
 // must never be held hostage by a slow photo upload. The photo (if any) is
 // attached as a fast follow-up afterward, via attachJobPhoto.
 async function finishJob(chatId: number, job: PendingJob): Promise<LogJobResult | null> {
-  const [result] = await Promise.all([logCompletedJob(job), clearPendingJob(chatId)]);
+  const [result] = await Promise.all([logCompletedJob(job), clearJobSession(chatId)]);
   if (result) {
     await replyToTelegram(chatId, `✅ Logged ${result.jobId}: ${job.customer} - ${job.packageName} - $${job.total.toFixed(0)} total`);
   } else {
     await replyToTelegram(chatId, "⚠️ Something went wrong logging that job - check the sheet.");
   }
   return result;
+}
+
+async function promptJobFieldFix(chatId: number, session: JobSession) {
+  const field = session.invalidFields[0];
+  const current = String(session.job[field]);
+  await sendMessage(
+    chatId,
+    `"${current}" isn't a valid ${JOB_FIELD_LABELS[field]} - pick one:`,
+    inlineKeyboard(session.options[field], `jobfix:${field}`)
+  );
+}
+
+async function promptJobPhotoStep(chatId: number, job: PendingJob) {
+  await sendMessage(
+    chatId,
+    `Got it - ${job.customer}, ${job.packageName}, $${job.total.toFixed(0)} total.\n\n📸 Send a photo of the car, or type /skip`
+  );
+}
+
+// Starts the /job flow: parse the pasted template, then validate the fields
+// backed by a sheet dropdown against the sheet's own actual list. A field
+// that already matches (typos and case aside) never interrupts the flow -
+// only a genuine mismatch triggers a one-tap correction, so the common case
+// (paste once, done) stays exactly as fast as before.
+async function startJobFlow(chatId: number, job: PendingJob) {
+  const options = await fetchJobOptions();
+  if (!options) {
+    await replyToTelegram(chatId, "⚠️ Couldn't validate that against the sheet just now - resend the /job template to try again.");
+    return;
+  }
+
+  const invalidFields: JobFieldKey[] = [];
+  let correctedJob = job;
+  (Object.keys(JOB_FIELD_LABELS) as JobFieldKey[]).forEach((field) => {
+    const valid = findValidValue(String(correctedJob[field]), options[field]);
+    if (valid !== null) {
+      correctedJob = { ...correctedJob, [field]: valid };
+    } else {
+      invalidFields.push(field);
+    }
+  });
+  // If the package name itself was invalid, pricing derived from it is
+  // unreliable - it gets recomputed once the user picks a valid package below.
+  if (!invalidFields.includes("packageName")) {
+    correctedJob = recomputeJobPricing(correctedJob);
+  }
+
+  const session: JobSession = { job: correctedJob, invalidFields, options };
+  await setJobSession(chatId, session);
+  if (invalidFields.length > 0) {
+    await promptJobFieldFix(chatId, session);
+  } else {
+    await promptJobPhotoStep(chatId, correctedJob);
+  }
+}
+
+async function handleJobFixCallback(chatId: number, callbackData: string, messageId: number) {
+  // callbackData: "jobfix:<field>:<value>" - split on the first two colons
+  // only, since the picked value itself may legitimately contain one.
+  const [, field, ...rest] = callbackData.split(":");
+  const value = rest.join(":");
+
+  const [session] = await Promise.all([getJobSession(chatId), stripInlineKeyboard(chatId, messageId)]);
+  if (session === null) {
+    await replyToTelegram(chatId, "⚠️ Lost track of that job entry (connection hiccup) - resend the /job template.");
+    return;
+  }
+  if (session.invalidFields[0] !== field) return; // stale duplicate tap, same guard as expense callbacks
+
+  let job = { ...session.job, [field as JobFieldKey]: value };
+  if (field === "packageName") job = recomputeJobPricing(job);
+  const invalidFields = session.invalidFields.slice(1);
+
+  const updated: JobSession = { ...session, job, invalidFields };
+  await setJobSession(chatId, updated);
+  if (invalidFields.length > 0) {
+    await promptJobFieldFix(chatId, updated);
+  } else {
+    await promptJobPhotoStep(chatId, job);
+  }
 }
 
 async function attachJobPhoto(chatId: number, row: number, photos: { file_id: string; width: number; height: number }[]) {
@@ -638,7 +782,7 @@ export async function POST(request: NextRequest) {
     const data: string | undefined = callbackQuery.data;
     const tasks: Promise<unknown>[] = [answerCallbackQuery(callbackQuery.id)];
     if (chatId && data && messageId) {
-      tasks.push(handleExpenseCallback(chatId, data, messageId));
+      tasks.push(data.startsWith("jobfix:") ? handleJobFixCallback(chatId, data, messageId) : handleExpenseCallback(chatId, data, messageId));
     }
     await Promise.all(tasks);
     return new NextResponse("OK", { status: 200 });
@@ -658,18 +802,14 @@ export async function POST(request: NextRequest) {
     if (!job.customer) {
       await replyToTelegram(chatId, "⚠️ Couldn't read that - make sure customer name is the first line after /job.");
     } else {
-      await setPendingJob(chatId, job);
-      await sendMessage(
-        chatId,
-        `Got it - ${job.customer}, ${job.packageName}, $${job.total.toFixed(0)} total.\n\n📸 Send a photo of the car, or type /skip`
-      );
+      await startJobFlow(chatId, job);
     }
   } else if (isExpenseStart && chatId) {
     await startExpenseFlow(chatId);
   } else if (chatId && photos && photos.length > 0) {
-    const pendingJob = await getPendingJob(chatId);
-    if (pendingJob) {
-      const result = await finishJob(chatId, pendingJob);
+    const jobSession = await getJobSession(chatId);
+    if (jobSession && jobSession.invalidFields.length === 0) {
+      const result = await finishJob(chatId, jobSession.job);
       if (result) await attachJobPhoto(chatId, result.row, photos);
     } else {
       const expenseSession = await getExpenseSession(chatId);
@@ -679,9 +819,9 @@ export async function POST(request: NextRequest) {
       }
     }
   } else if (isSkipCommand && chatId) {
-    const pendingJob = await getPendingJob(chatId);
-    if (pendingJob) {
-      await finishJob(chatId, pendingJob);
+    const jobSession = await getJobSession(chatId);
+    if (jobSession && jobSession.invalidFields.length === 0) {
+      await finishJob(chatId, jobSession.job);
     } else {
       const expenseSession = await getExpenseSession(chatId);
       if (expenseSession && expenseSession.step === "photo") {
