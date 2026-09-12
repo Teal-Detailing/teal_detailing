@@ -327,6 +327,37 @@ async function finishJob(chatId: number, job: PendingJob): Promise<LogJobResult 
   return result;
 }
 
+// Cross-account call: the Leads tracker lives under the personal account's
+// own Apps Script (GOOGLE_SHEETS_WEBAPP_URL), separate from the Completed
+// Jobs/Expenses script this webhook otherwise talks to. Matches purely by
+// phone number - no AI involved, so this costs nothing beyond the request.
+async function markLeadCompletedByPhone(phone: string): Promise<boolean> {
+  const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
+  if (!webAppUrl || !phone) return false;
+  try {
+    const res = await fetchAppsScript(webAppUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "mark_completed_by_phone", phone }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return !!data.matched;
+  } catch (err) {
+    console.error("Failed to mark lead completed by phone:", err);
+    return false;
+  }
+}
+
+// Best-effort follow-up after a job is logged - most completed jobs won't
+// match a tracked Lead (walk-ins, repeat customers, jobs sourced outside
+// Instagram), so silence on no-match is the right default, not an error.
+async function linkJobToLead(chatId: number, phone: string) {
+  if (await markLeadCompletedByPhone(phone)) {
+    await sendMessage(chatId, "🔗 Matching lead marked Completed.");
+  }
+}
+
 async function promptJobFieldFix(chatId: number, session: JobSession) {
   const field = session.invalidFields[0];
   const current = String(session.job[field]);
@@ -816,7 +847,10 @@ export async function POST(request: NextRequest) {
     const jobSession = await getJobSession(chatId);
     if (jobSession && jobSession.invalidFields.length === 0) {
       const result = await finishJob(chatId, jobSession.job);
-      if (result) await attachJobPhoto(chatId, result.row, photos);
+      if (result) {
+        await attachJobPhoto(chatId, result.row, photos);
+        await linkJobToLead(chatId, jobSession.job.phone);
+      }
     } else {
       const expenseSession = await getExpenseSession(chatId);
       if (expenseSession && expenseSession.step === "photo") {
@@ -827,7 +861,8 @@ export async function POST(request: NextRequest) {
   } else if (isSkipCommand && chatId) {
     const jobSession = await getJobSession(chatId);
     if (jobSession && jobSession.invalidFields.length === 0) {
-      await finishJob(chatId, jobSession.job);
+      const result = await finishJob(chatId, jobSession.job);
+      if (result) await linkJobToLead(chatId, jobSession.job.phone);
     } else {
       const expenseSession = await getExpenseSession(chatId);
       if (expenseSession && expenseSession.step === "photo") {
