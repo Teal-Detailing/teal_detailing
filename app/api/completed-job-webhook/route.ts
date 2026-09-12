@@ -211,17 +211,27 @@ type ExpenseSession = {
   options?: ExpenseOptions;
 };
 
-async function fetchExpenseOptions(): Promise<ExpenseOptions> {
+// null means the call itself failed (network/timeout/bad response) - kept
+// distinct from "genuinely no categories yet" so a transient Apps Script
+// hiccup doesn't get shown to the user as "go add a category manually".
+async function fetchExpenseOptions(): Promise<ExpenseOptions | null> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
-  const empty = { categories: [], paymentMethods: [], whoPaid: [] };
-  if (!webAppUrl) return empty;
+  if (!webAppUrl) return null;
   try {
     const res = await fetchAppsScript(`${webAppUrl}?listExpenseOptions=1`);
-    if (!res.ok) return empty;
-    return await res.json();
+    if (!res.ok) {
+      console.error("listExpenseOptions returned non-ok status:", res.status);
+      return null;
+    }
+    const data = await res.json();
+    if (!data || !Array.isArray(data.categories)) {
+      console.error("listExpenseOptions returned unexpected shape:", data);
+      return null;
+    }
+    return data;
   } catch (err) {
     console.error("Failed to fetch expense options:", err);
-    return empty;
+    return null;
   }
 }
 
@@ -300,6 +310,10 @@ async function logExpense(session: ExpenseSession, notes: string): Promise<boole
 
 async function startExpenseFlow(chatId: number) {
   const options = await fetchExpenseOptions();
+  if (!options) {
+    await replyToTelegram(chatId, "⚠️ Couldn't reach the Expenses sheet just now - tap 📝 Expense to try again.");
+    return;
+  }
   if (options.categories.length === 0) {
     await replyToTelegram(chatId, "⚠️ No categories found yet in the Expenses sheet - add one manually first.");
     return;
@@ -342,8 +356,6 @@ async function handleExpenseCallback(chatId: number, callbackData: string, messa
   const session = fetchedSession;
   if (session.step !== EXPECTED_STEP[kind]) return;
 
-  const options = session.options ?? (await fetchExpenseOptions());
-
   if (kind === "cat") {
     session.category = value;
     session.step = "price";
@@ -351,7 +363,10 @@ async function handleExpenseCallback(chatId: number, callbackData: string, messa
       setExpenseSession(chatId, session),
       sendMessage(chatId, `Category: ${value}\n\nEnter the price ($):`),
     ]);
-  } else if (kind === "date") {
+    return;
+  }
+
+  if (kind === "date") {
     if (value === "today") {
       session.expenseDate = todayInEastern().display;
     } else if (value === "yesterday") {
@@ -361,19 +376,35 @@ async function handleExpenseCallback(chatId: number, callbackData: string, messa
       await Promise.all([setExpenseSession(chatId, session), sendMessage(chatId, "Type the date (MM/DD/YYYY):")]);
       return;
     }
+    const options = session.options ?? (await fetchExpenseOptions());
+    if (!options) {
+      await replyToTelegram(chatId, "⚠️ Couldn't reach the Expenses sheet just now - please try again.");
+      return;
+    }
     session.step = "payment";
     await Promise.all([
       setExpenseSession(chatId, session),
       sendMessage(chatId, `Date: ${session.expenseDate}\n\nPayment method?`, inlineKeyboard(options.paymentMethods, "pay")),
     ]);
-  } else if (kind === "pay") {
+    return;
+  }
+
+  if (kind === "pay") {
+    const options = session.options ?? (await fetchExpenseOptions());
+    if (!options) {
+      await replyToTelegram(chatId, "⚠️ Couldn't reach the Expenses sheet just now - please try again.");
+      return;
+    }
     session.paymentMethod = value;
     session.step = "who_paid";
     await Promise.all([
       setExpenseSession(chatId, session),
       sendMessage(chatId, `Payment: ${value}\n\nWho paid?`, inlineKeyboard(options.whoPaid, "who")),
     ]);
-  } else if (kind === "who") {
+    return;
+  }
+
+  if (kind === "who") {
     session.whoPaid = value;
     session.step = "notes";
     await Promise.all([
@@ -402,6 +433,10 @@ async function handleExpenseTextStep(chatId: number, session: ExpenseSession, te
   } else if (session.step === "custom_date") {
     session.expenseDate = text.trim();
     const options = session.options ?? (await fetchExpenseOptions());
+    if (!options) {
+      await replyToTelegram(chatId, "⚠️ Couldn't reach the Expenses sheet just now - please try again.");
+      return;
+    }
     session.step = "payment";
     await Promise.all([
       setExpenseSession(chatId, session),
