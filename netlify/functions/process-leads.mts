@@ -30,12 +30,12 @@ export default async () => {
     }
 
     const priorState = await fetchLeadState(senderId);
-    const conversationText = await fetchConversationHistory(senderId, { onlyNew: !!priorState });
+    const { text: conversationText, lastMessageTimestamp } = await fetchConversationHistory(senderId, { onlyNew: !!priorState });
     const leadInfo = await extractLeadInfo(priorState, conversationText);
     if (leadInfo) {
       await setLeadState(senderId, leadInfo);
       if (String(leadInfo.isLead) !== "false") {
-        await upsertLead(senderId, username, leadInfo);
+        await upsertLead(senderId, username, leadInfo, lastMessageTimestamp);
       }
     }
     await markSenderProcessed(senderId);

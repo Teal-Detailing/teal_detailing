@@ -1,19 +1,28 @@
 import Anthropic from "@anthropic-ai/sdk";
 
-export async function fetchConversationHistory(customerId: string, opts?: { onlyNew?: boolean }): Promise<string> {
+export async function fetchConversationHistory(
+  customerId: string,
+  opts?: { onlyNew?: boolean }
+): Promise<{ text: string; lastMessageTimestamp: string | null }> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
-  if (!webAppUrl) return "";
+  if (!webAppUrl) return { text: "", lastMessageTimestamp: null };
   try {
     const onlyNewParam = opts?.onlyNew ? "&onlyNew=1" : "";
     const res = await fetch(`${webAppUrl}?senderId=${encodeURIComponent(customerId)}${onlyNewParam}`);
-    if (!res.ok) return "";
-    const messages: { direction: string; message: string }[] = await res.json();
-    return messages
+    if (!res.ok) return { text: "", lastMessageTimestamp: null };
+    const messages: { direction: string; message: string; timestamp?: string }[] = await res.json();
+    const text = messages
       .map((m) => `${m.direction === "incoming" ? "Customer" : "Teal Detailing"}: ${m.message}`)
       .join("\n");
+    // Used to stamp Last Contact Date with when the message actually arrived,
+    // not whenever this pipeline happens to get around to processing it -
+    // otherwise a backlogged message processed days late falsely looks like
+    // fresh activity from today.
+    const lastMessageTimestamp = messages.length > 0 ? messages[messages.length - 1].timestamp ?? null : null;
+    return { text, lastMessageTimestamp };
   } catch (err) {
     console.error("Failed to fetch conversation history:", err);
-    return "";
+    return { text: "", lastMessageTimestamp: null };
   }
 }
 
@@ -116,13 +125,18 @@ export async function extractLeadInfo(
   }
 }
 
-export async function upsertLead(customerId: string, username: string, fields: Record<string, unknown>) {
+export async function upsertLead(
+  customerId: string,
+  username: string,
+  fields: Record<string, unknown>,
+  lastMessageTimestamp?: string | null
+) {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return;
   await fetch(webAppUrl, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "upsert_lead", senderId: customerId, username, ...fields }),
+    body: JSON.stringify({ action: "upsert_lead", senderId: customerId, username, lastMessageTimestamp, ...fields }),
   }).catch((err) => console.error("Failed to upsert lead:", err));
 }
 
