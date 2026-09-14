@@ -45,6 +45,11 @@ async function getInstagramUsername(senderId: string): Promise<string | null> {
 
 function describeMessage(message: any): string | null {
   if (message?.text) return message.text;
+  // A quick-reply selection (common on ad-click conversations where the
+  // customer picks from preset options) can arrive with no `text` field -
+  // the chosen value lives here instead. Missing this is what silently
+  // dropped a real "replied to an ad" message before this fix.
+  if (message?.quick_reply?.payload) return message.quick_reply.payload;
   const attachments = message?.attachments;
   if (Array.isArray(attachments) && attachments.length > 0) {
     return attachments
@@ -113,7 +118,16 @@ export async function POST(request: NextRequest) {
         // For our own replies (echoes), the customer is the recipient, not the sender.
         const customerId = isEcho ? event.recipient?.id : event.sender?.id;
         const message = describeMessage(event.message);
-        if (!customerId || !message) continue; // skip read receipts, reactions, etc.
+        if (!customerId || !message) {
+          // Logged (not just silently skipped) so a genuinely new, unhandled
+          // event shape - like the ad-referral quick_reply case this fix
+          // addresses - shows up in Netlify's function logs instead of just
+          // vanishing with no trace.
+          if (event.message || event.referral) {
+            console.log("Skipped Instagram event with no extractable message:", JSON.stringify(event));
+          }
+          continue; // skip read receipts, reactions, etc.
+        }
 
         const mid: string | undefined = event.message?.mid;
         const timestamp = new Date(event.timestamp ?? Date.now()).toISOString();
