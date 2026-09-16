@@ -8,11 +8,28 @@ const WEEKLY_EXPENSE_TARGET = 700;
 const BOOKING_RATE_TARGET_PCT = 20;
 const COMPLETION_RATE_TARGET_PCT = 13;
 
+// Netlify's scheduled functions get no user watching them fail - an
+// unbounded fetch() that hangs until Apps Script (or the platform itself)
+// gives up can silently eat the whole run with zero output. Bounding each
+// call means a slow response fails fast enough to still send SOMETHING
+// (a partial digest, or the failure alert below) instead of nothing at all.
+const FETCH_TIMEOUT_MS = 15000;
+
+async function fetchWithTimeout(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function fetchDailySummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
-    const res = await fetch(`${webAppUrl}?dailySummary=1`);
+    const res = await fetchWithTimeout(`${webAppUrl}?dailySummary=1`);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -25,7 +42,7 @@ async function fetchBookingSummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
-    const res = await fetch(`${webAppUrl}?bookingSummary=1`);
+    const res = await fetchWithTimeout(`${webAppUrl}?bookingSummary=1`);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -42,7 +59,7 @@ async function fetchDailyOpsSummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return null;
   try {
-    const res = await fetch(`${webAppUrl}?dailyOpsSummary=1`);
+    const res = await fetchWithTimeout(`${webAppUrl}?dailyOpsSummary=1`);
     if (!res.ok) return null;
     return await res.json();
   } catch (err) {
@@ -91,7 +108,14 @@ function rateLine(label: string, actualPct: number, targetPct: number): string {
 
 export default async () => {
   const [s, b, c] = await Promise.all([fetchDailySummary(), fetchBookingSummary(), fetchDailyOpsSummary()]);
-  if (!s) return new Response("No summary available", { status: 200 });
+  if (!s) {
+    // Previously this just returned quietly - meaning a transient Apps
+    // Script hiccup at 11pm could skip the whole night's digest with no
+    // trace anywhere. Now at least you get told something broke instead of
+    // wondering why nothing arrived.
+    await notifyTelegram("⚠️ Daily summary failed to generate tonight - couldn't reach the Leads sheet. Check manually if needed.");
+    return new Response("No summary available", { status: 200 });
+  }
 
   const stepBreakdown = s.todaysLeadsByStep as Record<string, number> | undefined;
   const stepLines = stepBreakdown && Object.keys(stepBreakdown).length > 0
