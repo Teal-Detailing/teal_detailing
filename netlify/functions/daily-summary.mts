@@ -25,30 +25,35 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   }
 }
 
+// This only runs once a night, so trading a few extra seconds for
+// resilience is an easy call - Apps Script's occasional transient
+// slowness/errors (confirmed: two straight failures one minute apart, then
+// fine again moments later) are exactly the kind of blip a single retry
+// after a short pause is likely to clear.
+async function fetchJsonWithRetry(url: string, label: string): Promise<Record<string, unknown> | null> {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      const res = await fetchWithTimeout(url);
+      if (res.ok) return await res.json();
+      console.error(`${label} returned non-ok status on attempt ${attempt}:`, res.status);
+    } catch (err) {
+      console.error(`Failed to fetch ${label} on attempt ${attempt}:`, err);
+    }
+    if (attempt === 1) await new Promise((resolve) => setTimeout(resolve, 3000));
+  }
+  return null;
+}
+
 async function fetchDailySummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return null;
-  try {
-    const res = await fetchWithTimeout(`${webAppUrl}?dailySummary=1`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.error("Failed to fetch daily summary:", err);
-    return null;
-  }
+  return fetchJsonWithRetry(`${webAppUrl}?dailySummary=1`, "daily summary");
 }
 
 async function fetchBookingSummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.GOOGLE_SHEETS_WEBAPP_URL;
   if (!webAppUrl) return null;
-  try {
-    const res = await fetchWithTimeout(`${webAppUrl}?bookingSummary=1`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.error("Failed to fetch booking summary:", err);
-    return null;
-  }
+  return fetchJsonWithRetry(`${webAppUrl}?bookingSummary=1`, "booking summary");
 }
 
 // Reads directly from the Apps Script bound to the SAME spreadsheet the
@@ -58,14 +63,7 @@ async function fetchBookingSummary(): Promise<Record<string, unknown> | null> {
 async function fetchDailyOpsSummary(): Promise<Record<string, unknown> | null> {
   const webAppUrl = process.env.COMPLETED_JOBS_WEBAPP_URL;
   if (!webAppUrl) return null;
-  try {
-    const res = await fetchWithTimeout(`${webAppUrl}?dailyOpsSummary=1`);
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    console.error("Failed to fetch daily ops summary:", err);
-    return null;
-  }
+  return fetchJsonWithRetry(`${webAppUrl}?dailyOpsSummary=1`, "daily ops summary");
 }
 
 async function notifyTelegram(text: string) {
@@ -128,10 +126,14 @@ export default async () => {
 
   if (b) {
     text += `Today's Bookings: ${b.bookingsToday} ($${Number(b.valueToday).toFixed(0)})\n`;
+  } else {
+    text += `⚠️ Bookings data unavailable tonight (couldn't reach the Leads sheet's booking data)\n`;
   }
   if (c) {
     text += `Today's Completed Jobs: ${c.jobsToday} ($${Number(c.revenueToday).toFixed(0)})\n`;
     text += `Today's Expenses: $${Number(c.expensesToday).toFixed(0)}\n`;
+  } else {
+    text += `⚠️ Completed Jobs / Expenses data unavailable tonight (couldn't reach that sheet)\n`;
   }
 
   const daysElapsed = daysElapsedInWeekEastern();
@@ -140,6 +142,8 @@ export default async () => {
   if (c) {
     text += paceLine("Revenue", Number(c.weekRevenue), WEEKLY_REVENUE_TARGET, daysElapsed, false) + "\n";
     text += paceLine("Expenses", Number(c.weekExpenses), WEEKLY_EXPENSE_TARGET, daysElapsed, true) + "\n";
+  } else {
+    text += `⚠️ Revenue/Expenses pacing unavailable tonight\n`;
   }
 
   const weekLeads = Number(s.weekLeads ?? 0);
