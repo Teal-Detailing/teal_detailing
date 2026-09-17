@@ -9,6 +9,7 @@ import { PHONE_DISPLAY, PHONE_HREF } from '@/lib/constants'
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/gallery', label: 'Our Work' },
+  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ]

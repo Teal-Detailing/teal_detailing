@@ -127,6 +127,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/blog" className="text-sm hover:text-teal-400 transition-colors">
+                  Blog
+                </Link>
+              </li>
+              <li>
                 <Link href="/contact" className="text-sm hover:text-teal-400 transition-colors">
                   Contact
                 </Link>
@@ -162,6 +167,9 @@ export default function Footer() {
             </Link>
             <Link href="/gallery" className="hover:text-slate-300 transition-colors">
               Our Work
+            </Link>
+            <Link href="/blog" className="hover:text-slate-300 transition-colors">
+              Blog
             </Link>
             <Link href="/contact" className="hover:text-slate-300 transition-colors">
               Contact
