@@ -8,12 +8,19 @@ const WEEKLY_EXPENSE_TARGET = 700;
 const BOOKING_RATE_TARGET_PCT = 20;
 const COMPLETION_RATE_TARGET_PCT = 13;
 
-// Netlify's scheduled functions get no user watching them fail - an
-// unbounded fetch() that hangs until Apps Script (or the platform itself)
-// gives up can silently eat the whole run with zero output. Bounding each
-// call means a slow response fails fast enough to still send SOMETHING
-// (a partial digest, or the failure alert below) instead of nothing at all.
-const FETCH_TIMEOUT_MS = 15000;
+// Confirmed by direct testing: a single isolated call to either Apps Script
+// project answers in ~4s, but hitting the SAME script again immediately
+// (as this file's old Promise.all did, firing 2 simultaneous requests at
+// the Leads script alone) balloons response time to 20-75+ seconds, even a
+// stray 404 once. That's Apps Script's concurrent-execution limit on a
+// personal (non-Workspace) Google account - much tighter than a Workspace
+// account's. Fetches below are sequential specifically to stop generating
+// that contention ourselves; the timeout is generous because scheduled
+// functions get a long execution budget (unlike a user-facing request) and
+// real-world latency under any *external* contention has been seen well
+// past 15s.
+const FETCH_TIMEOUT_MS = 40000;
+const RETRY_DELAYS_MS = [5000, 10000];
 
 async function fetchWithTimeout(url: string): Promise<Response> {
   const controller = new AbortController();
@@ -25,13 +32,13 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   }
 }
 
-// This only runs once a night, so trading a few extra seconds for
-// resilience is an easy call - Apps Script's occasional transient
-// slowness/errors (confirmed: two straight failures one minute apart, then
-// fine again moments later) are exactly the kind of blip a single retry
-// after a short pause is likely to clear.
+// This only runs once a night, so trading extra time for resilience is an
+// easy call - Apps Script's concurrency-driven slowness is exactly the
+// kind of thing a retry after a real pause (not just a few seconds) is
+// likely to clear, once whatever else was contending for execution slots
+// has moved on.
 async function fetchJsonWithRetry(url: string, label: string): Promise<Record<string, unknown> | null> {
-  for (let attempt = 1; attempt <= 2; attempt++) {
+  for (let attempt = 1; attempt <= RETRY_DELAYS_MS.length + 1; attempt++) {
     try {
       const res = await fetchWithTimeout(url);
       if (res.ok) return await res.json();
@@ -39,7 +46,8 @@ async function fetchJsonWithRetry(url: string, label: string): Promise<Record<st
     } catch (err) {
       console.error(`Failed to fetch ${label} on attempt ${attempt}:`, err);
     }
-    if (attempt === 1) await new Promise((resolve) => setTimeout(resolve, 3000));
+    const delay = RETRY_DELAYS_MS[attempt - 1];
+    if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
   }
   return null;
 }
@@ -105,7 +113,11 @@ function rateLine(label: string, actualPct: number, targetPct: number): string {
 }
 
 export default async () => {
-  const [s, b, c] = await Promise.all([fetchDailySummary(), fetchBookingSummary(), fetchDailyOpsSummary()]);
+  // Sequential, not Promise.all - see the note above fetchWithTimeout on why
+  // firing these concurrently was itself causing the slowness/failures.
+  const s = await fetchDailySummary();
+  const b = await fetchBookingSummary();
+  const c = await fetchDailyOpsSummary();
   if (!s) {
     // Previously this just returned quietly - meaning a transient Apps
     // Script hiccup at 11pm could skip the whole night's digest with no
