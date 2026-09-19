@@ -146,6 +146,45 @@ export async function toWebJpeg(input: Buffer, width: number): Promise<Buffer> {
     .toBuffer();
 }
 
+// ------------------------------------------------------------------ post body
+
+// Where each photo sits is a layout detail, not worth failing a whole draft
+// (and paying for another) over: the model occasionally drops a marker,
+// repeats one, or spells it loosely. Normalise instead - one of each, with a
+// missing BEFORE going after the opening paragraph and a missing AFTER going
+// before the last section (usually the "keeping it that way" advice).
+export function placeImages(body: string): { body: string; found: Record<string, number> } {
+  const found: Record<string, number> = {};
+  let out = body;
+  for (const role of ["BEFORE", "AFTER"]) {
+    const loose = new RegExp(`\\{\\{\\s*${role}[_ ]?IMAGE\\s*\\}\\}`, "gi");
+    const marker = `{{${role}_IMAGE}}`;
+    found[role] = (out.match(loose) ?? []).length;
+    let seen = false;
+    out = out.replace(loose, () => (seen ? "" : ((seen = true), marker)));
+  }
+  out = out.replace(/\n{3,}/g, "\n\n").trim();
+
+  // A marker written mid-sentence would drop the photo inside a paragraph;
+  // lift it out onto its own line right after that paragraph.
+  const paragraphs = out.split(/\n{2,}/).flatMap((p) => {
+    const markers = p.match(/\{\{(?:BEFORE|AFTER)_IMAGE\}\}/g);
+    if (!markers || p.trim() === markers[0]) return [p];
+    const text = p.replace(/\s*\{\{(?:BEFORE|AFTER)_IMAGE\}\}\s*/g, " ").trim();
+    return [text, ...markers].filter(Boolean);
+  });
+  if (!found.BEFORE) {
+    const firstProse = paragraphs.findIndex((p) => !p.startsWith("#"));
+    paragraphs.splice(firstProse + 1, 0, "{{BEFORE_IMAGE}}");
+  }
+  if (!found.AFTER) {
+    const headings = paragraphs.map((p, i) => (p.startsWith("## ") ? i : -1)).filter((i) => i >= 0);
+    const at = headings.length >= 2 ? headings[headings.length - 1] : paragraphs.length;
+    paragraphs.splice(at, 0, "{{AFTER_IMAGE}}");
+  }
+  return { body: paragraphs.join("\n\n"), found };
+}
+
 // ------------------------------------------------------------------ Telegram
 
 type InlineKeyboard = { inline_keyboard: { text: string; callback_data: string }[][] };

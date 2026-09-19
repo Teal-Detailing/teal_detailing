@@ -6,7 +6,7 @@ import { getAllPosts, getPostBySlug, validateFrontmatter, BLOG_DIR } from "@/lib
 import { getCityBySlug } from "@/lib/cities";
 import {
   SITE, addSkippedJob, approvalKeyboard, commitAndPush, downloadTelegramFile, getPhoto, hashJobId,
-  listJobs, listPhotos, readState, retryKeyboard, sendDocument, sendPhotos, sendText, toWebJpeg,
+  listJobs, listPhotos, placeImages, readState, retryKeyboard, sendDocument, sendPhotos, sendText, toWebJpeg,
   todayEastern, trySendText, type Job, type JobPhoto,
 } from "./lib";
 import { writeDraft, type Draft } from "./writer";
@@ -41,9 +41,6 @@ function uniqueSlug(base: string): string {
 
 // A final guard on what the model returned, independent of the prompt.
 function checkDraft(draft: Draft) {
-  for (const marker of ["{{BEFORE_IMAGE}}", "{{AFTER_IMAGE}}"]) {
-    if (draft.body.split(marker).length !== 2) throw new Error(`The post must contain ${marker} exactly once`);
-  }
   const words = draft.body.trim().split(/\s+/).length;
   if (words < MIN_WORDS) throw new Error(`The post is too short (${words} words)`);
   if (/\(?\b\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}\b/.test(draft.body)) {
@@ -121,6 +118,10 @@ async function draftFromJob(job: Job, before: JobPhoto, after: JobPhoto): Promis
 If the wrong photos are named, rename them and tap Try again.`);
     return "unusable";
   }
+  const placed = placeImages(draft.body);
+  // Counts only - never the text itself, since these logs are public.
+  console.log(`Photo markers written by the model: before=${placed.found.BEFORE} after=${placed.found.AFTER}`);
+  draft.body = placed.body;
   checkDraft(draft);
 
   const slug = uniqueSlug(slugify(draft.slug || draft.title));
