@@ -5,7 +5,10 @@ Every Monday at 10am Eastern, the agent:
 1. Reads recent completed jobs that have a **Drive folder link** in the sheet
 2. Picks the newest job it hasn't written about whose folder has a photo named **before** and one named **after**
 3. Drafts a case-study post from those two photos and sends it to Telegram: the photos, the full text, and buttons
-4. **✅ Publish** → builds the site with the post, commits it, and Netlify deploys it (~3 min)
+4. **✅ Publish** → builds the site with the post, commits it, and Netlify deploys it (~3 min).
+   The bot then sends a **Google Business Profile update** — the after photo plus a short text
+   to paste into your profile's *Add update*, with a *Learn more* button linking to the post.
+   (The draft preview shows this text too, so you approve both together.)
    **🔄 Different job** → skips this job and drafts from the next one
    **⏭ Skip job** → skips this job; nothing is posted this week
 

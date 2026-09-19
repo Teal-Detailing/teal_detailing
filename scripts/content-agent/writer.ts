@@ -18,6 +18,7 @@ export type Draft = {
   beforeAlt: string;
   afterAlt: string;
   body: string;
+  businessProfileUpdate: string;
 };
 
 const citySlugs = cities.map((c) => c.slug);
@@ -42,6 +43,7 @@ const DRAFT_SCHEMA = {
   required: [
     "usable", "unusableReason", "privacyFlags", "title", "slug",
     "excerpt", "keywords", "relatedServices", "relatedCities", "faqs", "beforeAlt", "afterAlt", "body",
+    "businessProfileUpdate",
   ],
   properties: {
     usable: { type: "boolean" },
@@ -65,6 +67,7 @@ const DRAFT_SCHEMA = {
     beforeAlt: { type: "string" },
     afterAlt: { type: "string" },
     body: { type: "string" },
+    businessProfileUpdate: { type: "string" },
   },
 };
 
@@ -87,7 +90,11 @@ The post:
 - Tell it as something a car owner can use: what the car came in with, why that problem happens (South Florida conditions especially), what the crew did and why, the result, and how an owner can keep it that way.
 - Link 1-3 relevant service pages as /services/<slug>, and the city page as /<city-slug>/mobile-car-detailing when the job's city has one, using markdown links with natural anchor text. Use only slugs from the lists provided; relatedServices and relatedCities come from the same lists.
 - Match the voice of the example post: direct, specific, plain-spoken, no hype, no exclamation marks, no filler openings.
-- title: specific and searchable, under 70 characters - what was fixed, the vehicle type, and the city usually make a good title. slug: lowercase words joined by hyphens, under 60 characters. excerpt: one or two sentences, under 200 characters. keywords: 3-6 phrases a car owner would search. faqs: 2-3 questions an owner would actually search, each answered in 1-3 sentences of general guidance consistent with the post. beforeAlt / afterAlt: a literal description of each photo; they become the image alt text and captions.`;
+- title: specific and searchable, under 70 characters - what was fixed, the vehicle type, and the city usually make a good title. slug: lowercase words joined by hyphens, under 60 characters. excerpt: one or two sentences, under 200 characters. keywords: 3-6 phrases a car owner would search. faqs: 2-3 questions an owner would actually search, each answered in 1-3 sentences of general guidance consistent with the post. beforeAlt / afterAlt: a literal description of each photo; they become the image alt text and captions.
+
+The Google Business Profile update:
+- businessProfileUpdate is a short update the owner posts on the company's Google Business Profile alongside the after photo, linking to the full post. 60-120 words of plain text: lead with the result a car owner cares about, mention the vehicle type and city, and close by pointing to the full story.
+- No phone numbers, links, hashtags, or emojis - Google rejects updates containing phone numbers, and the link goes on the update's button. The same accuracy rules apply as for the post.`;
 
 export async function writeDraft(input: {
   job: Job;

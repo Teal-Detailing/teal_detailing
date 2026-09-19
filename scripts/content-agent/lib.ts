@@ -185,6 +185,25 @@ export function placeImages(body: string): { body: string; found: Record<string,
   return { body: paragraphs.join("\n\n"), found };
 }
 
+// Google Business Profile rejects updates containing phone numbers, and a
+// link belongs on the update's button, not in its text - so both are removed
+// here rather than trusted to the prompt. Google's limit is 1,500 characters.
+export function cleanBusinessUpdate(text: string): string {
+  let out = text
+    .replace(/\(?\+?1?[\s.-]?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/g, "")
+    .replace(/\b(?:https?:\/\/|www\.)\S+/gi, "")
+    .replace(/[ \t]+([.,!?;:])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  if (out.length > 1500) {
+    const cut = out.slice(0, 1500);
+    const end = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf(".\n"));
+    out = end > 0 ? cut.slice(0, end + 1) : cut;
+  }
+  return out;
+}
+
 // ------------------------------------------------------------------ Telegram
 
 type InlineKeyboard = { inline_keyboard: { text: string; callback_data: string }[][] };
@@ -236,6 +255,14 @@ export async function sendPhotos(photos: { buffer: Buffer; caption: string }[]) 
     form.append(`photo${i}`, new Blob([new Uint8Array(p.buffer)], { type: "image/jpeg" }), `photo${i}.jpg`);
   });
   await telegram("sendMediaGroup", form);
+}
+
+export async function sendPhoto(buffer: Buffer, caption: string) {
+  const form = new FormData();
+  form.append("chat_id", chatId());
+  form.append("caption", caption.slice(0, 1024));
+  form.append("photo", new Blob([new Uint8Array(buffer)], { type: "image/jpeg" }), "photo.jpg");
+  await telegram("sendPhoto", form);
 }
 
 export async function sendDocument(fileName: string, content: string, caption: string, replyMarkup: InlineKeyboard) {

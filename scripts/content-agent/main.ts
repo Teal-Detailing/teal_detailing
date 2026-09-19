@@ -6,7 +6,8 @@ import { getAllPosts, getPostBySlug, validateFrontmatter, BLOG_DIR } from "@/lib
 import { getCityBySlug } from "@/lib/cities";
 import {
   SITE, addSkippedJob, approvalKeyboard, commitAndPush, downloadTelegramFile, getPhoto, hashJobId,
-  listJobs, listPhotos, placeImages, readState, retryKeyboard, sendDocument, sendPhotos, sendText, toWebJpeg,
+  cleanBusinessUpdate, listJobs, listPhotos, placeImages, readState, retryKeyboard, sendDocument, sendPhoto,
+  sendPhotos, sendText, toWebJpeg,
   todayEastern, trySendText, type Job, type JobPhoto,
 } from "./lib";
 import { writeDraft, type Draft } from "./writer";
@@ -18,7 +19,9 @@ const MAX_JOBS_CHECKED = 15;
 const MAX_DRAFTS_PER_RUN = 3;
 const MIN_WORDS = 400;
 
-type DraftMeta = { slug: string; jobHash: string; folderId: string; before: string; after: string };
+// gbp is optional: drafts created before the Business Profile update existed
+// don't carry one, and still publish.
+type DraftMeta = { slug: string; jobHash: string; folderId: string; before: string; after: string; gbp?: string };
 
 type Payload = { action?: string; job?: string; docFileId?: string };
 
@@ -76,7 +79,7 @@ function buildMdx(draft: Draft, meta: DraftMeta): string {
 
 // Telegram shows the draft as plain text so it can be read in the chat before
 // deciding - markdown syntax that would just be noise there is flattened.
-function readable(draft: Draft): string[] {
+function readable(draft: Draft, gbp: string): string[] {
   const text = [
     draft.title.toUpperCase(),
     draft.excerpt,
@@ -85,6 +88,7 @@ function readable(draft: Draft): string[] {
       .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
       .replace(/^#{2,3}\s+(.*)$/gm, (_, heading) => `\n■ ${heading}`),
     draft.faqs.length ? "FAQ\n" + draft.faqs.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n") : "",
+    gbp ? `📍 GOOGLE BUSINESS PROFILE UPDATE\n(sent to you ready to paste once you publish)\n\n${gbp}` : "",
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -125,7 +129,8 @@ If the wrong photos are named, rename them and tap Try again.`);
   checkDraft(draft);
 
   const slug = uniqueSlug(slugify(draft.slug || draft.title));
-  const meta: DraftMeta = { slug, jobHash, folderId: job.folderId, before: before.id, after: after.id };
+  const gbp = cleanBusinessUpdate(draft.businessProfileUpdate ?? "");
+  const meta: DraftMeta = { slug, jobHash, folderId: job.folderId, before: before.id, after: after.id, gbp };
   const mdx = buildMdx(draft, meta);
 
   const parsed = matter(mdx).data;
@@ -148,7 +153,7 @@ If the wrong photos are named, rename them and tap Try again.`);
     { buffer: beforeJpg, caption: `Before — ${draft.beforeAlt}` },
     { buffer: afterJpg, caption: `After — ${draft.afterAlt}` },
   ]);
-  for (const chunk of readable(draft)) await sendText(chunk);
+  for (const chunk of readable(draft, gbp)) await sendText(chunk);
   await sendDocument(
     `${slug}.md`,
     mdx,
@@ -262,7 +267,23 @@ async function runPublish(docFileId: string) {
   }
 
   commitAndPush(`Publish blog post: ${String(data.title)}`, [postPath, imageDir]);
-  await sendText(`✅ Published — live in about 3 minutes:\n${SITE}/blog/${meta.slug}`);
+  const url = `${SITE}/blog/${meta.slug}`;
+  await sendText(`✅ Published — live in about 3 minutes:\n${url}`);
+
+  // Until the Business Profile API is approved, the update is delivered for
+  // pasting by hand: the photo, then the text alone in its own message so a
+  // long-press copies exactly that and nothing else.
+  if (meta.gbp) {
+    await sendText(
+      `📍 Google Business Profile update — once the post is live:\n\n` +
+        `1. Open your Business Profile (Google Maps app → your business, or search "Teal Detailing" on Google) → Add update\n` +
+        `2. Save the photo below and add it\n` +
+        `3. Copy the text in the last message and paste it\n` +
+        `4. Button: Learn more → ${url}`
+    );
+    await sendPhoto(afterJpg, "After photo for the update");
+    await sendText(meta.gbp);
+  }
   console.log(`Published ${meta.slug}`);
 }
 
