@@ -7,8 +7,6 @@ import type { Job, JobPhoto } from "./lib";
 export type Draft = {
   usable: boolean;
   unusableReason: string;
-  beforePhoto: number;
-  afterPhoto: number;
   privacyFlags: string[];
   title: string;
   slug: string;
@@ -42,14 +40,12 @@ const DRAFT_SCHEMA = {
   type: "object",
   additionalProperties: false,
   required: [
-    "usable", "unusableReason", "beforePhoto", "afterPhoto", "privacyFlags", "title", "slug",
+    "usable", "unusableReason", "privacyFlags", "title", "slug",
     "excerpt", "keywords", "relatedServices", "relatedCities", "faqs", "beforeAlt", "afterAlt", "body",
   ],
   properties: {
     usable: { type: "boolean" },
     unusableReason: { type: "string" },
-    beforePhoto: { type: "integer" },
-    afterPhoto: { type: "integer" },
     privacyFlags: stringArray,
     title: { type: "string" },
     slug: { type: "string" },
@@ -72,7 +68,7 @@ const DRAFT_SCHEMA = {
   },
 };
 
-const SYSTEM_PROMPT = `You write case-study blog posts for Teal Detailing, a mobile car detailing company serving Miami-Dade, Broward, and Palm Beach counties in South Florida. Each post is built from one real completed job - the job record and the photos the crew took - and you also choose which two photos illustrate it.
+const SYSTEM_PROMPT = `You write case-study blog posts for Teal Detailing, a mobile car detailing company serving Miami-Dade, Broward, and Palm Beach counties in South Florida. Each post is built from one real completed job: the job record, and a before and an after photo the owner picked from that job.
 
 These posts are worth publishing only because they describe something that really happened, so accuracy comes first:
 - State as fact only what the job record says or what is clearly visible in the photos. General detailing knowledge - why a technique works, how South Florida's sun, salt air, rain, sand, and humidity affect cars - is welcome as context, framed as general knowledge rather than a claim about this job.
@@ -81,9 +77,9 @@ These posts are worth publishing only because they describe something that reall
 - The customer is anonymous. Never include names, phone numbers, street names, or house numbers. Refer to location at city or neighborhood level only.
 
 Photos:
-- Pick one BEFORE and one AFTER photo, ideally the same area from a similar angle so the difference is obvious. File and subfolder names are hints ("before", "after", "IMG_1234"); trust what you see over the names.
-- In privacyFlags, list anything in the two chosen photos that deserves a second look before publishing: a readable license plate, a person's face, a house number or identifiable home exterior, documents or personal items showing names. Use an empty list if there is nothing.
-- If the photos can't support an honest before/after post - no clear before and after, too blurry, mostly people - set usable to false, explain why in unusableReason, and leave the other fields empty (0 for the photo numbers).
+- The first photo is BEFORE and the second is AFTER - the owner chose and labelled them. Describe what each actually shows.
+- In privacyFlags, list anything in either photo that deserves a second look before publishing: a readable license plate, a person's face, a house number or identifiable home exterior, documents or personal items showing names. Use an empty list if there is nothing.
+- If the pair can't support an honest before/after post - they show different vehicles, the "before" already looks finished, or they're too blurry to tell - set usable to false, explain why in unusableReason, and leave the other fields empty.
 
 The post:
 - 650-1,000 words of MDX body. No frontmatter and no H1 - the title is rendered separately. Use ## and ### headings.
@@ -91,15 +87,16 @@ The post:
 - Tell it as something a car owner can use: what the car came in with, why that problem happens (South Florida conditions especially), what the crew did and why, the result, and how an owner can keep it that way.
 - Link 1-3 relevant service pages as /services/<slug>, and the city page as /<city-slug>/mobile-car-detailing when the job's city has one, using markdown links with natural anchor text. Use only slugs from the lists provided; relatedServices and relatedCities come from the same lists.
 - Match the voice of the example post: direct, specific, plain-spoken, no hype, no exclamation marks, no filler openings.
-- title: specific and searchable, under 70 characters - what was fixed, the vehicle type, and the city usually make a good title. slug: lowercase words joined by hyphens, under 60 characters. excerpt: one or two sentences, under 200 characters. keywords: 3-6 phrases a car owner would search. faqs: 2-3 questions an owner would actually search, each answered in 1-3 sentences of general guidance consistent with the post. beforeAlt / afterAlt: a literal description of each chosen photo; they become the image alt text and captions.`;
+- title: specific and searchable, under 70 characters - what was fixed, the vehicle type, and the city usually make a good title. slug: lowercase words joined by hyphens, under 60 characters. excerpt: one or two sentences, under 200 characters. keywords: 3-6 phrases a car owner would search. faqs: 2-3 questions an owner would actually search, each answered in 1-3 sentences of general guidance consistent with the post. beforeAlt / afterAlt: a literal description of each photo; they become the image alt text and captions.`;
 
 export async function writeDraft(input: {
   job: Job;
-  photos: JobPhoto[];
+  before: JobPhoto;
+  after: JobPhoto;
   existingTitles: string[];
   examplePost: string;
 }): Promise<Draft> {
-  const { job, photos } = input;
+  const { job } = input;
 
   const steps = packageSteps(job.packageName);
   const facts = [
@@ -111,7 +108,7 @@ export async function writeDraft(input: {
       : `Steps included in that package: unknown - describe the work only in general terms`,
     `Add-ons: ${job.addOns || "none"}`,
     `Crew notes: ${job.notes || "none"}`,
-    `Area: ${job.area || "not recorded"} (mention only the city or neighborhood)`,
+    `City: ${job.area || "not recorded - don't name a city"}`,
   ].join("\n");
 
   const content: Anthropic.Beta.BetaContentBlockParam[] = [
@@ -123,22 +120,19 @@ export async function writeDraft(input: {
         `Allowed city slugs:\n${cities.map((c) => `${c.slug} (${c.name})`).join("\n")}`,
         `Existing post titles - take a different angle from these:\n${input.existingTitles.join("\n") || "(none yet)"}`,
         `Example post, for voice only:\n<example>\n${input.examplePost}\n</example>`,
-        `The job's photos follow, numbered from 1.`,
+        `The two photos follow.`,
       ].join("\n\n"),
     },
   ];
 
-  photos.forEach((photo, i) => {
-    content.push({
-      type: "text",
-      text: `Photo ${i + 1} - file: ${photo.name}${photo.folder ? `, subfolder: ${photo.folder}` : ""}`,
-    });
+  for (const [label, photo] of [["BEFORE", input.before], ["AFTER", input.after]] as const) {
+    content.push({ type: "text", text: label });
     content.push({
       type: "image",
       source: { type: "base64", media_type: "image/jpeg", data: photo.thumb ?? "" },
     });
-  });
-  content.push({ type: "text", text: "Pick the two photos and write the post." });
+  }
+  content.push({ type: "text", text: "Write the post." });
 
   const client = new Anthropic();
   const message = await client.beta.messages

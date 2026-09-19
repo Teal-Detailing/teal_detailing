@@ -2,14 +2,22 @@
 
 Every Monday at 10am Eastern, the agent:
 
-1. Reads recent completed jobs that have a before/after **Drive folder link** in the sheet
-2. Picks the newest job it hasn't written about, looks at the photos, and chooses a before + after pair
-3. Drafts a case-study post and sends it to Telegram: the two photos, the full text, and buttons
+1. Reads recent completed jobs that have a **Drive folder link** in the sheet
+2. Picks the newest job it hasn't written about whose folder has a photo named **before** and one named **after**
+3. Drafts a case-study post from those two photos and sends it to Telegram: the photos, the full text, and buttons
 4. **✅ Publish** → builds the site with the post, commits it, and Netlify deploys it (~3 min)
    **🔄 Different job** → skips this job and drafts from the next one
    **⏭ Skip job** → skips this job; nothing is posted this week
 
 Send `/draft` to the bot at any time to run it without waiting for Monday.
+
+## Choosing a job for a post
+
+In the job's Drive folder, rename the best two photos so their names contain the word
+**before** and **after** — `before.jpg`, `After.HEIC`, `IMG_4410 after.jpg` all work.
+Only those two are used; the rest of the folder can hold any number of other shots.
+Jobs without a named pair are simply passed over, so renaming is also how you choose
+which jobs become posts.
 
 Nothing reaches GitHub until you tap Publish — this repo is public, so rejected drafts and
 their photos only ever exist in your Telegram chat.
@@ -31,12 +39,20 @@ This is a **new, separate** script. It does not touch the `/job` bot's script.
    - `SPREADSHEET_ID` — the long ID in the sheet's URL: `docs.google.com/spreadsheets/d/`**`THIS_PART`**`/edit`
    - `API_KEY` — a random string. Generate one in Terminal with `openssl rand -hex 32` and keep it for step 4.
    - `JOBS_SHEET_NAME` — *optional*, only if the jobs are not on the first tab that has folder links.
-6. **Deploy → New deployment** → type **Web app** → Execute as **Me** → Who has access **Anyone** → **Deploy**.
-   Approve the permissions prompt (it asks for read-only access to Sheets and Drive).
-7. Copy the **Web app URL** (ends in `/exec`).
+6. In the function menu at the top of the editor pick **authorize** → **Run** → **Review permissions** → choose the account.
+   Google shows *"Google hasn't verified this app"* for any personal script: **Advanced → Go to Teal content agent → Allow**.
+   The log at the bottom should list your spreadsheet and how many jobs have a photo folder.
+   (Google requires full Sheets permission to open a sheet by ID; the script itself only reads.)
+7. **Deploy → New deployment** → type **Web app** → Execute as **Me** → Who has access **Anyone** → **Deploy**.
+8. Copy the **Web app URL** (ends in `/exec`).
+
+**Changing the script later:** edits don't reach the live URL until you redeploy. Use
+**Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** - that keeps the same URL.
+A *new* deployment gets a new URL, and the `CONTENT_SCRIPT_URL` secret would need updating.
 
 The script only returns what a published post could safely use: vehicle type, package, add-ons,
-notes, city, and photos. Customer names, phone numbers, prices, and street addresses never leave the sheet.
+notes, the city (only if it's a recognised South Florida city), and the two named photos.
+Customer names, phone numbers, prices, and street addresses never leave the sheet.
 
 ## 2. Telegram bot
 
@@ -97,8 +113,8 @@ It should answer `"ok":true`.
 
 ## 7. Try it
 
-1. Add a Drive folder link with before/after photos to a recent job in the sheet
-   (make sure that Google account can open the folder).
+1. In a recent job's folder, rename the best two photos to **before** and **after**.
+   If the photos are on a **Shared Drive**, the account that owns the sheet must be a member of it.
 2. Send `/draft` to the bot. A draft arrives in a few minutes.
 3. Read it, then tap a button.
 
@@ -112,9 +128,13 @@ hashed job IDs, never job details.
 
 | Message | Fix |
 |---|---|
-| `didn't return JSON` | The Apps Script deployment isn't set to access **Anyone** — redeploy (step 1.6) |
+| `didn't return JSON` | The Apps Script deployment isn't set to access **Anyone** — redeploy (step 1.7) |
 | `unauthorized` | `CONTENT_SCRIPT_KEY` doesn't match the script's `API_KEY` property |
-| `No tab contains a Drive folder link yet` | No job row has a folder link, or set `JOBS_SHEET_NAME` |
+| `Specified permissions are not sufficient` | Update `appsscript.json`, run **authorize** (step 1.6), then redeploy as a new version |
+| `No item with the given ID could be found` | The script's Google account isn't a member of the Shared Drive holding the photos - add it under the Shared Drive's **Manage members** |
+| `Sheets API returned 403` / `has not been used in project` | In the script editor, **Services (+)** → add **Google Sheets API** and **Drive API**, save, redeploy as a new version |
+| `No post this week — no recent job has a photo named "before"…` | Rename two photos in a job's folder (see *Choosing a job for a post*), then tap Try again |
+| `No tab contains a Drive folder link yet` | Run **findPhotoLinks** in the editor: it lists which columns hold Drive links and whether they point at folders. Check `SPREADSHEET_ID` is the sheet you add links to |
 | `Folder is not linked from any job` | The link was removed from the sheet after the draft was made |
 | `Could not render photo` | Drive has no preview for that file yet — wait a few minutes and try again |
 | Buttons do nothing | Re-run step 6, and check the Netlify variables in step 5 |

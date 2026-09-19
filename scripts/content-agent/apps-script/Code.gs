@@ -12,12 +12,18 @@
  *   JOBS_SHEET_NAME  optional - tab holding completed jobs. Defaults to the
  *                    first tab where any row contains a Drive folder link.
  *
+ * Google requires full Sheets permission for SpreadsheetApp.openById, even
+ * though this script only ever reads.
+ *
  * It never returns customer names, phone numbers, prices, or street numbers -
  * the agent runs in a public GitHub repo's Actions, so it only ever receives
  * what a published post could safely use.
  */
 
-var FOLDER_URL = /drive\.google\.com\/(?:drive\/(?:u\/\d+\/)?folders\/|open\?id=)([A-Za-z0-9_-]{10,})/;
+// Folder links only. The old "open?id=" form is deliberately not matched: it
+// can point at a single file, and the /job bot's photo column would then be
+// mistaken for a job's photo folder.
+var FOLDER_URL = /drive\.google\.com\/drive\/(?:u\/\d+\/)?folders\/([A-Za-z0-9_-]{10,})/;
 
 function doGet(e) {
   try {
@@ -26,12 +32,79 @@ function doGet(e) {
     if (!expected || p.key !== expected) return json_({ error: 'unauthorized' });
 
     if (p.action === 'jobs') return json_({ jobs: listJobs_(Number(p.days) || 120) });
-    if (p.action === 'photos') return json_({ photos: listPhotos_(p.folderId) });
+    if (p.action === 'photos') return json_(listPhotos_(p.folderId));
     if (p.action === 'photo') return json_(getPhoto_(p.folderId, p.fileId, Number(p.size) || 1800));
     return json_({ error: 'unknown action' });
   } catch (err) {
     return json_({ error: String((err && err.message) || err) });
   }
+}
+
+// Run once from the editor (pick "authorize" in the function menu -> Run).
+// It exists to bring up Google's permission prompt, and doubles as a setup
+// check: it opens the newest job's actual photo folder - usually on a Shared
+// Drive - so a membership problem shows up here rather than in Telegram.
+function authorize() {
+  var ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'));
+  Logger.log('Spreadsheet: ' + ss.getName());
+  Logger.log('Jobs tab: ' + jobsSheet_().getName());
+
+  var jobs = listJobs_(120);
+  Logger.log('Jobs with a photo folder (last 120 days): ' + jobs.length);
+  if (!jobs.length) return;
+
+  var folder;
+  try {
+    folder = DriveApp.getFolderById(jobs[0].folderId);
+  } catch (err) {
+    Logger.log('CANNOT OPEN the newest job folder. Add ' + Session.getEffectiveUser().getEmail() +
+      ' as a member of the Shared Drive, then run this again. (' + err.message + ')');
+    return;
+  }
+  var pair = namedPair_(jobs[0].folderId);
+  Logger.log('Newest job folder: "' + folder.getName() + '" - ' + pair.total + ' photo(s), ' +
+    'named before: ' + (pair.before ? pair.before.name : 'NONE') + ', named after: ' + (pair.after ? pair.after.name : 'NONE'));
+  var sample = pair.before || pair.after;
+  if (sample) Logger.log('Photo preview: ' + (thumbnail_(sample.id, 200) ? 'OK' : 'FAILED'));
+  Logger.log('City sent to the agent: ' + (jobs[0].area || '(none recognised)'));
+}
+
+// Troubleshooting: shows where Drive links appear in the sheet and in what
+// form. Prints tab and column names only - never cell contents.
+function findPhotoLinks() {
+  var ss = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID'));
+  Logger.log('Spreadsheet: ' + ss.getName());
+  ss.getSheets().forEach(function (sheet) {
+    var range = sheet.getDataRange();
+    var values = range.getDisplayValues();
+    var formulas = range.getFormulas();
+    var rich = range.getRichTextValues();
+    var chips = chipLinks_(sheet);
+    var header = values[0] || [];
+    var found = {};
+    for (var r = 1; r < values.length; r++) {
+      for (var c = 0; c < values[r].length; c++) {
+        var rt = rich[r][c];
+        var link = rt ? (rt.getLinkUrl() || rt.getRuns().map(function (x) { return x.getLinkUrl(); }).filter(String)[0]) : '';
+        var kinds = [];
+        [['chip or link', (chips[r + ',' + c] || []).join(' ')], ['pasted URL', values[r][c]],
+         ['formula', formulas[r][c]], ['link text', link]].forEach(function (p) {
+          var v = String(p[1] || '');
+          if (/drive\.google\.com|docs\.google\.com/.test(v)) {
+            kinds.push(p[0] + (/\/folders\//.test(v) ? ' to a folder' : /\/file\/d\//.test(v) ? ' to a single FILE' : ''));
+          }
+        });
+        if (kinds.length) {
+          var key = '"' + (header[c] || 'column ' + (c + 1)) + '" as ' + kinds.join(' + ');
+          found[key] = (found[key] || 0) + 1;
+        }
+      }
+    }
+    Logger.log('Tab "' + sheet.getName() + '" - ' + (values.length - 1) + ' rows - columns: ' + header.join(' | '));
+    var keys = Object.keys(found);
+    keys.forEach(function (k) { Logger.log('    Drive links in ' + k + ': ' + found[k] + ' row(s)'); });
+    if (!keys.length) Logger.log('    no Drive links the script can read');
+  });
 }
 
 function json_(obj) {
@@ -56,22 +129,23 @@ function jobsSheet_() {
   throw new Error('No tab contains a Drive folder link yet');
 }
 
-// A folder link can arrive three ways: pasted as plain text, as a chip/rich
-// text link whose visible text is something like "Photos", or as a
-// =HYPERLINK() formula. Checking all three means it's found however it was
-// added.
+// A folder link can arrive four ways: as a smart chip (Sheets' default when
+// a Drive link is pasted - a grey pill showing the folder name), as plain
+// pasted text, as a link behind other text, or as a =HYPERLINK() formula.
+// Checking all four means it's found however it was added.
 function readRows_(sheet) {
   var range = sheet.getDataRange();
   var values = range.getDisplayValues();
   var rich = range.getRichTextValues();
   var formulas = range.getFormulas();
+  var chips = chipLinks_(sheet);
   var header = values[0] || [];
   var rows = [];
 
   for (var r = 1; r < values.length; r++) {
     var folderId = null;
     for (var c = 0; c < values[r].length && !folderId; c++) {
-      var candidates = [values[r][c], formulas[r][c]];
+      var candidates = [values[r][c], formulas[r][c]].concat(chips[r + ',' + c] || []);
       var rt = rich[r][c];
       if (rt) {
         candidates.push(rt.getLinkUrl());
@@ -87,6 +161,43 @@ function readRows_(sheet) {
   return rows;
 }
 
+// SpreadsheetApp can't see the link inside a smart chip - it only returns
+// the chip's display text (the folder name). The Sheets API returns it as
+// CellData.chipRuns[].chip.richLinkProperties.uri. Keys are "row,col",
+// 0-based from A1, matching getDataRange().
+function chipLinks_(sheet) {
+  var range = "'" + sheet.getName().replace(/'/g, "''") + "'";
+  var url = 'https://sheets.googleapis.com/v4/spreadsheets/' + sheet.getParent().getId() +
+    '?ranges=' + encodeURIComponent(range) +
+    '&fields=' + encodeURIComponent('sheets.data(startRow,startColumn,rowData.values(hyperlink,chipRuns))');
+  var res = UrlFetchApp.fetch(url, {
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    muteHttpExceptions: true
+  });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('Sheets API returned ' + res.getResponseCode() + ': ' + res.getContentText().slice(0, 300));
+  }
+
+  var links = {};
+  var grids = ((JSON.parse(res.getContentText()).sheets || [])[0] || {}).data || [];
+  grids.forEach(function (grid) {
+    var r0 = grid.startRow || 0;
+    var c0 = grid.startColumn || 0;
+    (grid.rowData || []).forEach(function (row, ri) {
+      (row.values || []).forEach(function (cell, ci) {
+        var found = [];
+        if (cell.hyperlink) found.push(cell.hyperlink);
+        (cell.chipRuns || []).forEach(function (run) {
+          var props = run.chip && run.chip.richLinkProperties;
+          if (props && props.uri) found.push(props.uri);
+        });
+        if (found.length) links[(r0 + ri) + ',' + (c0 + ci)] = found;
+      });
+    });
+  });
+  return links;
+}
+
 function column_(header, include, exclude) {
   for (var i = 0; i < header.length; i++) {
     var h = String(header[i]);
@@ -99,13 +210,45 @@ function cell_(row, idx) {
   return idx >= 0 ? String(row.cells[idx] || '').trim() : '';
 }
 
-// "123 Main St, Apt 4, Miami, FL 33130" -> "Miami, FL 33130". The agent only
-// needs the city; the street never leaves the spreadsheet.
-function areaOnly_(address) {
-  var parts = address.split(',').map(function (s) { return s.trim(); }).filter(String);
-  if (parts.length >= 3) return parts.slice(-2).join(', ');
-  if (parts.length === 2) return parts[1];
-  return address.replace(/^\s*\d+[A-Za-z]?\s+/, '').replace(/\b(apt|unit|suite|#)\s*\S+/ig, '').trim();
+// Only a recognised city ever leaves the sheet - never the street. The
+// City/Area column holds full addresses, often without commas
+// ("123 sw 1st st Miami fl 33100"), so the city is matched from a known
+// list, anchored to the end of the address so a street like "N Miami Ave"
+// isn't mistaken for the city. No match means no location at all.
+var CITIES = [
+  'North Miami Beach', 'Miami Beach', 'North Miami', 'Miami Gardens', 'Miami Lakes', 'Miami Springs',
+  'Miami Shores', 'South Miami', 'Miami', 'Doral', 'Hialeah Gardens', 'Hialeah', 'Kendall', 'Westchester',
+  'Sweetwater', 'Coral Gables', 'Pinecrest', 'Palmetto Bay', 'Cutler Bay', 'Homestead', 'Florida City',
+  'Key Biscayne', 'Aventura', 'Sunny Isles Beach', 'Bal Harbour', 'Surfside', 'Opa-locka', 'Medley',
+  'Fort Lauderdale', 'Hollywood', 'Pembroke Pines', 'Miramar', 'Davie', 'Plantation', 'Sunrise', 'Weston',
+  'Cooper City', 'Southwest Ranches', 'Coral Springs', 'Tamarac', 'Lauderhill', 'Lauderdale Lakes',
+  'Lauderdale-by-the-Sea', 'Oakland Park', 'Wilton Manors', 'Pompano Beach', 'Deerfield Beach',
+  'Hallandale Beach', 'Dania Beach', 'Margate', 'Coconut Creek', 'Parkland', 'Lighthouse Point',
+  'North Lauderdale', 'West Park', 'Boca Raton', 'Delray Beach', 'Boynton Beach', 'Lake Worth Beach',
+  'Lake Worth', 'Lantana', 'West Palm Beach', 'Palm Beach Gardens', 'North Palm Beach', 'Royal Palm Beach',
+  'Palm Beach', 'Jupiter', 'Tequesta', 'Wellington', 'Greenacres', 'Riviera Beach', 'Loxahatchee'
+];
+
+var CITY_AT_END = new RegExp(
+  '(?:^|[\\s,])(' + CITIES.map(function (c) { return c.replace(/-/g, '[- ]'); }).join('|') + ')' +
+  '\\s*,?\\s*(?:fl|fla|florida)?\\.?\\s*,?\\s*(?:\\d{5}(?:-\\d{4})?)?\\s*,?\\s*(?:usa?)?\\s*$',
+  'i'
+);
+
+function cityOf_(address) {
+  var normalised = String(address)
+    .replace(/\bft\.?\s+/ig, 'fort ')
+    .replace(/\bn\.?\s+(miami|palm)/ig, 'north $1')
+    .replace(/\bw\.?\s+palm/ig, 'west palm')
+    .replace(/\s+/g, ' ')
+    .trim();
+  var m = normalised.match(CITY_AT_END);
+  if (!m) return '';
+  var hit = m[1].toLowerCase().replace(/[- ]/g, '');
+  for (var i = 0; i < CITIES.length; i++) {
+    if (CITIES[i].toLowerCase().replace(/[- ]/g, '') === hit) return CITIES[i] + ', FL';
+  }
+  return '';
 }
 
 function listJobs_(days) {
@@ -122,7 +265,7 @@ function listJobs_(days) {
     pkg: column_(h, /package/i, /price|total/i),
     addOns: column_(h, /add.?ons?/i, /price/i),
     notes: column_(h, /notes?/i),
-    address: column_(h, /address|location/i)
+    address: column_(h, /address|location|city|area/i)
   };
 
   var cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
@@ -139,7 +282,7 @@ function listJobs_(days) {
         packageName: cell_(r, col.pkg),
         addOns: cell_(r, col.addOns),
         notes: cell_(r, col.notes),
-        area: areaOnly_(cell_(r, col.address)),
+        area: cityOf_(cell_(r, col.address)),
         folderId: r.folderId
       };
     })
@@ -159,7 +302,7 @@ function assertKnownFolder_(folderId) {
 
 function collectImages_(folder, label, out, depth) {
   var files = folder.getFiles();
-  while (files.hasNext() && out.length < 30) {
+  while (files.hasNext() && out.length < 300) {
     var f = files.next();
     if (/^image\//.test(f.getMimeType())) {
       out.push({ id: f.getId(), name: f.getName(), folder: label, created: f.getDateCreated().toISOString() });
@@ -175,16 +318,45 @@ function collectImages_(folder, label, out, depth) {
   }
 }
 
+// The owner marks the pair to publish by renaming two photos in the job's
+// folder so the names contain the word "before" and "after" ("before.jpg",
+// "Before 2.HEIC", "IMG_4410 after.jpg"). Only those two are ever read, so
+// a folder can hold any number of other shots - and a folder with no named
+// pair simply isn't used for a post.
+function photoRole_(name) {
+  var base = String(name).replace(/\.[^.]+$/, '').toLowerCase();
+  var isBefore = /(^|[^a-z])before([^a-z]|$)/.test(base);
+  var isAfter = /(^|[^a-z])after([^a-z]|$)/.test(base);
+  if (isBefore === isAfter) return null;
+  return isBefore ? 'before' : 'after';
+}
+
+function namedPair_(folderId) {
+  var all = [];
+  collectImages_(DriveApp.getFolderById(folderId), '', all, 0);
+  // With several "before" photos, the plainest name wins: "before.jpg" over "before 2.jpg".
+  var pick = function (role) {
+    return all
+      .filter(function (p) { return photoRole_(p.name) === role; })
+      .sort(function (a, b) { return a.name.length - b.name.length || (a.name < b.name ? -1 : 1); })[0] || null;
+  };
+  return { total: all.length, before: pick('before'), after: pick('after') };
+}
+
 function listPhotos_(folderId) {
   assertKnownFolder_(folderId);
-  var out = [];
-  collectImages_(DriveApp.getFolderById(folderId), '', out, 0);
-  out.sort(function (a, b) { return a.created < b.created ? -1 : 1; });
-  return out.slice(0, 24).map(function (p) {
+  var pair = namedPair_(folderId);
+  var photos = [];
+  [['before', pair.before], ['after', pair.after]].forEach(function (entry) {
+    var p = entry[1];
+    if (!p) return;
     var blob = thumbnail_(p.id, 800);
-    p.thumb = blob ? Utilities.base64Encode(blob.getBytes()) : null;
-    return p;
+    photos.push({
+      id: p.id, name: p.name, folder: p.folder, created: p.created, role: entry[0],
+      thumb: blob ? Utilities.base64Encode(blob.getBytes()) : null
+    });
   });
+  return { total: pair.total, photos: photos };
 }
 
 function getPhoto_(folderId, fileId, size) {

@@ -11,9 +11,11 @@ import {
 } from "./lib";
 import { writeDraft, type Draft } from "./writer";
 
-// How many candidate jobs one run will try before giving up - bounds model
-// spend when several recent jobs turn out to have unusable photos.
-const MAX_JOBS_PER_RUN = 3;
+// Checking a folder for a named before/after pair costs nothing but an Apps
+// Script call, so a run can look through many jobs; model calls are the
+// part that costs money, and those are capped separately.
+const MAX_JOBS_CHECKED = 15;
+const MAX_DRAFTS_PER_RUN = 3;
 const MIN_WORDS = 400;
 
 type DraftMeta = { slug: string; jobHash: string; folderId: string; before: string; after: string };
@@ -38,11 +40,7 @@ function uniqueSlug(base: string): string {
 }
 
 // A final guard on what the model returned, independent of the prompt.
-function checkDraft(draft: Draft, photoCount: number) {
-  const inRange = (n: number) => Number.isInteger(n) && n >= 1 && n <= photoCount;
-  if (!inRange(draft.beforePhoto) || !inRange(draft.afterPhoto) || draft.beforePhoto === draft.afterPhoto) {
-    throw new Error("The model picked invalid photo numbers");
-  }
+function checkDraft(draft: Draft) {
   for (const marker of ["{{BEFORE_IMAGE}}", "{{AFTER_IMAGE}}"]) {
     if (draft.body.split(marker).length !== 2) throw new Error(`The post must contain ${marker} exactly once`);
   }
@@ -107,24 +105,24 @@ function readable(draft: Draft): string[] {
   return chunks;
 }
 
-async function draftFromJob(job: Job, photos: JobPhoto[]): Promise<"sent" | "unusable"> {
+async function draftFromJob(job: Job, before: JobPhoto, after: JobPhoto): Promise<"sent" | "unusable"> {
   const jobHash = hashJobId(job.jobId);
   const posts = getAllPosts();
   const example = posts.find((p) => p.category === "case-study") ?? posts[0];
   const examplePost = example ? getPostBySlug(example.slug)?.content ?? "" : "";
 
-  console.log(`Drafting from job ${jobHash} with ${photos.length} photos`);
-  const draft = await writeDraft({ job, photos, existingTitles: posts.map((p) => p.title), examplePost });
+  console.log(`Drafting from job ${jobHash}`);
+  const draft = await writeDraft({ job, before, after, existingTitles: posts.map((p) => p.title), examplePost });
 
   if (!draft.usable) {
     console.log(`Job ${jobHash} judged unusable`);
-    await sendText(`ℹ️ Passed over a ${job.vehicleType || "job"} from ${job.date || "recently"}: ${draft.unusableReason}`);
+    await sendText(`ℹ️ Passed over ${job.jobId}: ${draft.unusableReason}
+
+If the wrong photos are named, rename them and tap Try again.`);
     return "unusable";
   }
-  checkDraft(draft, photos.length);
+  checkDraft(draft);
 
-  const before = photos[draft.beforePhoto - 1];
-  const after = photos[draft.afterPhoto - 1];
   const slug = uniqueSlug(slugify(draft.slug || draft.title));
   const meta: DraftMeta = { slug, jobHash, folderId: job.folderId, before: before.id, after: after.id };
   const mdx = buildMdx(draft, meta);
@@ -144,7 +142,7 @@ async function draftFromJob(job: Job, photos: JobPhoto[]): Promise<"sent" | "unu
     ? `\n\n⚠️ Check before publishing:\n${draft.privacyFlags.map((f) => `• ${f}`).join("\n")}`
     : "";
 
-  await sendText(`📝 This week's draft — ${[job.vehicleType, job.packageName, city].filter(Boolean).join(" · ")}`);
+  await sendText(`📝 This week's draft — ${[job.jobId, job.vehicleType, job.packageName, city].filter(Boolean).join(" · ")}`);
   await sendPhotos([
     { buffer: beforeJpg, caption: `Before — ${draft.beforeAlt}` },
     { buffer: afterJpg, caption: `After — ${draft.afterAlt}` },
@@ -178,44 +176,47 @@ async function runDraft() {
     return;
   }
 
-  const passedOver: string[] = [];
+  // Jobs are used only once the owner has named a before and an after photo
+  // in the folder. Nothing is recorded for jobs passed over here - naming the
+  // photos later makes them eligible again.
+  const notReady: string[] = [];
+  let drafts = 0;
   let sent = false;
-  for (const job of candidates.slice(0, MAX_JOBS_PER_RUN)) {
-    const photos = (await listPhotos(job.folderId)).filter((p) => p.thumb);
-    if (photos.length < 2) {
-      // Not recorded as skipped - photos may still be on their way.
-      console.log(`Job ${hashJobId(job.jobId)} has ${photos.length} photos; trying the next job`);
+  for (const job of candidates.slice(0, MAX_JOBS_CHECKED)) {
+    if (drafts >= MAX_DRAFTS_PER_RUN) break;
+    const { photos } = await listPhotos(job.folderId);
+    const before = photos.find((p) => p.role === "before");
+    const after = photos.find((p) => p.role === "after");
+    if (!before || !after) {
+      notReady.push(`${job.jobId}: no photo named ${!before && !after ? '"before" or "after"' : !before ? '"before"' : '"after"'}`);
+      continue;
+    }
+    if (!before.thumb || !after.thumb) {
+      notReady.push(`${job.jobId}: Drive hasn't made previews of the named photos yet`);
       continue;
     }
 
     // Thumbnails come from Drive in whatever format it rendered; normalise so
     // the model always gets small JPEGs.
-    const normalised = await Promise.all(
-      photos.map(async (p) => ({
-        ...p,
-        thumb: (await toWebJpeg(Buffer.from(p.thumb!, "base64"), 800)).toString("base64"),
-      }))
-    );
+    const small = async (p: JobPhoto) => ({
+      ...p,
+      thumb: (await toWebJpeg(Buffer.from(p.thumb!, "base64"), 800)).toString("base64"),
+    });
 
-    if ((await draftFromJob(job, normalised)) === "sent") {
+    drafts++;
+    if ((await draftFromJob(job, await small(before), await small(after))) === "sent") {
       sent = true;
       break;
     }
-    const jobHash = hashJobId(job.jobId);
-    if (addSkippedJob(jobHash)) passedOver.push(jobHash);
   }
 
   if (!sent) {
+    const checked = notReady.length
+      ? `\n\nJobs checked:\n${notReady.slice(0, 8).map((line) => `• ${line}`).join("\n")}`
+      : "";
     await sendText(
-      `📭 Checked ${Math.min(candidates.length, MAX_JOBS_PER_RUN)} recent job(s) but none had a usable before/after pair, so no post this week.`,
+      `📭 No post this week — no recent job has a photo named "before" and one named "after" in its folder.${checked}\n\nRename the best two photos in a job's folder, then tap below.`,
       retryKeyboard
-    );
-  }
-
-  if (passedOver.length) {
-    commitAndPush(
-      `Content agent: pass over ${passedOver.length} job(s) with unusable photos [skip netlify]`,
-      ["scripts/content-agent/state.json"]
     );
   }
 }

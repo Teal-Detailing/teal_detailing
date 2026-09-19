@@ -87,6 +87,7 @@ export type JobPhoto = {
   name: string;
   folder: string;
   created: string;
+  role: "before" | "after";
   thumb: string | null;
 };
 
@@ -119,9 +120,10 @@ export async function listJobs(days = 120): Promise<Job[]> {
   return jobs;
 }
 
-export async function listPhotos(folderId: string): Promise<JobPhoto[]> {
-  const { photos } = await callScript<{ photos: JobPhoto[] }>({ action: "photos", folderId });
-  return photos;
+// The photos named "before" and "after" in a job's folder - at most one of
+// each - plus how many photos the folder holds in total.
+export async function listPhotos(folderId: string): Promise<{ photos: JobPhoto[]; total: number }> {
+  return callScript<{ photos: JobPhoto[]; total: number }>({ action: "photos", folderId });
 }
 
 export async function getPhoto(folderId: string, fileId: string): Promise<Buffer> {
