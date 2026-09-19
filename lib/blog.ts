@@ -37,6 +37,10 @@ export interface PostFrontmatter {
   keywords?: string[]
   faqs?: BlogFaq[]
   draft?: boolean
+  // Hash of the completed-job ID a case study was written from. Hashed
+  // because the repo is public and the raw ID is internal; the content agent
+  // only needs it to avoid writing about the same job twice.
+  sourceJob?: string
 }
 
 export interface Post extends PostFrontmatter {
@@ -54,7 +58,7 @@ const REQUIRED_FIELDS: (keyof PostFrontmatter)[] = [
 // Posts are written by an agent, so a malformed file is a question of when,
 // not if. Failing the build with the offending filename beats silently
 // shipping a post with no title or a category that renders nowhere.
-function validate(slug: string, data: Record<string, unknown>): PostFrontmatter {
+export function validateFrontmatter(slug: string, data: Record<string, unknown>): PostFrontmatter {
   for (const field of REQUIRED_FIELDS) {
     if (!data[field]) {
       throw new Error(`Blog post "${slug}" is missing required frontmatter: ${field}`)
@@ -92,7 +96,7 @@ function readPost(fileName: string): Post {
   const slug = fileName.replace(/\.mdx?$/, '')
   const raw = fs.readFileSync(path.join(BLOG_DIR, fileName), 'utf8')
   const { data, content } = matter(raw)
-  const frontmatter = validate(slug, data)
+  const frontmatter = validateFrontmatter(slug, data)
 
   const words = content.trim().split(/\s+/).length
 

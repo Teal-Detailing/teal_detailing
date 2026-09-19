@@ -1,0 +1,50 @@
+name: Content agent
+
+# Weekly: drafts a case-study post from a recent completed job and sends it to
+# Telegram for approval. The Publish / Skip / Different job buttons in
+# Telegram come back through /api/content-bot-webhook as repository_dispatch.
+
+on:
+  schedule:
+    # Mondays 14:00 UTC = 10am Eastern (9am in winter).
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+  repository_dispatch:
+    types: [content-agent]
+
+permissions:
+  contents: write
+
+# One run at a time: a publish and a skip landing together would otherwise
+# race on the same commit to main.
+concurrency:
+  group: content-agent
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Run content agent
+        # The payload is passed through env and parsed as JSON by the script -
+        # never interpolated into the shell, since it originates from a
+        # Telegram button press.
+        env:
+          CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CONTENT_BOT_TOKEN: ${{ secrets.CONTENT_BOT_TOKEN }}
+          CONTENT_BOT_CHAT_ID: ${{ secrets.CONTENT_BOT_CHAT_ID }}
+          CONTENT_SCRIPT_URL: ${{ secrets.CONTENT_SCRIPT_URL }}
+          CONTENT_SCRIPT_KEY: ${{ secrets.CONTENT_SCRIPT_KEY }}
+          NEXT_TELEMETRY_DISABLED: 1
+        run: npx tsx scripts/content-agent/main.ts

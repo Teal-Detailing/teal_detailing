@@ -39,7 +39,7 @@ function PostImage({ src = '', alt = '' }: React.ComponentPropsWithoutRef<'img'>
         alt={alt}
         width={1200}
         height={800}
-        className="rounded-2xl w-full h-auto shadow-card"
+        className="rounded-2xl w-auto max-w-full h-auto max-h-[75vh] mx-auto shadow-card"
         sizes="(max-width: 768px) 100vw, 768px"
       />
       {alt ? (

@@ -151,15 +151,19 @@ export default function BlogPostPage({ params }: { params: { slug: string } }) {
 
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           {post.image ? (
-            <Image
-              src={post.image}
-              alt={post.imageAlt ?? post.title}
-              width={1200}
-              height={675}
-              priority
-              className="rounded-2xl w-full h-auto shadow-card mb-12"
-              sizes="(max-width: 768px) 100vw, 768px"
-            />
+            // A fixed frame, since case-study photos come straight off a phone
+            // and are usually portrait - uncropped they'd push the post a full
+            // screen down.
+            <div className="relative aspect-[16/10] mb-12 rounded-2xl overflow-hidden shadow-card bg-slate-100">
+              <Image
+                src={post.image}
+                alt={post.imageAlt ?? post.title}
+                fill
+                priority
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
           ) : null}
 
           <PostBody source={post.content} />
